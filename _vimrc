@@ -1,23 +1,48 @@
-if has('kaoriya')
-	let g:no_vimrc_example=0
-	let g:vimrc_local_finish=1
-	let g:gvimrc_local_finish=1
- 
-	"$VIM/plugins/kaoriya/autodate.vim
-	let plugin_autodate_disable  = 1
-	"$VIM/plugins/kaoriya/cmdex.vim
-	let plugin_cmdex_disable     = 1
-	"$VIM/plugins/kaoriya/dicwin.vim
-	let plugin_dicwin_disable    = 1
-	"$VIMRUNTIME/plugin/format.vim
-	let plugin_format_disable    = 1
-	"$VIM/plugins/kaoriya/hz_ja.vim
-	let plugin_hz_ja_disable     = 1
-	"$VIM/plugins/kaoriya/scrnmode.vim
-	let plugin_scrnmode_disable  = 1
-	"$VIM/plugins/kaoriya/verifyenc.vim
-	let plugin_verifyenc_disable = 1
+set pythonthreedll = "/c/Users/icses/Anaconda3"
+"set pythonthreedll = "/c/Python35"
+"dein Scripts-----------------------------
+if &compatible
+  set nocompatible               " Be iMproved
 endif
+
+let s:dein_path = expand('~/.vim/dein')
+let s:dein_repo_path = s:dein_path . 'repos/github.com/Shougo/dein.vim'
+
+" dein.vimがなければgithubからclone
+if &runtimepath !~# '/dein.vim'
+  if !isdirectory(s:dein_repo_path)
+    execute '!git clone https://github.com/Shougo/dein.vim' s:dein_repo_path
+  endif
+  execute 'set runtimepath^=' . fnamemodify(s:dein_repo_path, ':p')
+endif
+
+" Required:
+if dein#load_state(s:dein_path)
+  call dein#begin(s:dein_path)
+
+  let g:config_dir = expand('~/.vim/dein/userconfig')
+  let s:toml = g:config_dir . '/plugins.toml'
+  let s:lazy_toml = g:config_dir . '/plugins_lazy.toml'
+
+  " TOML 読み込み
+  call dein#load_toml(s:toml, {'lazy': 0})
+  call dein#load_toml(s:lazy_toml, {'lazy': 1})
+
+  " Required:
+  call dein#end()
+  call dein#save_state()
+endif
+
+" Required:
+filetype plugin indent on
+syntax enable
+
+" If you want to install not installed plugins on startup.
+if dein#check_install()
+  call dein#install()
+endif
+
+"End dein Scripts-------------------------
 
 
 """"""""""""""""""""
