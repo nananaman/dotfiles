@@ -1,5 +1,3 @@
-set pythonthreedll = "/c/Users/icses/Anaconda3"
-"set pythonthreedll = "/c/Python35"
 "dein Scripts-----------------------------
 if &compatible
   set nocompatible               " Be iMproved
