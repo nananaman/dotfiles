@@ -161,7 +161,7 @@ let g:airline#extensions#tabline#buffer_idx_mode = 1
 nmap <C-o> <Plug>AirlineSelectPrevTab
 nmap <C-p> <Plug>AirlineSelectNextTab
 " テーマ
-let g:airline_theme = 'papercolor'
+let g:airline_theme = 'tender'
 " PowerLineフォントを有効
 let g:airline_powerline_fonts = 1
 
@@ -179,3 +179,6 @@ let g:neocomplete#text_mode_filetypes = { "_" : 1}
 " NERDTree設定
 map <C-n> :NERDTreeToggle<CR>
 
+" molokai設定
+colorscheme tender
+syntax enable
