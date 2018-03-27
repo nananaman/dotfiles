@@ -42,13 +42,6 @@ if dein#check_install()
 endif
 
 "End dein Scripts-------------------------
-" deoplete Scripts
-call dein#add('Shougo/deoplete.nvim')
-if !has('nvim')
-    call dein#add('roxma/nvim-yarp')
-    call dein#add('roxma/vim-hug-neovim-rpx')
-endif
-let g:deoplete#enable_at_startup = 1
 
 
 """"""""""""""""""""
@@ -164,11 +157,25 @@ nnoremap <Leader>q :<C-u>bw! \[quickrun\ output\]<CR>
 let g:airline#extensions#tabline#enabled = 1
 " タブに番号を振る
 let g:airline#extensions#tabline#buffer_idx_mode = 1
-" Tabを<C-p><C-n>で切り替え
-nmap <C-p> <Plug>AirlineSelectPrevTab
-nmap <C-n> <Plug>AirlineSelectNextTab
+" Tabを<C-o><C-p>で切り替え
+nmap <C-o> <Plug>AirlineSelectPrevTab
+nmap <C-p> <Plug>AirlineSelectNextTab
 " テーマ
 let g:airline_theme = 'papercolor'
 " PowerLineフォントを有効
 let g:airline_powerline_fonts = 1
+
+" neocomplete設定
+" 起動時に有効
+let g:neocomplete#enable_at_startup = 1
+" ポップアップメニューで表示される候補の数
+let g:neocomplete#max_list = 50
+" 大文字が入力されるまで大文字小文字を区別しない
+let g:neocomplete#enable_smart_case = 1
+" タブキーで補完候補選択
+inoremap <expr><TAB> pumvisible() ? "<C-n>" : "\<TAB>"
+let g:neocomplete#text_mode_filetypes = { "_" : 1}
+
+" NERDTree設定
+map <C-n> :NERDTreeToggle<CR>
 
