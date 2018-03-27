@@ -1,5 +1,3 @@
-set pythonthreedll = "/c/Users/icses/Anaconda3"
-"set pythonthreedll = "/c/Python35"
 "dein Scripts-----------------------------
 if &compatible
   set nocompatible               " Be iMproved
@@ -20,7 +18,8 @@ endif
 if dein#load_state(s:dein_path)
   call dein#begin(s:dein_path)
 
-  let g:config_dir = expand('~/.vim/dein/userconfig')
+  " let g:config_dir = expand('~/.vim/dein/userconfig')
+  let g:config_dir = expand('~/dotfiles/dein')
   let s:toml = g:config_dir . '/plugins.toml'
   let s:lazy_toml = g:config_dir . '/plugins_lazy.toml'
 
@@ -43,6 +42,13 @@ if dein#check_install()
 endif
 
 "End dein Scripts-------------------------
+" deoplete Scripts
+call dein#add('Shougo/deoplete.nvim')
+if !has('nvim')
+    call dein#add('roxma/nvim-yarp')
+    call dein#add('roxma/vim-hug-neovim-rpx')
+endif
+let g:deoplete#enable_at_startup = 1
 
 
 """"""""""""""""""""
@@ -79,6 +85,20 @@ set laststatus=2
 " コマンドラインの補完
 set wildmode=list:longest
 
+" Tab系
+" Tabが意味するスペース数
+set tabstop=4
+" 自動インデントで入るスペース数
+set shiftwidth=4
+" Tabで入力されるスペース数
+set softtabstop=4
+" Tabでスペースが入力される
+set expandtab
+" 自動インデント
+set autoindent
+" {があると自動でインデント
+set smartindent
+
 " 検索系
 " 検索文字列が小文字の場合、大文字小文字を区別しない
 set ignorecase
@@ -92,3 +112,63 @@ set wrapscan
 set hlsearch
 " Esc連打でハイライト解除
 nmap <Esc><Esc> :nohlsearch<CR><Esc>
+
+" jedi-vim設定
+" ポップアップを表示しない
+autocmd FileType python setlocal completeopt-=preview
+" supertab設定
+let g:SuperTabContextDefaultCompletionType = "context"
+let g:SuperTabDefaultCompletionType = "<c-n>"
+
+" autopep8設定
+function! Preserve(command)
+    " Save the last search.
+    let search = @/
+    " Save the current cursor position.
+    let cursor_position = getpos('.')
+    " Save the current window position.
+    normal! H
+    let window_position = getpos('.')
+    call setpos('.', cursor_position)
+    " Execute the command.
+    execute a:command
+    " Restore the last search.
+    let @/ = search
+    " Restore the previous window position.
+    call setpos('.', window_position)
+    normal! zt
+    " Restore the previous cursor position.
+    call setpos('.', cursor_position)
+endfunction
+    
+function! Autopep8()
+    call Preserve(':silent %!autopep8 -')
+endfunction
+
+autocmd FileType python nnoremap <S-f> :call Autopep8()<CR>
+
+" quickrun設定
+let g:quickrun_config = {
+            \    "_" : {
+            \       "runner" : "vimproc",
+            \       "outputter/buffer/split" : "botright 8sp",
+            \       "outputter/buffer/close_on_empty" : 1,
+            \       }
+            \}
+nnoremap <expr><silent> <C-c> quickrun#is_running() ? quickrun#sweep_sessions() : "\<C-c>"
+" quickrunのbufferを<Leader>qで閉じる
+nnoremap <Leader>q :<C-u>bw! \[quickrun\ output\]<CR>
+
+" vim-airline設定
+" タブを有効
+let g:airline#extensions#tabline#enabled = 1
+" タブに番号を振る
+let g:airline#extensions#tabline#buffer_idx_mode = 1
+" Tabを<C-p><C-n>で切り替え
+nmap <C-p> <Plug>AirlineSelectPrevTab
+nmap <C-n> <Plug>AirlineSelectNextTab
+" テーマ
+let g:airline_theme = 'papercolor'
+" PowerLineフォントを有効
+let g:airline_powerline_fonts = 1
+
