@@ -30,10 +30,7 @@ repo = 'scrooloose/nerdtree'
 repo = 'tomasr/molokai'
 
 [[plugins]]
-repo = 'raphamorim/lucario'
-
-[[plugins]]
-repo = 'whatyouhide/vim-gotham'
-
-[[plugins]]
 repo = 'jacoborus/tender.vim'
+
+[[plugins]]
+repo = 'reireias/vim-cheatsheet'

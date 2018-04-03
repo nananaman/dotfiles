@@ -1,0 +1,9 @@
+#!/usr/bin/env perl
+$latex = 'pdflatex -synctex=1 -halt-on-error';
+$bibtex = 'pbibtex';
+$biber = 'biber -u -U --output_safechars';
+$dvipdf = 'dvipdfmx %0 -o %D %S';
+$makeindex = 'mendex %0 -o %D %S';
+$max_repeat = 5;
+$pdf_mode = 3;
+$pvc_view_file_via_temporary = 0;

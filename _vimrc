@@ -183,3 +183,28 @@ map <C-n> :NERDTreeToggle<CR>
 " molokai設定
 colorscheme tender
 syntax enable
+
+" vimtex設定
+let g:vimtex_compiler_latexmk = {
+            \'background': 1,
+            \'build_dir': '',
+            \'continuous': 1,
+            \'callback': 0,
+            \'options': [
+            \   '-pdfdvi',
+            \   '-verbose',
+            \   '-file-line-error',
+            \   '-synctex=1',
+            \   '-interaction=nonstopmode',
+            \],
+            \}
+
+" vim-cheatseet設定
+" cheatcheetの場所
+let g:cheatsheet#cheat_file = '~/dotfiles/.cheatsheet.md'
+" vsplitして表示
+let g:cheatsheet#vsplit = 1
+
+" instant_markdown設定
+" markdownを自動で開かない
+let g:instant_markdown_autostart = 0
