@@ -10,5 +10,5 @@
 
 * Initialize
 
-'$ ~/dotfiles/initialize.sh'
+`$ ~/dotfiles/initialize.sh`
 
