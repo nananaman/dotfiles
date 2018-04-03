@@ -8,7 +8,7 @@
 * If you want to use vimtex:
     * Install texlive
 
-* Initialize
+## Initialize
 
 `$ ~/dotfiles/initialize.sh`
 
