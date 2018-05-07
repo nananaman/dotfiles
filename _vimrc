@@ -208,3 +208,8 @@ let g:cheatsheet#vsplit = 1
 " instant_markdown設定
 " markdownを自動で開かない
 let g:instant_markdown_autostart = 0
+
+" vim-indent-guides設定
+let g:indent_guides_enable_on_vim_startup = 1
+let g:indent_guides_guide_size = 1
+let g:indent_guides_start_level = 2
