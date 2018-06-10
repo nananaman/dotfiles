@@ -59,6 +59,8 @@ set autoread
 set hidden
 " 入力中のコマンドをステータスに表示
 set showcmd
+" ヤンクがクリップボードに入る
+set clipboard=unnamedplus
 
 " 見た目系
 " 行番号表示
