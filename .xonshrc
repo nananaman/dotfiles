@@ -1,0 +1,55 @@
+# -*- coding: utf-8 -*-
+
+# エディタ
+import os
+os.environ['EDITOR'] = '/usr/local/share/vim'
+os.environ['VISUAL'] = '/usr/local/share/vim'
+
+$XONSH_COLOR_STYLE = "native"
+# 補完をEnterで直接実行しない
+$COMPLETIONS_CONFIRM = True
+# Tabではなく空白4つ
+$INDENT = "    "
+# 補完時に大小区別しない
+$CASE_SENSITIVE_COMPLETIONS = False
+# 連続重複コマンドを保存しない
+$HISTCONTROL = "ignoredups"
+# 括弧を補完
+$XONSH_AUTOPAIR = True
+# ディレクトリ名を入力でcd
+$AUTO_CD = True
+# エラー全て吐くように
+$XONSH_SHOW_TRACEBACK = True
+# サブプロセスタイムアウトのメッセージ抑制
+$SUPPRESS_BRANCH_TIMEOUT_MESSAGE = True
+# キー入力速評価
+$UPDATE_COMPLETIONS_ON_KEYPRESS = True
+# プロンプトの表記
+$PROMPT = "{INTENSE_RED}{user}{INTENSE_GREEN}@{INTENSE_BLUE}{hostname}{INTENSE_YELLOW} [ {cwd} ] {GREEN}$ "
+# lsコマンドの結果の見た目
+# $LS_COLORS = "di=34:ln=35:so=32:pi=33:ex=31:bd=46;34:su=41;30:sg=46;30:tw=42;30:ow=43;30"
+
+# alias
+aliases['la'] = "ls -la"
+aliases["v"] = "vim"
+aliases["vi"] = "vim"
+aliases["vx"] = "vim ~/.xonshrc"
+aliases["vv"] = "vim ~/.vimrc"
+
+# コマンド入力中に<C-v>でvim編集
+from prompt_toolkit.keys import Keys
+from prompt_toolkit.filters import (Condition, IsMultiline, HasSelection, EmacsInsertMode, ViInsertMode)
+@events.on_ptk_create
+def custom_keybindings(bindings, **kw):
+    handler = bindings.registry.add_binding
+
+    @handler(Keys.ControlV)
+    def edit_in_editor(event):
+        event.current_buffer.tempfile_suffix = '~py'
+        event.current_buffer.open_in_editor(ecent.cli)
+
+# xontrib
+# zコマンドの利用 pip install xontrib-z
+xontrib load z
+# apt-getをtabで補完 pip install xonsh-apt-tabcomplete
+xontrib load apt_tabcomplete
