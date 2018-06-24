@@ -34,3 +34,7 @@ repo = 'jacoborus/tender.vim'
 
 [[plugins]]
 repo = 'reireias/vim-cheatsheet'
+
+[[plugins]]
+repo = 'Shougo/denite.nvim'
+
