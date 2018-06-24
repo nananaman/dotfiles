@@ -1,14 +1,16 @@
 # dotfiles
 
+未テスト
 ## Installation
 
-* Install vim8
-    * lua, python3
-
+```
+$ cd ~
+$ bash ~/dotfiles/install.sh
+```
 * If you want to use vimtex:
     * Install texlive
 
 ## Initialize
 
-`$ ~/dotfiles/initialize.sh`
+`$ bash ~/dotfiles/initialize.sh`
 
