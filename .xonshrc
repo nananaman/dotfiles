@@ -2,8 +2,8 @@
 
 # エディタ
 import os
-os.environ['EDITOR'] = '/usr/local/share/vim'
-os.environ['VISUAL'] = '/usr/local/share/vim'
+os.environ['EDITOR'] = '/usr/local/bin/vim'
+os.environ['VISUAL'] = '/usr/local/bin/vim'
 
 $XONSH_COLOR_STYLE = "native"
 # 補完をEnterで直接実行しない
@@ -22,7 +22,7 @@ $AUTO_CD = True
 $XONSH_SHOW_TRACEBACK = True
 # サブプロセスタイムアウトのメッセージ抑制
 $SUPPRESS_BRANCH_TIMEOUT_MESSAGE = True
-# キー入力速評価
+# キー入力即評価
 $UPDATE_COMPLETIONS_ON_KEYPRESS = True
 # プロンプトの表記
 $PROMPT = "{INTENSE_RED}{user}{INTENSE_GREEN}@{INTENSE_BLUE}{hostname}{INTENSE_YELLOW} [ {cwd} ] {GREEN}$ "
@@ -45,8 +45,8 @@ def custom_keybindings(bindings, **kw):
 
     @handler(Keys.ControlV)
     def edit_in_editor(event):
-        event.current_buffer.tempfile_suffix = '~py'
-        event.current_buffer.open_in_editor(ecent.cli)
+        event.current_buffer.tempfile_suffix = '.py'
+        event.current_buffer.open_in_editor(event.cli)
 
 # xontrib
 # zコマンドの利用 pip install xontrib-z
