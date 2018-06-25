@@ -42,7 +42,7 @@ if dein#check_install()
 endif
 
 "End dein Scripts-------------------------
-
+let g:python3_host_prog = expand('/home/nananaman/anaconda3/bin/python')
 
 """"""""""""""""""""
 " setting
@@ -215,3 +215,32 @@ let g:instant_markdown_autostart = 0
 let g:indent_guides_enable_on_vim_startup = 1
 let g:indent_guides_guide_size = 1
 let g:indent_guides_start_level = 2
+
+" Denite設定
+nmap [denite] <Nop>
+map <C-j> [denite]
+
+" プロジェクト内のファイル検索
+nmap <silent> [denite]<C-p> :<C-u>Denite file_rec -highlight-mode-insert=Search<CR>
+" dotfiles配下をカレントにしてfile_rec起動
+nmap <silent> [denite]<C-v> :<C-u>call denite#start([{'name': 'file_rec', 'args':['~/.dotfiles']}])
+" ファイル内の関数/クラスなどの検索
+nmap <silent>[denite]<C-o> :<C-u>Denite outline -highlight-mode-insert=Search<CR>
+" バッファに展開中のファイル検索
+nmap <silent>[denite]<C-b> :<C-u>Denite buffer -highlight-mode-insert=Search<CR>
+
+" 上下移動を<C-j><C-k>
+call denite#custom#map('normal', '<C-j>', '<denite:move_to_next_line>')
+call denite#custom#map('normal', '<C-k>', '<denite:move_to_previous_line>')
+call denite#custom#map('insert', '<C-j>', '<denite:move_to_next_line>')
+call denite#custom#map('insert', '<C-k>', '<denite:move_to_previous_line>')
+" 入力履歴移動を<C-j><C-k>
+call denite#custom#map('insert', '<C-h>', '<denite:assign_next_text>')
+call denite#custom#map('insert', '<C-l>', '<denite:assign_previous_text>')
+" 横割りオープンを<C-s>
+call denite#custom#map('insert', '<C-s>', '<denite:do_action:split>')
+" 縦割りオープンを<C-i>
+call denite#custom#map('insert', '<C-i>', '<denite:do_action:vsplit>')
+" タブオープンを<C-o>
+call denite#custom#map('insert', '<C-o>', '<denite:do_action:tabopen>')
+
