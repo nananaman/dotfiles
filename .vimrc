@@ -42,7 +42,7 @@ if dein#check_install()
 endif
 
 "End dein Scripts-------------------------
-let g:python3_host_prog = expand('/home/nananaman/anaconda3/bin/python')
+let g:python3_host_prog = expand('$USER/anaconda3/bin/python')
 
 """"""""""""""""""""
 " setting
