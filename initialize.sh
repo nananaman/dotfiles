@@ -1,6 +1,6 @@
 #!/bin/sh
 # xonsh
-pip install xonsh
+pip3 install xonsh
 
 # vim8
 sudo apt-get install -y git build-essential ncurses-dev lua5.2 lua5.2-dev luajit python-dev python3-dev
@@ -23,11 +23,11 @@ sudo apt-get install -y nodejs
 sudo npm -g install instant-markdown-d
 
 # xonsh実行
-echo ^# run xonsh >> ~/.bashrc
-echo alias x='xonsh' >> 
-echo x
+echo # run xonsh >> ~/.bashrc
+echo alias x='xonsh' >> ~/.bashrc
+echo x >> ~/.bashrc
 xonsh
 
 # xonshtrib導入
-pip install xonsh-apt-tabcomplete
-pip install xontrib-z
+pip3 install xonsh-apt-tabcomplete
+pip3 install xontrib-z

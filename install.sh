@@ -16,7 +16,7 @@ for f in .??*; do
     ["$f" = ".gitconfig.local.template" ] && continue
     ["$f" = ".gitmodules" ] && continue
 
-    ln -snfv ~/dotfiles"$f" ~/
+    ln -snfv ~/dotfiles/"$f" ~/
 done
 
 cat << END
