@@ -20,7 +20,7 @@ curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
 # instant-markdown-d
-npm -g install instant-markdown-d
+sudo npm -g install instant-markdown-d
 
 # xonsh実行
 echo ^# run xonsh >> ~/.bashrc
