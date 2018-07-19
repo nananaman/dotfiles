@@ -23,7 +23,7 @@ sudo apt-get install -y nodejs
 sudo npm -g install instant-markdown-d
 
 # xonsh実行
-echo # run xonsh >> ~/.bashrc
+echo \# run xonsh >> ~/.bashrc
 echo alias x='xonsh' >> ~/.bashrc
 echo x >> ~/.bashrc
 xonsh
