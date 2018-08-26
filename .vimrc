@@ -164,7 +164,7 @@ let g:airline#extensions#tabline#buffer_idx_mode = 1
 nmap <C-o> <Plug>AirlineSelectPrevTab
 nmap <C-p> <Plug>AirlineSelectNextTab
 " テーマ
-let g:airline_theme = 'tender'
+let g:airline_theme = 'gruvbox'
 " PowerLineフォントを有効
 let g:airline_powerline_fonts = 1
 
@@ -182,8 +182,12 @@ let g:neocomplete#text_mode_filetypes = { "_" : 1}
 " NERDTree設定
 map <C-n> :NERDTreeToggle<CR>
 
-" molokai設定
-colorscheme tender
+" colorscheme設定
+colorscheme gruvbox
+set background=dark
+let g:gruvbox_contrast_dark = 'hard'
+let g:gruvbox_invert_indent_guides=1
+
 syntax enable
 
 " vimtex設定
@@ -215,6 +219,7 @@ let g:instant_markdown_autostart = 0
 let g:indent_guides_enable_on_vim_startup = 1
 let g:indent_guides_guide_size = 1
 let g:indent_guides_start_level = 2
+let g:indent_guides_auto_colors = 1
 
 " Denite設定
 nmap [denite] <Nop>

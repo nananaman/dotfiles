@@ -27,10 +27,7 @@ repo = 'ujihisa/neco-look'
 repo = 'scrooloose/nerdtree'
 
 [[plugins]]
-repo = 'tomasr/molokai'
-
-[[plugins]]
-repo = 'jacoborus/tender.vim'
+repo = 'morhetz/gruvbox'
 
 [[plugins]]
 repo = 'reireias/vim-cheatsheet'

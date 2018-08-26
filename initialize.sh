@@ -1,6 +1,6 @@
 #!/bin/sh
 # xonsh
-pip3 install xonsh
+pip install xonsh
 
 # vim8
 sudo apt-get install -y git build-essential ncurses-dev lua5.2 lua5.2-dev luajit python-dev python3-dev
@@ -29,5 +29,5 @@ echo x >> ~/.bashrc
 xonsh
 
 # xonshtrib導入
-pip3 install xonsh-apt-tabcomplete
-pip3 install xontrib-z
+pip install xonsh-apt-tabcomplete
+pip install xontrib-z
