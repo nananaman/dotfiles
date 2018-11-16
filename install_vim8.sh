@@ -13,10 +13,5 @@ sudo make install
 # powerline
 sudo apt-get install fonts-powerline
 
-# nodejs npm
-curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
-sudo apt-get install -y nodejs
-
-# instant-markdown-d
-sudo npm -g install instant-markdown-d
-
+# ag
+sudo apt-get install silversearcher-ag

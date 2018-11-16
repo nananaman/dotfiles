@@ -33,5 +33,7 @@ repo = 'morhetz/gruvbox'
 repo = 'reireias/vim-cheatsheet'
 
 [[plugins]]
-repo = 'Shougo/denite.nvim'
+repo = 'w0rp/ale'
 
+[[plugins]]
+repo = 'easymotion/vim-easymotion'

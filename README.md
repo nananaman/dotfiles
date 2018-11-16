@@ -1,16 +1,18 @@
 # dotfiles
 
-未テスト
 ## Installation
 
 ```
 $ cd ~
-$ bash ~/dotfiles/install.sh
+$ bash ~/dotfiles/install_dotfiles.sh
 ```
 * If you want to use vimtex:
     * Install texlive
 
-## Initialize
+## Install Vim8
 
-`$ bash ~/dotfiles/initialize.sh`
+`$ bash ~/dotfiles/install_vim8.sh`
 
+## Install xonsh
+
+`$ bash ~/dotfiles/install_xonsh.sh`
