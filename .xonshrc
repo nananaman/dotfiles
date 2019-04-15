@@ -16,6 +16,8 @@ $CASE_SENSITIVE_COMPLETIONS = False
 $HISTCONTROL = "ignoredups"
 # 括弧を補完
 $XONSH_AUTOPAIR = True
+# VIモード
+$VI_MODE = True
 # ディレクトリ名を入力でcd
 $AUTO_CD = True
 # エラー全て吐くように
@@ -23,14 +25,15 @@ $XONSH_SHOW_TRACEBACK = True
 # サブプロセスタイムアウトのメッセージ抑制
 $SUPPRESS_BRANCH_TIMEOUT_MESSAGE = True
 # キー入力即評価
-$UPDATE_COMPLETIONS_ON_KEYPRESS = True
+$UPDATE_COMPLETIONS_ON_KEYPRESS = False
 # プロンプトの表記
-#$PROMPT = "{INTENSE_RED}{user}{INTENSE_GREEN}@{INTENSE_BLUE}{hostname}{INTENSE_YELLOW} [ {cwd} ] {GREEN}$ "
 $PROMPT = "{INTENSE_RED}{user}{INTENSE_GREEN}@{INTENSE_BLUE}{hostname}{INTENSE_YELLOW} [ {cwd} ] {INTENSE_BLUE}[ {gitstatus} {INTENSE_BLUE}] {GREEN}$ "
-# lsコマンドの結果の見た目
-# $LS_COLORS = "di=34:ln=35:so=32:pi=33:ex=31:bd=46;34:su=41;30:sg=46;30:tw=42;30:ow=43;30"
 
-# alias
+
+#########
+# alias #
+#########
+
 aliases['l'] = "ls"
 aliases['la'] = "ls -a"
 aliases["v"] = "vim"
@@ -39,15 +42,33 @@ aliases["vb"] = "vim ~/.bashrc"
 aliases["vx"] = "vim ~/.xonshrc"
 aliases["vv"] = "vim ~/.vimrc"
 
-# コマンド入力中に<C-v>でvim編集
-from prompt_toolkit.key_binding import KeyBindings
-from prompt_toolkit.filters import (Condition, IsMultiline, HasSelection, EmacsInsertMode, ViInsertMode)
+
+###############
+# key binding #
+###############
+
+from prompt_toolkit.keys import Keys
+from prompt_toolkit.filters import Condition, EmacsInsertMode, ViInsertMode
+
 @events.on_ptk_create
 def custom_keybindings(bindings, **kw):
-    @bindings.add('c-v')
-    def _(event):
-        event.current_buffer.tempfile_suffix = '.py'
-        event.current_buffer.open_in_editor(event.cli)
+    handler = bindings.add
+
+    # コマンド入力中に<C-w>で記号、スペースの直前まで削除
+    @handler(Keys.ControlW)
+    def __ctrl_w(event):
+        # 'event.current_buffer'から、現在のバッファを取り出す。
+        buf = event.current_buffer # type: prompt_toolkif.buffer.Buffer
+        text = buf.text[:buf.cursor_position] # type: str
+
+        # バッファ中の文字から、削除したい文字数をカウントする。
+        m = re.search(r"[/,.=\s][^/,.=\s]+[/,.=\s]?$", text)
+        if m is not None:
+            buf.delete_before_cursor(len(text) - m.start() - 1)
+            return
+
+        # 削除する
+        buf.delete_before_cursor(len(text))
 
 # xontrib
 # zコマンドの利用 pip install xontrib-z
