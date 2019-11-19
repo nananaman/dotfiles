@@ -35,7 +35,6 @@ sudo apt-get install -y nodejs
 # yarn
 npm install -g yarn
 
-ln -snfv ~/dotfiles/coc-settings.json ~/.vim/coc-settings.json
 
 cat << END
 

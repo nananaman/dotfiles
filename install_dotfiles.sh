@@ -19,6 +19,9 @@ for f in .??*; do
     ln -snfv ~/dotfiles/"$f" ~/
 done
 
+ln -snfv ~/dotfiles/coc-settings.json ~/.vim/coc-settings.json
+ln -snfv ~/dotfiles/.tmux.conf ~/.tmux.conf
+
 cat << END
 
 **************************
