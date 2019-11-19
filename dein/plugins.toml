@@ -2,26 +2,10 @@
 repo = 'Shougo/dein.vim'
 
 [[plugins]]
-repo = 'Shougo/vimproc.vim'
-build = 'make'
-
-[[plugins]]
 repo = 'vim-airline/vim-airline'
 
 [[plugins]]
 repo = 'vim-airline/vim-airline-themes'
-
-[[plugins]]
-repo = 'Shougo/neocomplete.vim'
-
-[[plugins]]
-repo = 'Shougo/neco-vim'
-
-[[plugins]]
-repo = 'Shougo/neco-syntax'
-
-[[plugins]]
-repo = 'ujihisa/neco-look'
 
 [[plugins]]
 repo = 'scrooloose/nerdtree'
@@ -33,7 +17,15 @@ repo = 'morhetz/gruvbox'
 repo = 'reireias/vim-cheatsheet'
 
 [[plugins]]
-repo = 'w0rp/ale'
+repo = 'easymotion/vim-easymotion'
 
 [[plugins]]
-repo = 'easymotion/vim-easymotion'
+repo = 'neoclide/coc.nvim'
+rev = 'release'
+on_i = 1
+lerged = '0'
+hook_source = 'call coc#util#install()'
+
+[[plugins]]
+repo = 'ryanoasis/vim-devicons'
+

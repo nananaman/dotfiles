@@ -1,0 +1,5 @@
+{
+    "suggest.noselect": true,
+    "suggest.preferCompleteThanJumpPlaceholder": true,
+    "python.jediEnabled": false
+}

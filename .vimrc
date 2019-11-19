@@ -42,7 +42,7 @@ if dein#check_install()
 endif
 
 "End dein Scripts-------------------------
-let g:python3_host_prog = expand('$USER/anaconda3/bin/python')
+"let g:python3_host_prog = expand('$USER/anaconda3/bin/python')
 let t_Co=256
 
 """"""""""""""""""""
@@ -54,6 +54,8 @@ set fenc=utf-8
 set nobackup
 " スワップファイルを作らない
 set noswapfile
+" ファイルを上書きする前にバックアップを作ることを無効化
+set nowritebackup
 " 編集中のファイルが変更されたら自動で読み直す
 set autoread
 " バッファが編集中でもその他のファイルを開けるように
@@ -62,6 +64,9 @@ set hidden
 set showcmd
 " ヤンクがクリップボードに入る
 set clipboard=unnamedplus
+set clipboard+=unnamed
+" 更新間隔
+set updatetime=300
 
 " 見た目系
 " 行番号表示
@@ -80,14 +85,17 @@ set showmatch
 set laststatus=2
 " コマンドラインの補完
 set wildmode=list:longest
+" ins-completion-menu 関連のメッセージを表示しない
+set shortmess+=c
+set signcolumn=yes
 
 " Tab系
 " Tabが意味するスペース数
-set tabstop=4
+set tabstop=2
 " 自動インデントで入るスペース数
-set shiftwidth=4
+set shiftwidth=2
 " Tabで入力されるスペース数
-set softtabstop=4
+set softtabstop=2
 " Tabでスペースが入力される
 set expandtab
 " 自動インデント
@@ -109,53 +117,6 @@ set hlsearch
 " Esc連打でハイライト解除
 nmap <Esc><Esc> :nohlsearch<CR><Esc>
 
-" jedi-vim設定
-" ポップアップを表示しない
-autocmd FileType python setlocal completeopt-=preview
-" supertab設定
-let g:SuperTabContextDefaultCompletionType = "context"
-let g:SuperTabDefaultCompletionType = "<c-n>"
-
-" autopep8設定
-function! Preserve(command)
-    " Save the last search.
-    let search = @/
-    " Save the current cursor position.
-    let cursor_position = getpos('.')
-    " Save the current window position.
-    normal! H
-    let window_position = getpos('.')
-    call setpos('.', cursor_position)
-    " Execute the command.
-    execute a:command
-    " Restore the last search.
-    let @/ = search
-    " Restore the previous window position.
-    call setpos('.', window_position)
-    normal! zt
-    " Restore the previous cursor position.
-    call setpos('.', cursor_position)
-endfunction
-    
-function! Autopep8()
-    call Preserve(':silent %!autopep8 -')
-endfunction
-
-autocmd FileType python nnoremap <S-f> :call Autopep8()<CR>
-
-" quickrun設定
-let g:quickrun_config = {
-            \    "_" : {
-            \       "runner" : "vimproc",
-            \       "runner/vimproc/updatetime" : 60,
-            \       "outputter/buffer/split" : "botright 8sp",
-            \       "outputter/buffer/close_on_empty" : 1,
-            \       }
-            \}
-nnoremap <expr><silent> <C-c> quickrun#is_running() ? quickrun#sweep_sessions() : "\<C-c>"
-" quickrunのbufferを<Leader>qで閉じる
-nnoremap <Leader>q :<C-u>bw! \[quickrun\ output\]<CR>
-
 " vim-airline設定
 " タブを有効
 let g:airline#extensions#tabline#enabled = 1
@@ -169,16 +130,101 @@ let g:airline_theme = 'gruvbox'
 " PowerLineフォントを有効
 let g:airline_powerline_fonts = 1
 
-" neocomplete設定
-" 起動時に有効
-let g:neocomplete#enable_at_startup = 1
-" ポップアップメニューで表示される候補の数
-let g:neocomplete#max_list = 50
-" 大文字が入力されるまで大文字小文字を区別しない
-let g:neocomplete#enable_smart_case = 1
+" coc.nvim設定
 " タブキーで補完候補選択
-inoremap <expr><TAB> pumvisible() ? "<C-n>" : "\<TAB>"
-let g:neocomplete#text_mode_filetypes = { "_" : 1}
+inoremap <silent><expr><TAB> pumvisible() ? "<C-n>" : <SID>check_back_space() ? "\<TAB>" : coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1] =~# '\s'
+endfunction
+
+" <c-space>で補完
+inoremap <silent><expr> <c-space> coc#refresh()
+
+" Use `[g` and `]g` to navigate diagnostics
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
+
+" 定義ジャンプ
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" Kでドキュメントを開く
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if (index(['vim', 'help'],  &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
+
+" カーソル下のカッコをハイライトする
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" rn でリネーム
+nmap <leader>rn <Plug>(coc-rename)
+
+" <leader>fでフォーマット
+xmap <leader>f <Plug>(coc-format-selected)
+nmap <leader>f <Plug>(coc-format-selected)
+
+augroup mygroup
+  autocmd!
+  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+augroup end
+
+" Remap for do codeAction of selected region, ex: `<leader>aap` for current paragraph
+xmap <leader>a  <Plug>(coc-codeaction-selected)
+nmap <leader>a  <Plug>(coc-codeaction-selected)
+
+" Remap for do codeAction of current line
+nmap <leader>ac  <Plug>(coc-codeaction)
+" Fix autofix problem of current line
+nmap <leader>qf  <Plug>(coc-fix-current)
+
+" Create mappings for function text object, requires document symbols feature of languageserver.
+xmap if <Plug>(coc-funcobj-i)
+xmap af <Plug>(coc-funcobj-a)
+omap if <Plug>(coc-funcobj-i)
+omap af <Plug>(coc-funcobj-a)
+
+" Use <C-d> for select selections ranges, needs server support, like: coc-tsserver, coc-python
+nmap <silent> <C-d> <Plug>(coc-range-select)
+xmap <silent> <C-d> <Plug>(coc-range-select)
+
+" Use `:Format` to format current buffer
+command! -nargs=0 Format :call CocAction('format')
+
+" Use `:Fold` to fold current buffer
+command! -nargs=? Fold :call     CocAction('fold', <f-args>)
+
+" use `:OR` for organize import of current buffer
+command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
+
+" Using CocList
+" Show all diagnostics
+nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
+" Manage extensions
+nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
+" Show commands
+nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
+" Find symbol of current document
+nnoremap <silent> <space>o  :<C-u>CocList outline<cr>
+" Search workspace symbols
+nnoremap <silent> <space>s  :<C-u>CocList -I symbols<cr>
+" Do default action for next item.
+nnoremap <silent> <space>j  :<C-u>CocNext<CR>
+" Do default action for previous item.
+nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
+" Resume latest coc list
+nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 
 " NERDTree設定
 map <C-n> :NERDTreeToggle<CR>
@@ -188,8 +234,6 @@ colorscheme gruvbox
 set background=dark
 let g:gruvbox_contrast_dark = 'hard'
 let g:gruvbox_invert_indent_guides=1
-
-syntax enable
 
 " vimtex設定
 let g:vimtex_compiler_latexmk = {
@@ -222,13 +266,10 @@ let g:indent_guides_guide_size = 1
 let g:indent_guides_start_level = 2
 let g:indent_guides_auto_colors = 1
 
-" ALE設定
-let g:ale_sign_column_always = 1
-let g:ale_virtualtext_cursor = 1
-" <C-k>で前の、<C-j>で次のエラーにジャンプ
-nmap <silent> <C-k> <Plug>(ale_previous_wrap)
-nmap <silent> <C-j> <Plug>(ale_next_wrap)
-
 " EasyMotion設定
 " s{char}{char}{label}で移動 
 nmap s <Plug>(easymotion-s2)
+
+highlight Normal ctermbg=NONE guibg=NONE
+highlight NonText ctermbg=NONE guibg=NONE
+highlight LineNr ctermbg=NONE guibg=NONE

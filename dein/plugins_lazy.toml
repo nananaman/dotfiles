@@ -1,27 +1,4 @@
 [[plugins]]
-repo = 'davidhalter/jedi-vim'
-on_ft = ['python']
-hook_add = '''
-	let g:jedi#popup_on_dot = 1
-	let g:jedi#popup_select_first = 0
-	let g:jedi#complitions_command = "<Ctrl-Space>"
-	let g:jedi#goto_command = "<leader>d"
-	let g:jedi#goto_assignments_comand = "<leader>g"
-	let g:jedi#goto_definitions_comand = ""
-	let g:jedi#documentation_command = "K"
-	let g:jedi#usages_command = "<leader>n"
-	let g:jedi#rename_command = "<leader>R"
-'''
-
-[[plugins]]
-repo = 'ervandew/supertab'
-on_ft = ['python']
-
-[[plugins]]
-repo = 'thinca/vim-quickrun'
-on_ft = ['python']
-
-[[plugins]]
 repo = 'tell-k/vim-autopep8'
 on_ft = ['python']
 

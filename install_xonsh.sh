@@ -12,3 +12,11 @@ xonsh
 # xonshtrib導入
 pip install xonsh-apt-tabcomplete
 pip install xontrib-z
+
+cat << END
+
+**************************
+XONSH SETUP FINISHED!
+**************************
+
+END
