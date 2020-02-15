@@ -43,6 +43,7 @@ aliases["vx"] = "vim ~/.xonshrc"
 aliases["vv"] = "vim ~/.vimrc"
 aliases["vt"] = "vim ~/.tmux.conf"
 aliases["vd"] = "vim ~/dotfiles/dein/plugins.toml"
+aliases["vt"] = "vim ~/.tmux.conf"
 
 
 ###############
@@ -77,3 +78,4 @@ def custom_keybindings(bindings, **kw):
 xontrib load z
 # apt-getをtabで補完 pip install xonsh-apt-tabcomplete
 xontrib load apt_tabcomplete
+xontrib load docker_tabcomplete

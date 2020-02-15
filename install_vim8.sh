@@ -10,19 +10,19 @@ sudo ./configure --with-features=huge --enable-gui=auto --enable-gtk2-check --wi
 sudo make
 sudo make install
 
+# powerline
+sudo apt-get install fonts-powerline
 if [ "$(uname)" == 'Darwin' ]; then
   # Mac
   brew tap homebrew/cask-fonts
   brew cask install font-hack-nerd-font
 elif [ "$(expr substr $(uname -s) 1 5)" == 'Linux' ]; then
-  # powerline
-  sudo apt-get install fonts-powerline
-
   # nerd fonts
   mkdir -p ~/.local/share/fonts
   cd ~/.local/share/fonts && curl -fLo "Droid Sans Mono for Powerline Nerd Font Complete.otf" https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/DroidSansMono/complete/Droid%20Sans%20Mono%20Nerd%20Font%20Complete.otf
 
 elif [ "$(expr substr $(uname -s) 1 10)" == 'MINGW32_NT' ]; then                                                                                           
+  :
   # Cygwin
 else
   echo "Your platform ($(uname -a)) is not supported."
