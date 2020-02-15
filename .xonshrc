@@ -78,4 +78,3 @@ def custom_keybindings(bindings, **kw):
 xontrib load z
 # apt-getをtabで補完 pip install xonsh-apt-tabcomplete
 xontrib load apt_tabcomplete
-xontrib load docker_tabcomplete
