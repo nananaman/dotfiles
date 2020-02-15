@@ -41,6 +41,7 @@ aliases["vi"] = "vim"
 aliases["vb"] = "vim ~/.bashrc"
 aliases["vx"] = "vim ~/.xonshrc"
 aliases["vv"] = "vim ~/.vimrc"
+aliases["vt"] = "vim ~/.tmux.conf"
 aliases["vd"] = "vim ~/dotfiles/dein/plugins.toml"
 
 
