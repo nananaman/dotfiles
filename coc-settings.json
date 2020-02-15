@@ -1,5 +1,6 @@
 {
     "suggest.noselect": true,
     "suggest.preferCompleteThanJumpPlaceholder": true,
-    "python.jediEnabled": false
+    "python.jediEnabled": false,
+    "solargraph.commandPath": "/Users/junta/.rbenv/versions/2.6.4/bin/solargraph"
 }
