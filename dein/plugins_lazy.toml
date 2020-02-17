@@ -7,10 +7,6 @@ repo = 'nathanaelkane/vim-indent-guides'
 on_ft = ['python']
 
 [[plugins]]
-repo = 'lervag/vimtex'
-on_ft = ['tex']
-
-[[plugins]]
-repo = 'suan/vim-instant-markdown'
-on_ft = ['markdown']
+repo = 'ngmy/vim-rubocop'
+on_ft = ['ruby']
 
