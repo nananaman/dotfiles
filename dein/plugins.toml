@@ -29,3 +29,5 @@ hook_source = 'call coc#util#install()'
 [[plugins]]
 repo = 'ryanoasis/vim-devicons'
 
+[[plugins]]
+repo = 'tpope/vim-endwise'
