@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# ptk
+pip install prompt_toolkit
+
 # xonsh
 pip install xonsh
 
@@ -10,8 +13,8 @@ echo x >> ~/.bashrc
 xonsh
 
 # xonshtrib導入
-pip install xonsh-apt-tabcomplete
-pip install xontrib-z
+xpip install xonsh-apt-tabcomplete
+xpip install xontrib-z
 
 cat << END
 
