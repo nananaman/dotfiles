@@ -10,15 +10,9 @@ git submodule init
 git submodule update
 
 echo "start setup..."
-for f in .??*; do
-    ["$f" = ".git" ] && continue
-    ["$f" = ".cheatsheet.md" ] && continue
-    ["$f" = ".gitconfig.local.template" ] && continue
-    ["$f" = ".gitmodules" ] && continue
 
-    ln -snfv ~/dotfiles/"$f" ~/
-done
-
+ln -snfv ~/dotfiles/.vimrc ~/.vimrc
+ln -snfv ~/dotfiles/.xonshrc ~/.xonshrc
 ln -snfv ~/dotfiles/coc-settings.json ~/.vim/coc-settings.json
 ln -snfv ~/dotfiles/.tmux.conf ~/.tmux.conf
 

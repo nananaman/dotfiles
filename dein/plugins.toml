@@ -14,9 +14,6 @@ repo = 'scrooloose/nerdtree'
 repo = 'morhetz/gruvbox'
 
 [[plugins]]
-repo = 'reireias/vim-cheatsheet'
-
-[[plugins]]
 repo = 'easymotion/vim-easymotion'
 
 [[plugins]]
