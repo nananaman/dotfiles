@@ -34,3 +34,7 @@ repo = 'tpope/vim-endwise'
 
 [[plugins]]
 repo = 'editorconfig/editorconfig-vim'
+
+[[plugins]]
+repo = 'nathanaelkane/vim-indent-guides'
+
