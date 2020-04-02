@@ -31,3 +31,6 @@ repo = 'ryanoasis/vim-devicons'
 
 [[plugins]]
 repo = 'tpope/vim-endwise'
+
+[[plugins]]
+repo = 'editorconfig/editorconfig-vim'
