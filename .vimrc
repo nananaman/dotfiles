@@ -117,6 +117,11 @@ set hlsearch
 " Esc連打でハイライト解除
 nmap <Esc><Esc> :nohlsearch<CR><Esc>
 
+" 
+inoremap {<Enter> {}<Left><CR><ESC><S-o>
+inoremap [<Enter> []<Left><CR><ESC><S-o>
+inoremap (<Enter> ()<Left><CR><ESC><S-o>
+
 " vim-airline設定
 " タブを有効
 let g:airline#extensions#tabline#enabled = 1
