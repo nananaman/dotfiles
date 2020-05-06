@@ -267,3 +267,12 @@ nmap s <Plug>(easymotion-s2)
 highlight Normal ctermbg=NONE guibg=NONE
 highlight NonText ctermbg=NONE guibg=NONE
 highlight LineNr ctermbg=NONE guibg=NONE
+
+" vim-fugitive設定
+nnoremap <leader>ga :Git add %:p<CR><CR>
+nnoremap <leader>gc :Gcommit<CR><CR>
+nnoremap <leader>gs :Gstatus<CR>
+nnoremap <leader>gp :Gpush<CR>
+nnoremap <leader>gd :Gdiff<CR>
+nnoremap <leader>gl :Glog<CR>
+nnoremap <leader>gb :Gblame<CR>
