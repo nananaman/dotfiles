@@ -117,11 +117,6 @@ set hlsearch
 " Esc連打でハイライト解除
 nmap <Esc><Esc> :nohlsearch<CR><Esc>
 
-" 
-inoremap {<Enter> {}<Left><CR><ESC><S-o>
-inoremap [<Enter> []<Left><CR><ESC><S-o>
-inoremap (<Enter> ()<Left><CR><ESC><S-o>
-
 " vim-airline設定
 " タブを有効
 let g:airline#extensions#tabline#enabled = 1
@@ -254,12 +249,6 @@ let g:vimtex_compiler_latexmk = {
             \   '-interaction=nonstopmode',
             \],
             \}
-
-" vim-cheatseet設定
-" cheatcheetの場所
-let g:cheatsheet#cheat_file = '~/dotfiles/.cheatsheet.md'
-" vsplitして表示
-let g:cheatsheet#vsplit = 1
 
 " instant_markdown設定
 " markdownを自動で開かない

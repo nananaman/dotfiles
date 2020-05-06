@@ -42,7 +42,16 @@ repo = 'andymass/vim-matchup'
 repo = 'tpope/vim-surround'
 
 [[plugins]]
+repo = 'tpope/vim-repeat'
+
+[[plugins]]
 repo = 'machakann/vim-highlightedyank'
 
 [[plugins]]
 repo = 'rhysd/clever-f.vim'
+
+[[plugins]]
+repo = 'jiangmiao/auto-pairs'
+
+[[plugins]]
+repo = 'tpope/vim-commentary'
