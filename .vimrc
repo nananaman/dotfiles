@@ -42,7 +42,7 @@ if dein#check_install()
 endif
 
 "End dein Scripts-------------------------
-"let g:python3_host_prog = expand('$USER/anaconda3/bin/python')
+" let g:python3_host_prog = expand('/Users/j.watanabe/.pyenv/versions/3.6.5/bin/python')
 let t_Co=256
 
 """"""""""""""""""""
