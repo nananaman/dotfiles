@@ -116,6 +116,8 @@ set wrapscan
 set hlsearch
 " Esc連打でハイライト解除
 nmap <Esc><Esc> :nohlsearch<CR><Esc>
+" 保存時に行末のスペースoを削除
+autocmd BufWritePre * :%s/\s\+$//ge
 
 " vim-airline設定
 " タブを有効

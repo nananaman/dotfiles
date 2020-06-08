@@ -6,7 +6,6 @@ on_ft = ['python']
 repo = 'ngmy/vim-rubocop'
 on_ft = ['ruby']
 
-
 [[plugins]]
 repo = 'chrisbra/csv.vim'
 on_ft = ['csv']
