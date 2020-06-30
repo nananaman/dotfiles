@@ -263,7 +263,7 @@ let g:indent_guides_start_level = 2
 let g:indent_guides_auto_colors = 1
 
 " EasyMotion設定
-" s{char}{char}{label}で移動 
+" s{char}{char}{label}で移動
 nmap s <Plug>(easymotion-s2)
 
 highlight Normal ctermbg=NONE guibg=NONE
@@ -278,3 +278,9 @@ nnoremap <leader>gp :Gpush<CR>
 nnoremap <leader>gd :Gdiff<CR>
 nnoremap <leader>gl :Glog<CR>
 nnoremap <leader>gb :Gblame<CR>
+
+" Start interactive EasyAlign in visual mode (e.g. vipga)
+xmap ga <Plug>(EasyAlign)
+
+" Start interactive EasyAlign for a motion/text object (e.g. gaip)
+nmap ga <Plug>(EasyAlign)
