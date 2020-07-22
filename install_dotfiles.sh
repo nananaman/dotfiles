@@ -15,6 +15,7 @@ ln -snfv ~/dotfiles/.vimrc ~/.vimrc
 ln -snfv ~/dotfiles/.xonshrc ~/.xonshrc
 ln -snfv ~/dotfiles/coc-settings.json ~/.vim/coc-settings.json
 ln -snfv ~/dotfiles/.tmux.conf ~/.tmux.conf
+ln -snfv ~/dotfiles/.hyper.js ~/.hyper.js
 
 cat << END
 
