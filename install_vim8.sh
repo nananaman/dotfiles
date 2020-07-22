@@ -21,7 +21,7 @@ elif [ "$(expr substr $(uname -s) 1 5)" == 'Linux' ]; then
   mkdir -p ~/.local/share/fonts
   cd ~/.local/share/fonts && curl -fLo "Droid Sans Mono for Powerline Nerd Font Complete.otf" https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/DroidSansMono/complete/Droid%20Sans%20Mono%20Nerd%20Font%20Complete.otf
 
-elif [ "$(expr substr $(uname -s) 1 10)" == 'MINGW32_NT' ]; then                                                                                           
+elif [ "$(expr substr $(uname -s) 1 10)" == 'MINGW32_NT' ]; then
   :
   # Cygwin
 else
@@ -34,7 +34,6 @@ sudo apt-get install -y nodejs
 
 # yarn
 npm install -g yarn
-
 
 cat << END
 

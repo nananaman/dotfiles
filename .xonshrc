@@ -30,9 +30,37 @@ $UPDATE_COMPLETIONS_ON_KEYPRESS = False
 $PROMPT = "{INTENSE_RED}{user}{INTENSE_GREEN}@{INTENSE_BLUE}{hostname}{INTENSE_YELLOW} [ {cwd} ] {INTENSE_BLUE}[ {gitstatus} {INTENSE_BLUE}] {GREEN}$ "
 # LSコマンドの出力の見た目
 $LS_COLORS = "di=34:ln=35:so=32:pi=33:ex=31:bd=46;34:cd=43;34:su=41;30:sg=46;30:tw=42;30:ow=43;30"
+
 #########
 # alias #
 #########
+
+def _fh():
+  if len(list(__xonsh__.history.items())) > 0:
+    history = list(dict.fromkeys(filter(lambda command: command != "fh", map(lambda item: item["inp"], __xonsh__.history.items()))))
+    if len(history) > 0 :
+      history = "\n".join(history[::-1])
+      command = $(echo @(history) | fzf +s +m)
+      if command:
+        @(command.split())
+
+def _fbr():
+  branch = $(git branch -vv | fzf +m | awk '{print $1}' | sed "s/.* //")
+  command = "git checkout " + branch
+  @(command.split())
+
+def _fbrm():
+  branch = $(git branch --all | grep -v HEAD | fzf +m | sed 's/.* //' | sed "s#remotes/[^/]*/##")
+  command = "git checkout " + branch
+  @(command.split())
+
+import re
+def _fshow():
+  commit = $(git log --graph --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" | fzf --ansi --no-sort --reverse --tiebreak=index)
+  commit = re.search(r'[a-f0-9]{7}', commit)
+  if commit is not None:
+    command = "git show {} --color=always".format(commit.group(0))
+    @(command.split())
 
 aliases['l'] = "ls"
 aliases['la'] = "ls -a"
@@ -43,8 +71,13 @@ aliases["vx"] = "vim ~/.xonshrc"
 aliases["vv"] = "vim ~/.vimrc"
 aliases["vt"] = "vim ~/.tmux.conf"
 aliases["vd"] = "vim ~/dotfiles/dein/plugins.toml"
+aliases["vdl"] = "vim ~/dotfiles/dein/plugins_lazy.toml"
 aliases["vt"] = "vim ~/.tmux.conf"
 
+aliases["fh"] = _fh
+aliases["fbr"] = _fbr
+aliases["fbrm"] = _fbrm
+aliases["fshow"] = _fshow
 
 ###############
 # key binding #

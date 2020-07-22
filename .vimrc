@@ -42,7 +42,6 @@ if dein#check_install()
 endif
 
 "End dein Scripts-------------------------
-" let g:python3_host_prog = expand('/Users/j.watanabe/.pyenv/versions/3.6.5/bin/python')
 let t_Co=256
 
 """"""""""""""""""""
@@ -284,3 +283,21 @@ xmap ga <Plug>(EasyAlign)
 
 " Start interactive EasyAlign for a motion/text object (e.g. gaip)
 nmap ga <Plug>(EasyAlign)
+
+" fzf設定
+command! -bang -nargs=* GGrep
+      \ call fzf#vim#grep(
+      \ 'git grep --line-number -- '.shellescape(<q-args>), 0,
+      \ fzf#vim#with_preview({'dir': systemlist('git rev-parse --show-toplevel')[0]}), <bang>0
+      \)
+
+nnoremap <silent> ,f :GFiles<CR>
+nnoremap <silent> ,F :GFiles?<CR>
+nnoremap <silent> ,b :Buffers<CR>
+nnoremap <silent> ,l :BLines<CR>
+nnoremap <silent> ,h :History<CR>
+nnoremap <silent> ,m :Mark<CR>
+nnoremap ,g :GGrep<Space>
+
+command! Terminal call popup_create(term_start([&shell], #{ hidden: 1, term_finish: 'close' }), #{ border: [], minwidth: winwidth(0)/2, minheight: &lines/2 })
+command! Term :Terminal
