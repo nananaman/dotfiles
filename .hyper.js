@@ -12,7 +12,6 @@ module.exports = {
     fontSize: 16,
 
     // font family with optional fallbacks
-    // fontFamily: 'HackGen, Ricty for Powerline, Droid Sans Mono Nerd Font Complete, Hack Nerd Font, Menlo, "DejaVu Sans Mono", Consolas, "Lucida Console", monospace',
     fontFamily: 'HackGenNerd Console, Menlo, "DejaVu Sans Mono", Consolas, "Lucida Console", monospace',
 
     // default font weight: 'normal' or 'bold'
