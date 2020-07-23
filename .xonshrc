@@ -62,6 +62,12 @@ def _fshow():
     command = "git show {} --color=always".format(commit.group(0))
     @(command.split())
 
+def _fvd():
+  target = $(echo @('\n'.join(list(filter(lambda x: '.git/' not in x, $(find ~/dotfiles/).split())))) | fzf +m)
+  if target:
+    command = "vim " + target
+    @(command.split())
+
 aliases['l'] = "ls"
 aliases['la'] = "ls -a"
 aliases["v"] = "vim"
@@ -73,11 +79,14 @@ aliases["vt"] = "vim ~/.tmux.conf"
 aliases["vd"] = "vim ~/dotfiles/dein/plugins.toml"
 aliases["vdl"] = "vim ~/dotfiles/dein/plugins_lazy.toml"
 aliases["vt"] = "vim ~/.tmux.conf"
+aliases["vj"] = "vim ~/dotfiles/.hyper.js"
+aliases["vjw"] = "vim ~/dotfiles/.hyper.win.js"
 
 aliases["fh"] = _fh
 aliases["fbr"] = _fbr
 aliases["fbrm"] = _fbrm
 aliases["fshow"] = _fshow
+aliases["fvd"] = _fvd
 
 ###############
 # key binding #

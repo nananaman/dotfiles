@@ -15,11 +15,3 @@ xonsh
 # xonshtrib導入
 xpip install xonsh-apt-tabcomplete
 xpip install xontrib-z
-
-cat << END
-
-**************************
-XONSH SETUP FINISHED!
-**************************
-
-END

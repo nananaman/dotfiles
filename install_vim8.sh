@@ -33,11 +33,3 @@ sudo apt-get install -y nodejs
 
 # yarn
 npm install -g yarn
-
-cat << END
-
-**************************
-VIM8 SETUP FINISHED!
-**************************
-
-END

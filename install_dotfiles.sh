@@ -9,8 +9,6 @@ cd $THIS_DIR
 git submodule init
 git submodule update
 
-echo "start setup..."
-
 ln -snfv ~/dotfiles/.vimrc ~/.vimrc
 ln -snfv ~/dotfiles/.xonshrc ~/.xonshrc
 ln -snfv ~/dotfiles/coc-settings.json ~/.vim/coc-settings.json
@@ -21,11 +19,3 @@ if [ "$(expr substr $(uname -s) 1 10)" == 'MINGW32_NT' ]; then
 else
   ln -snfv ~/dotfiles/.hyper.js ~/.hyper.js
 fi
-
-cat << END
-
-**************************
-DOTFILES SETUP FINISHED!
-**************************
-
-END

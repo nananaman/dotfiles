@@ -6,11 +6,7 @@ echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
 echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
 echo 'eval "$(pyenv init -)"' >> ~/.bashrc
 
-cat << END
-**************************
-Python SETUP FINISHED!
-
 source ~/.bashrc
-pyenv install --list
-**************************
-END
+
+git clone https://github.com/momo-lab/pyenv-instrall-latest.git "$(PYENV_ROOT)"/plugins/pyenv-install-latest
+pyenv install-latest
