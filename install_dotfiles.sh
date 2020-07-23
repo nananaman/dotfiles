@@ -15,7 +15,7 @@ ln -snfv ~/dotfiles/coc-settings.json ~/.vim/coc-settings.json
 ln -snfv ~/dotfiles/.tmux.conf ~/.tmux.conf
 
 if [ "$(expr substr $(uname -s) 1 10)" == 'MINGW32_NT' ]; then
-  ln -snfv ~/dotfiles/.hyper.win.js /mnt/c/Users/foola/AppData/Roaming/Hyper/.hyper.js
+  cp ~/dotfiles/.hyper.win.js /mnt/c/Users/foola/AppData/Roaming/Hyper/.hyper.js
 else
   ln -snfv ~/dotfiles/.hyper.js ~/.hyper.js
 fi
