@@ -55,11 +55,7 @@ module.exports = {
     css: '',
 
     // custom CSS to embed in the terminal window
-    termCSS: `
-      x-screen {
-        -webkit-font-smoothing: subpixel-antialiased !important;
-      }
-    `,
+    termCSS: ``,
 
     // if you're using a Linux setup which show native menus, set to false
     // default: `true` on Linux, `true` on Windows, ignored on macOS
