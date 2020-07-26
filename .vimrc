@@ -44,6 +44,8 @@ endif
 "End dein Scripts-------------------------
 let t_Co=256
 
+autocmd BufNewFile,BufRead *.ts setlocal filetype=typescript
+
 """"""""""""""""""""
 " setting
 """"""""""""""""""""
