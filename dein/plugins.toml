@@ -72,3 +72,6 @@ merged = 0
 
 [[plugins]]
 repo = 'junegunn/fzf.vim'
+
+[[plugins]]
+repo = 'dart-lang/dart-vim-plugin'
