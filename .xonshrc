@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 
+# colors
+_dark_primary_color  = "#7B1FA2"
+_light_primary_color = "#E1BEE7"
+_primary_color       = "#9C27B0"
+_success_color       = "#4CAF50"
+_error_color         = "#CC6666"
+
 # エディタ
 import os
 os.environ['EDITOR'] = '/usr/local/bin/vim'
@@ -27,13 +34,13 @@ $SUPPRESS_BRANCH_TIMEOUT_MESSAGE = True
 # キー入力即評価
 $UPDATE_COMPLETIONS_ON_KEYPRESS = False
 # プロンプトの表記
-$PROMPT_FIELDS['gitstatus_prefix'] = lambda: " {#FFF9C4}on {#FBC02D} " if os.path.exists(".git") else ""
-$PROMPT_FIELDS['success_color'] = lambda: "{#CC6666}" if __xonsh__.history.rtns and __xonsh__.history.rtns[-1] != 0 else "{#4CAF50}"
-$PROMPT = "\n{#FFEB3B}{cwd}{gitstatus_prefix}{gitstatus}\n{success_color}❯ "
+$PROMPT_FIELDS['gitstatus_prefix'] = lambda: " {" + _light_primary_color +  "}on {" + _primary_color + "} " if os.path.exists(".git") else ""
+$PROMPT_FIELDS['success_color'] = lambda: "{BOLD_" + _error_color + "}" if __xonsh__.history.rtns and __xonsh__.history.rtns[-1] != 0 else "{BOLD_" + _success_color + "}"
+$PROMPT = "\n{" + _primary_color + "}{cwd}{gitstatus_prefix}{gitstatus}\n{success_color}❯❯ "
 # $PROMPT = "{INTENSE_RED}{user}{INTENSE_GREEN}@{INTENSE_BLUE}{hostname}{INTENSE_YELLOW} [ {cwd} ] {INTENSE_BLUE}[ {gitstatus} {INTENSE_BLUE}] {GREEN}$ "
 # Gitの表記
-$XONSH_GITSTATUS_BRANCH = "{#FBC02D}"
-$XONSH_GITSTATUS_OPERATION = "{#FBC02D}"
+$XONSH_GITSTATUS_BRANCH = "{" + _primary_color + "}"
+$XONSH_GITSTATUS_OPERATION = "{"+ _primary_color + "}"
 # LSコマンドの出力の見た目
 $LS_COLORS = "di=34:ln=35:so=32:pi=33:ex=31:bd=46;34:cd=43;34:su=41;30:sg=46;30:tw=42;30:ow=43;30"
 
