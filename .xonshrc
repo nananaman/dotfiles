@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 # colors
-_dark_primary_color  = "#7B1FA2"
-_light_primary_color = "#E1BEE7"
-_primary_color       = "#9C27B0"
+_dark_primary_color  = "#FBC02D"
+_light_primary_color = "#FFF9C4"
+_primary_color       = "#FFEB3B"
 _success_color       = "#4CAF50"
 _error_color         = "#CC6666"
 
@@ -53,17 +53,17 @@ def _fh():
     history = list(dict.fromkeys(filter(lambda command: command != "fh", map(lambda item: item["inp"], __xonsh__.history.items()))))
     if len(history) > 0 :
       history = "\n".join(history[::-1])
-      command = $(echo @(history) | fzf +s +m)
+      command = $(echo @(history) | fzf +s +m --reverse)
       if command:
         @(command.split())
 
 def _fbr():
-  branch = $(git branch -vv | fzf +m | awk '{print $1}' | sed "s/.* //")
+  branch = $(git branch -vv | fzf +m --reverse | awk '{print $1}' | sed "s/.* //")
   command = "git checkout " + branch
   @(command.split())
 
 def _fbrm():
-  branch = $(git branch --all | grep -v HEAD | fzf +m | sed 's/.* //' | sed "s#remotes/[^/]*/##")
+  branch = $(git branch --all | grep -v HEAD | fzf +m --reverse | sed 's/.* //' | sed "s#remotes/[^/]*/##")
   command = "git checkout " + branch
   @(command.split())
 
@@ -76,13 +76,20 @@ def _fshow():
     @(command.split())
 
 def _fvd():
-  target = $(echo @('\n'.join(list(filter(lambda x: '.git/' not in x, $(find ~/dotfiles/).split())))) | fzf +m)
+  target = $(echo @('\n'.join(list(filter(lambda x: '.git/' not in x, $(find ~/dotfiles/).split())))) | fzf +m --reverse)
   if target:
     command = "vim " + target
     @(command.split())
 
-aliases['l'] = "ls"
-aliases['la'] = "ls -a"
+def _fssh():
+  target = $(cat ~/.ssh/config | grep -i ^host | awk '{print $2}'| fzf --no-sort --reverse)
+  if target:
+    command = "ssh " + target
+    @(command.split())
+
+aliases['l'] = "lsd"
+aliases['ls'] = "lsd"
+aliases['la'] = "lsd -a"
 aliases["v"] = "vim"
 aliases["vi"] = "vim"
 aliases["vb"] = "vim ~/.bashrc"
@@ -92,14 +99,17 @@ aliases["vt"] = "vim ~/.tmux.conf"
 aliases["vd"] = "vim ~/dotfiles/dein/plugins.toml"
 aliases["vdl"] = "vim ~/dotfiles/dein/plugins_lazy.toml"
 aliases["vt"] = "vim ~/.tmux.conf"
-aliases["vj"] = "vim ~/dotfiles/.hyper.js"
-aliases["vjw"] = "vim ~/dotfiles/.hyper.win.js"
+aliases["vh"] = "vim ~/dotfiles/.hyper.js"
+aliases["vhw"] = "vim ~/dotfiles/.hyper.win.js"
 
 aliases["fh"] = _fh
 aliases["fbr"] = _fbr
 aliases["fbrm"] = _fbrm
 aliases["fshow"] = _fshow
 aliases["fvd"] = _fvd
+aliases["fssh"] = _fssh
+
+aliases["twty"] = "~/go/bin/twty"
 
 ###############
 # key binding #
