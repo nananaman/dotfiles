@@ -8,9 +8,6 @@ repo = 'vim-airline/vim-airline'
 repo = 'vim-airline/vim-airline-themes'
 
 [[plugins]]
-repo = 'scrooloose/nerdtree'
-
-[[plugins]]
 repo = 'morhetz/gruvbox'
 
 [[plugins]]
@@ -75,3 +72,12 @@ repo = 'junegunn/fzf.vim'
 
 [[plugins]]
 repo = 'dart-lang/dart-vim-plugin'
+
+[[plugins]]
+repo = 'lambdalisue/fern.vim'
+
+[[plugins]]
+repo = 'lambdalisue/nerdfont.vim'
+
+[[plugins]]
+repo = 'lambdalisue/fern-renderer-nerdfont.vim'

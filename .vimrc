@@ -229,8 +229,9 @@ nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list
 nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 
-" NERDTree設定
-map <C-n> :NERDTreeToggle<CR>
+" fern.vim設定
+map <C-n> :Fern . -reveal=% -drawer -toggle<CR>
+let g:fern#renderer = "nerdfont"
 
 " colorscheme設定
 colorscheme gruvbox
