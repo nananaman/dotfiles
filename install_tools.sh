@@ -17,3 +17,6 @@ go get github.com/mattn/memo
 
 # twty
 go get github.com/mattn/twty
+
+# fk
+go get github.com/skanehira/fk/cmd/fk
