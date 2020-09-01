@@ -12,6 +12,7 @@ sudo make install
 
 # powerline
 sudo apt-get install fonts-powerline
+
 if [ "$(uname)" == 'Darwin' ]; then
   # Mac
   cd ~/Library/Fonts && curl -fLo "HackGenNerdConsole-Bold.ttf" https://github.com/yuru7/HackGen/raw/master/build/HackGenNerdConsole-Bold.ttf

@@ -304,3 +304,6 @@ nnoremap ,g :GGrep<Space>
 
 command! Terminal call popup_create(term_start([&shell], #{ hidden: 1, term_finish: 'close' }), #{ border: [], minwidth: winwidth(0)/2, minheight: &lines/2 })
 command! Term :Terminal
+
+" coc-go
+autocmd BufWritePre *.go :call CocAction('runCommand', 'editor.action.organizeImport')

@@ -109,9 +109,6 @@ aliases["fshow"] = _fshow
 aliases["fvd"] = _fvd
 aliases["fssh"] = _fssh
 
-aliases["twty"] = "~/go/bin/twty"
-aliases["memo"] = "~/go/bin/memo"
-
 ###############
 # key binding #
 ###############

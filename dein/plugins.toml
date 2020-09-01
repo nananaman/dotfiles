@@ -81,3 +81,9 @@ repo = 'lambdalisue/nerdfont.vim'
 
 [[plugins]]
 repo = 'lambdalisue/fern-renderer-nerdfont.vim'
+
+[[plugins]]
+repo = 'skanehira/translate.vim'
+
+[[plugins]]
+repo = 'skanehira/code2img.vim'
