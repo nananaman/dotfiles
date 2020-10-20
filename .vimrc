@@ -128,7 +128,7 @@ nmap <C-p> :bnext<CR>
 
 " vim-ligitline設定
 let g:lightline = {
-      \ 'colorscheme': 'wombat',
+      \ 'colorscheme': 'tokyonight',
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ],
       \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
@@ -256,10 +256,11 @@ map <C-n> :Fern . -reveal=% -drawer -toggle<CR>
 let g:fern#renderer = "nerdfont"
 
 " colorscheme設定
-colorscheme gruvbox
-set background=dark
-let g:gruvbox_contrast_dark = 'hard'
-let g:gruvbox_invert_indent_guides=1
+let g:tokyonight_style = 'night'
+let g:tokyonight_disable_italic_comment = 1
+colorscheme tokyonight
+
+" set background=dark
 
 " vimtex設定
 let g:vimtex_compiler_latexmk = {

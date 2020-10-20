@@ -13,5 +13,4 @@ echo x >> ~/.bashrc
 xonsh
 
 # xonshtrib導入
-xpip install xonsh-apt-tabcomplete
 xpip install xontrib-z

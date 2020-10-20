@@ -5,7 +5,7 @@ repo = 'Shougo/dein.vim'
 repo = 'itchyny/lightline.vim'
 
 [[plugins]]
-repo = 'morhetz/gruvbox'
+repo = 'ghifarit53/tokyonight-vim'
 
 [[plugins]]
 repo = 'easymotion/vim-easymotion'

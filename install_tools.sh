@@ -8,6 +8,9 @@ else
   exit 1
 fi
 
+# install rust
+curl https://sh.rustup.rs -sSf | sh
+
 # code2img
 git clone https://github.com/skanehira/code2img
 cd code2img && go install
@@ -20,3 +23,6 @@ go get github.com/mattn/twty
 
 # fk
 go get github.com/skanehira/fk/cmd/fk
+
+# lsd
+cargo install lsd

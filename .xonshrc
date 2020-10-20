@@ -48,15 +48,6 @@ $LS_COLORS = "di=34:ln=35:so=32:pi=33:ex=31:bd=46;34:cd=43;34:su=41;30:sg=46;30:
 # alias #
 #########
 
-def _fh():
-  if len(list(__xonsh__.history.items())) > 0:
-    history = list(dict.fromkeys(filter(lambda command: command != "fh", map(lambda item: item["inp"], __xonsh__.history.items()))))
-    if len(history) > 0 :
-      history = "\n".join(history[::-1])
-      command = $(echo @(history) | fzf +s +m --reverse)
-      if command:
-        @(command.split())
-
 def _fbr():
   branch = $(git branch -vv | fzf +m --reverse | awk '{print $1}' | sed "s/.* //")
   command = "git checkout " + branch
@@ -102,42 +93,12 @@ aliases["vt"] = "vim ~/.tmux.conf"
 aliases["vh"] = "vim ~/dotfiles/.hyper.js"
 aliases["vhw"] = "vim ~/dotfiles/.hyper.win.js"
 
-aliases["fh"] = _fh
 aliases["fbr"] = _fbr
 aliases["fbrm"] = _fbrm
 aliases["fshow"] = _fshow
 aliases["fvd"] = _fvd
 aliases["fssh"] = _fssh
 
-###############
-# key binding #
-###############
-
-from prompt_toolkit.keys import Keys
-from prompt_toolkit.filters import Condition, EmacsInsertMode, ViInsertMode
-
-@events.on_ptk_create
-def custom_keybindings(bindings, **kw):
-    handler = bindings.add
-
-    # コマンド入力中に<C-w>で記号、スペースの直前まで削除
-    @handler(Keys.ControlW)
-    def __ctrl_w(event):
-        # 'event.current_buffer'から、現在のバッファを取り出す。
-        buf = event.current_buffer # type: prompt_toolkif.buffer.Buffer
-        text = buf.text[:buf.cursor_position] # type: str
-
-        # バッファ中の文字から、削除したい文字数をカウントする。
-        m = re.search(r"[/,.=\s][^/,.=\s]+[/,.=\s]?$", text)
-        if m is not None:
-            buf.delete_before_cursor(len(text) - m.start() - 1)
-            return
-
-        # 削除する
-        buf.delete_before_cursor(len(text))
-
 # xontrib
 # zコマンドの利用 pip install xontrib-z
 xontrib load z
-# apt-getをtabで補完 pip install xonsh-apt-tabcomplete
-xontrib load apt_tabcomplete
