@@ -2,16 +2,16 @@
 repo = 'Shougo/dein.vim'
 
 [[plugins]]
-repo = 'vim-airline/vim-airline'
-
-[[plugins]]
-repo = 'vim-airline/vim-airline-themes'
+repo = 'itchyny/lightline.vim'
 
 [[plugins]]
 repo = 'morhetz/gruvbox'
 
 [[plugins]]
 repo = 'easymotion/vim-easymotion'
+
+[[plugins]]
+repo = 'mengelbrecht/lightline-bufferline'
 
 [[plugins]]
 repo = 'neoclide/coc.nvim'
@@ -87,3 +87,6 @@ repo = 'skanehira/translate.vim'
 
 [[plugins]]
 repo = 'skanehira/code2img.vim'
+
+[[plugins]]
+repo = 'mattn/vim-sonictemplate'

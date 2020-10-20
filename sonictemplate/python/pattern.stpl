@@ -1,0 +1,12 @@
+^main$
+	def main():
+	    {{_cursor_}}
+
+	if __name__ == '__main__':
+	    main()
+
+\([a-zA-z\_\.]\+\).len$
+	len({{$1}})
+
+print(\([a-zA-z\_]\+\).len)$
+	print(len({{$1}})){{_cursor_}}

@@ -120,18 +120,40 @@ nmap <Esc><Esc> :nohlsearch<CR><Esc>
 " 保存時に行末のスペースoを削除
 autocmd BufWritePre * :%s/\s\+$//ge
 
-" vim-airline設定
-" タブを有効
-let g:airline#extensions#tabline#enabled = 1
-" タブに番号を振る
-let g:airline#extensions#tabline#buffer_idx_mode = 1
-" Tabを<C-o><C-p>で切り替え
-nmap <C-o> <Plug>AirlineSelectPrevTab
-nmap <C-p> <Plug>AirlineSelectNextTab
-" テーマ
-let g:airline_theme = 'gruvbox'
-" PowerLineフォントを有効
-let g:airline_powerline_fonts = 1
+" tablineを表示
+set showtabline=2
+" Bufferを<C-o><C-p>で切り替え
+nmap <C-o> :bprevious<CR>
+nmap <C-p> :bnext<CR>
+
+" vim-ligitline設定
+let g:lightline = {
+      \ 'colorscheme': 'wombat',
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
+      \ },
+      \ 'component_function': {
+      \   'gitbranch': 'FugitiveHead'
+      \ },
+      \ 'separator': { 'left': '', 'right': '' },
+      \ 'subseparator': { 'left': '', 'right': '' },
+      \ 'tabline': {
+      \   'left': [ ['buffers'] ],
+      \   'right': [ ['close'] ]
+      \ },
+      \ 'component_expand': {
+      \   'buffers': 'lightline#bufferline#buffers'
+      \ },
+      \ 'component_type': {
+      \   'buffers': 'tabsel'
+      \ }
+      \ }
+
+" lightline-bufferline設定
+let g:lightline#bufferline#show_number     = 0
+let g:lightline#bufferline#unnamed         = '[No Name]'
+let g:lightline#bufferline#enable_nerdfont = 1
 
 " coc.nvim設定
 " タブキーで補完候補選択
@@ -307,3 +329,6 @@ command! Term :Terminal
 
 " coc-go
 autocmd BufWritePre *.go :call CocAction('runCommand', 'editor.action.organizeImport')
+
+" sonictemplate.vim
+let g:sonictemplate_vim_template_dir = [ '~/dotfiles/sonictemplate' ]
