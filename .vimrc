@@ -131,10 +131,11 @@ let g:lightline = {
       \ 'colorscheme': 'tokyonight',
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ],
-      \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
+      \             [ 'gitbranch', 'readonly', 'relativepath', 'modified' ] ]
       \ },
       \ 'component_function': {
-      \   'gitbranch': 'FugitiveHead'
+      \   'gitbranch': 'FugitiveHead',
+      \   'myfilename': 'MyFilename'
       \ },
       \ 'separator': { 'left': '', 'right': '' },
       \ 'subseparator': { 'left': '', 'right': '' },
@@ -188,6 +189,11 @@ function! s:show_documentation()
     call CocAction('doHover')
   endif
 endfunction
+
+nnoremap <nowait><expr> <C-j> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-j>"
+nnoremap <nowait><expr> <C-k> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-k>"
+inoremap <nowait><expr> <C-j> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
+inoremap <nowait><expr> <C-k> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
 
 " カーソル下のカッコをハイライトする
 autocmd CursorHold * silent call CocActionAsync('highlight')

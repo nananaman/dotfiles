@@ -90,3 +90,6 @@ repo = 'skanehira/code2img.vim'
 
 [[plugins]]
 repo = 'mattn/vim-sonictemplate'
+
+[[plugins]]
+repo = 'obcat/vim-hitspop'

@@ -99,6 +99,8 @@ aliases["fshow"] = _fshow
 aliases["fvd"] = _fvd
 aliases["fssh"] = _fssh
 
+aliases["tmux"] = "~/Downloads/tmux/tmux"
+
 # xontrib
 # zコマンドの利用 pip install xontrib-z
 xontrib load z
