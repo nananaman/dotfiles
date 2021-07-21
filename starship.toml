@@ -1,0 +1,6 @@
+[directory]
+style = "#FFEB3B"
+
+[git_branch]
+symbol = " "
+style = "#FFEB3B"
