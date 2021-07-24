@@ -1,15 +1,21 @@
 #!/bin/sh
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  sudo apt-get install fish
+    sudo apt-add-repository ppa:fish-shell/release-3
+    sudo apt-get update
+    sudo apt-get install fish
+    sudo chsh $USER -s `which fish`
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   # Mac OSX
-  brew install fish fish fzf ghq fd bat
+  brew install fish
 else
   # Unknown.
+  continue
 fi
 
-chsh -s `which fish`
+sudo chsh $USER -s `which fish`
+
+fish
 
 # fisher
 curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher
@@ -18,6 +24,3 @@ curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher
 fisher install jethrokuan/z
 fisher install PatrickF1/fzf.fish
 fisher install decors/fish-ghq
-
-# starship
-sh -c "$(curl -fsSL https://starship.rs/install.sh)"

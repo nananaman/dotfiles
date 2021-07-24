@@ -2,6 +2,7 @@ if [ "$(uname)" == 'Darwin' ]; then
   # Mac
   brew install tmux
 elif [ "$(expr substr $(uname -s) 1 5)" == 'Linux' ]; then
+  # Debian, Ubuntu
   sudo apt update
   sudo apt install git automake bison build-essential pkg-config libevent-dev libncurses5-dev
 

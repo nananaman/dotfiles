@@ -1,29 +1,16 @@
-#!/bin/sh
+GITHUB_URL='https://github.com/nananaman/dotfiles.git'
 
-echo "[Info] start setup..."
+# install git
+if !(type git >/dev/null 2>&1); then
+  if [ "$(uname)" == 'Darwin' ]; then
+    brew install git
+  elif [ "$(expr substr $(uname -s) 1 5)" == 'Linux' ]; then
+    sudo apt-get install git
+  fi
+fi
 
-echo "[Info] Install dotfiles..."
-sh install_dotfiles.sh
+git clone --recursive "$GITHUB_URL" '~/.dotfiles'
 
-echo "[Info] Install fzf..."
-sh install_fzf.sh
-
-echo "[Info] Install tmux..."
-sh install_tmux.sh
-
-echo "[Info] Install vim8..."
-sh install_vim8.sh
-
-echo "[Info] Install python..."
-sh install_pyenv.sh
-
-echo "[Info] Install xonsh..."
-sh install_xonsh.sh
-
-cat << END
-
-**************************
-**    SETUP FINISHED!   **
-**************************
-
-END
+cd ~/dotfiles
+make deploy
+make init

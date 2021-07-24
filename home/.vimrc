@@ -18,8 +18,7 @@ endif
 if dein#load_state(s:dein_path)
   call dein#begin(s:dein_path)
 
-  " let g:config_dir = expand('~/.vim/dein/userconfig')
-  let g:config_dir = expand('~/dotfiles/dein')
+  let g:config_dir = expand('~/.vim/dein')
   let s:toml = g:config_dir . '/plugins.toml'
   let s:lazy_toml = g:config_dir . '/plugins_lazy.toml'
 
@@ -338,4 +337,4 @@ command! Term :Terminal
 autocmd BufWritePre *.go :call CocAction('runCommand', 'editor.action.organizeImport')
 
 " sonictemplate.vim
-let g:sonictemplate_vim_template_dir = [ '~/dotfiles/sonictemplate' ]
+let g:sonictemplate_vim_template_dir = [ '~/.vim/sonictemplate' ]

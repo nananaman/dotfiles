@@ -1,0 +1,6 @@
+alias cat='bat'
+alias ls='lsd'
+alias la='lsd -a'
+alias reload='exec fish'
+alias vh='vim ~/dotfiles/.hyper.js'
+alias vhw='vim ~/dotfiles/.hyper.win.js'
