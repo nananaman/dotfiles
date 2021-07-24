@@ -3,8 +3,10 @@ if [ "$(uname)" == 'Darwin' ]; then
   brew install tmux
 elif [ "$(expr substr $(uname -s) 1 5)" == 'Linux' ]; then
   # Debian, Ubuntu
-  sudo apt update
-  sudo apt install git automake bison build-essential pkg-config libevent-dev libncurses5-dev
+  TZ=Asia/Tokyo
+  ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+  sudo apt-get update
+  sudo apt-get install -y automake bison build-essential pkg-config libevent-dev libncurses5-dev
 
   cd /usr/local/src/
   git clone https://github.com/tmux/tmux

@@ -1,10 +1,12 @@
 #!/bin/sh
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    sudo apt-add-repository ppa:fish-shell/release-3
-    sudo apt-get update
-    sudo apt-get install fish
-    sudo chsh $USER -s `which fish`
+  if !(type add-apt-repository >/dev/null 2>&1); then
+    sudo apt-get install -y software-properties-common
+  fi
+  sudo apt-add-repository ppa:fish-shell/release-3
+  sudo apt-get update
+  sudo apt-get install -y fish
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   # Mac OSX
   brew install fish

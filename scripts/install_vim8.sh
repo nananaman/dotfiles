@@ -25,7 +25,7 @@ if [ "$(uname)" == 'Darwin' ]; then
   # clean-up a bit
   rm -rf /tmp/fonts
 elif [ "$(expr substr $(uname -s) 1 5)" == 'Linux' ]; then
-  sudo apt-get install fonts-powerline
+  sudo apt-get install -y fonts-powerline
 fi
 
 # font

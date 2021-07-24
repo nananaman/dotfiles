@@ -3,16 +3,16 @@
 echo "[Info] start setup..."
 
 echo "[Info] Install tools..."
-sh install_tools.sh
+bash install_tools.sh
 
 echo "[Info] Install tmux..."
-sh install_tmux.sh
+bash install_tmux.sh
 
 echo "[Info] Install vim8..."
-sh install_vim8.sh
+bash install_vim8.sh
 
 echo "[Info] Install fish..."
-sh install_fish.sh
+bash install_fish.sh
 
 cat << END
 
