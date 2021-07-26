@@ -30,3 +30,5 @@ function tmuxpopup -d 'toggle tmux popup window'
     tmux popup -d '#{pane_current_path}' -xC -yC -w$width -h$height -E "tmux attach -t popup || tmux new -s popup"
   end
 end
+
+set fish_greeting

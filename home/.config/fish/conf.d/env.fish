@@ -1,3 +1,6 @@
+# shell
+set SHELL /usr/local/bin/fish
+
 # path
 set PATH $HOME/.cargo/bin /usr/local/go/bin $PATH
 

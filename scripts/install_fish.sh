@@ -15,7 +15,12 @@ else
   continue
 fi
 
-sudo chsh $USER -s `which fish`
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  sudo chsh $USER -s `which fish`
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+  chsh -s `which fish`
+fi
+
 
 fish
 
