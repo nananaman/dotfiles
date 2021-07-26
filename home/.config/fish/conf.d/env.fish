@@ -1,8 +1,12 @@
 # shell
 set SHELL /usr/local/bin/fish
 
-# path
-set PATH $HOME/.cargo/bin /usr/local/go/bin $PATH
+# cargo
+set PATH $HOME/.cargo/bin $PATH
+
+# go
+set PATH /usr/local/go/bin $PATH
+set PATH $HOME/go/bin $PATH
 
 # fzf
 fzf_configure_bindings --directory=\cf
