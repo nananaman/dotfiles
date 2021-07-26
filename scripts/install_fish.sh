@@ -24,6 +24,12 @@ fi
 
 fish
 
+# ローカル設定用のファイル
+set -l local_config_path ~/.config/fish/conf.d/local.fish
+if test -f $local_config_path
+  touch $local_config_path
+fi
+
 # fisher
 curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher
 
