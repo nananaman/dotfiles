@@ -2,6 +2,7 @@
 
 cp -r ~/dotfiles/home/. ~/
 
-if [ "$(expr substr $(uname -s) 1 10)" == 'MINGW32_NT' ]; then
+# is WSL
+if [[ $(grep WSL /proc/version) ]]; then
   cp ~/dotfiles/.hyper.win.js /mnt/c/Users/foola/AppData/Roaming/Hyper/.hyper.js
 fi
