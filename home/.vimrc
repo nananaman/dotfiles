@@ -119,6 +119,10 @@ nmap <Esc><Esc> :nohlsearch<CR><Esc>
 " 保存時に行末のスペースoを削除
 autocmd BufWritePre * :%s/\s\+$//ge
 
+" 画面分割
+nmap <silent> <C-w>\| :vsplit<cr>
+nmap <silent> <C-w>- :split<cr>
+
 " tablineを表示
 set showtabline=2
 " Bufferを<C-o><C-p>で切り替え

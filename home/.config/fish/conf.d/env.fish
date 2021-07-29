@@ -1,5 +1,5 @@
 # shell
-set SHELL /usr/local/bin/fish
+set SHELL (which fish)
 
 # cargo
 set PATH $HOME/.cargo/bin $PATH
@@ -10,10 +10,6 @@ set PATH $HOME/go/bin $PATH
 
 # fzf
 fzf_configure_bindings --directory=\cf
-
-# ghq
-fzf_configure_bindings --directory=\cf
-bind \cb '__ghq_repository_search'
 
 # starship
 if not type -q starship

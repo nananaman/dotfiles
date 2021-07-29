@@ -1,3 +1,5 @@
+set fish_greeting
+
 function fbr
   set -l branch ( git branch -vv | fzf +m --reverse  )
   and git checkout ( echo $branch | awk '{print $1}' | sed 's/.* //'  )
@@ -15,9 +17,11 @@ function fvd
   if string length -q -- $tgt
     vim $tgt
     and make deploy
+    and cd -
     and exec fish
+  else
+    cd -
   end
-  cd -
 end
 
 function tmuxpopup -d 'toggle tmux popup window'
@@ -31,4 +35,53 @@ function tmuxpopup -d 'toggle tmux popup window'
   end
 end
 
-set fish_greeting
+function inittmux
+  if not string length -q $TMUX
+    set -l sessions ( tmux list-sessions )
+    if string length -q "$sesions"
+      tmux new-session
+      return
+    end
+
+    set -l create_new_session "Create New Session"
+    set -l sessions $sessions "$create_new_session"
+    set -l session_id ( string join \n $sessions | fzf +m --reverse | cut -d: -f1 )
+    if test "$session_id" = "$create_new_session"
+      tmux new-session
+    else if string length -q "$session_id"
+      tmux attach-session -t $session_id
+    end
+  end
+end
+
+function f
+  set -l project ( ghq list | fzf +m --reverse --prompt='Project > ' )
+  if not string length -q $project
+    return
+  end
+
+  set -l dir ( ghq root )/$project
+  if string length -q $TMUX
+    set repo ( basename $project )
+    set session ( string replace . - $repo )
+    set current_session ( tmux list-sessions | grep attached | cut -d: -f1 )
+    echo $session
+
+    if string match -r '^[0-9]+$' $current_session
+      cd $dir
+      tmux rename-session $session
+    else
+      tmux list-sessions | cut -d: -f1 | grep -e "^$session\$" > /dev/null
+      if test $status -ne 0
+        tmux new-session -d -c $dir -s $session
+      end
+      tmux switch-client -t $session
+    end
+  else
+    cd $dir
+  end
+end
+
+if status --is-login
+  inittmux
+end
