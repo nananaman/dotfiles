@@ -93,3 +93,6 @@ repo = 'mattn/vim-sonictemplate'
 
 [[plugins]]
 repo = 'obcat/vim-hitspop'
+
+[[plugins]]
+repo = 'christoomey/vim-tmux-navigator'

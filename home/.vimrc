@@ -120,8 +120,15 @@ nmap <Esc><Esc> :nohlsearch<CR><Esc>
 autocmd BufWritePre * :%s/\s\+$//ge
 
 " 画面分割
-nmap <silent> <C-w>\| :vsplit<cr>
-nmap <silent> <C-w>- :split<cr>
+nmap <silent> <C-w>\| :vsplit<CR>
+nmap <silent> <C-w>- :split<CR>
+
+" tmux
+let g:tmux_navigator_no_mappings = 1
+nmap <C-w>h :TmuxNavigateLeft<CR>
+nmap <C-w>j :TmuxNavigateDown<CR>
+nmap <C-w>k :TmuxNavigateUp<CR>
+nmap <C-w>l :TmuxNavigateRight<CR>
 
 " tablineを表示
 set showtabline=2
@@ -195,8 +202,8 @@ endfunction
 
 nnoremap <nowait><expr> <C-j> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-j>"
 nnoremap <nowait><expr> <C-k> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-k>"
-inoremap <nowait><expr> <C-j> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
-inoremap <nowait><expr> <C-k> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
+inoremap <nowait><expr> <C-j> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<CR>" : "\<Right>"
+inoremap <nowait><expr> <C-k> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<CR>" : "\<Left>"
 
 " カーソル下のカッコをハイライトする
 autocmd CursorHold * silent call CocActionAsync('highlight')
@@ -244,15 +251,15 @@ command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organize
 
 " Using CocList
 " Show all diagnostics
-nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
+nnoremap <silent> <space>a  :<C-u>CocList diagnostics<CR>
 " Manage extensions
-nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
+nnoremap <silent> <space>e  :<C-u>CocList extensions<CR>
 " Show commands
-nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
+nnoremap <silent> <space>c  :<C-u>CocList commands<CR>
 " Find symbol of current document
-nnoremap <silent> <space>o  :<C-u>CocList outline<cr>
+nnoremap <silent> <space>o  :<C-u>CocList outline<CR>
 " Search workspace symbols
-nnoremap <silent> <space>s  :<C-u>CocList -I symbols<cr>
+nnoremap <silent> <space>s  :<C-u>CocList -I symbols<CR>
 " Do default action for next item.
 nnoremap <silent> <space>j  :<C-u>CocNext<CR>
 " Do default action for previous item.

@@ -35,7 +35,7 @@ function tmuxpopup -d 'toggle tmux popup window'
   end
 end
 
-function inittmux
+function inittmux -d 'シェル起動時に呼んでtmuxに入ってなければ入る'
   if not string length -q $TMUX
     set -l sessions ( tmux list-sessions )
     if string length -q "$sesions"
@@ -54,7 +54,7 @@ function inittmux
   end
 end
 
-function f
+function f -d 'ghqで管理してるプロジェクトをfzfで検索してsessionで開く'
   set -l project ( ghq list | fzf +m --reverse --prompt='Project > ' )
   if not string length -q $project
     return
