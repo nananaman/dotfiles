@@ -24,6 +24,14 @@ function fvd
   end
 end
 
+function ghq-migrater-check -d 'call ghq-migrator'
+  bash ~/dotfiles/scripts/ghq-migrator.bash (pwd)
+end
+
+function ghq-migrater-migrate -d 'call ghq-migrator and run'
+  GHQ_MIGRATOR_ACTUALLY_RUN=1 bash ~/dotfiles/scripts/ghq-migrator.bash (pwd)
+end
+
 function tmuxpopup -d 'toggle tmux popup window'
   set width '80%'
   set height '80%'

@@ -276,23 +276,6 @@ let g:tokyonight_style = 'night'
 let g:tokyonight_disable_italic_comment = 1
 colorscheme tokyonight
 
-" set background=dark
-
-" vimtex設定
-let g:vimtex_compiler_latexmk = {
-            \'background': 1,
-            \'build_dir': '',
-            \'continuous': 1,
-            \'callback': 0,
-            \'options': [
-            \   '-pdfdvi',
-            \   '-verbose',
-            \   '-file-line-error',
-            \   '-synctex=1',
-            \   '-interaction=nonstopmode',
-            \],
-            \}
-
 " instant_markdown設定
 " markdownを自動で開かない
 let g:instant_markdown_autostart = 0
