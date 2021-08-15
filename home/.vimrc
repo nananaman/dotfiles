@@ -123,13 +123,6 @@ autocmd BufWritePre * :%s/\s\+$//ge
 nmap <silent> <C-w>\| :vsplit<CR>
 nmap <silent> <C-w>- :split<CR>
 
-" tmux
-let g:tmux_navigator_no_mappings = 1
-nmap <C-w>h :TmuxNavigateLeft<CR>
-nmap <C-w>j :TmuxNavigateDown<CR>
-nmap <C-w>k :TmuxNavigateUp<CR>
-nmap <C-w>l :TmuxNavigateRight<CR>
-
 " tablineを表示
 set showtabline=2
 " Bufferを<C-o><C-p>で切り替え
