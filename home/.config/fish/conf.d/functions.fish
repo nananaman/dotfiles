@@ -76,6 +76,7 @@ function f -d 'ghqで管理してるプロジェクトをfzfで検索してsessi
 
     if string match -r '^[0-9]+$' $current_session
       tmux rename-session $session
+      cd $dir
     else
       tmux list-sessions | cut -d: -f1 | grep -e "^$session\$" > /dev/null
       if test $status -ne 0
@@ -84,7 +85,6 @@ function f -d 'ghqで管理してるプロジェクトをfzfで検索してsessi
       tmux switch-client -t $session
     end
   end
-  cd $dir
 end
 
 if status --is-login

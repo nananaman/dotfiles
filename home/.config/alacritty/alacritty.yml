@@ -1,0 +1,10 @@
+# shell:
+#   program: /Windows/System32/wsl.exe ~ -d Ubuntu-20.04
+
+font:
+  normal:
+    family: HackGenNerd Console
+    style: Bold
+
+background_opacity: 0.85
+startup_mode: SimpleFullscreen

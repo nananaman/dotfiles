@@ -3,51 +3,44 @@ if &compatible
   set nocompatible               " Be iMproved
 endif
 
-let s:dein_path = expand('~/.vim/dein')
-let s:dein_repo_path = s:dein_path . 'repos/github.com/Shougo/dein.vim'
-
-" dein.vimがなければgithubからclone
-if &runtimepath !~# '/dein.vim'
-  if !isdirectory(s:dein_repo_path)
-    execute '!git clone https://github.com/Shougo/dein.vim' s:dein_repo_path
-  endif
-  execute 'set runtimepath^=' . fnamemodify(s:dein_repo_path, ':p')
-endif
+" Required:
+set runtimepath+=/home/nananaman/.cache/dein/repos/github.com/Shougo/dein.vim
 
 " Required:
-if dein#load_state(s:dein_path)
-  call dein#begin(s:dein_path)
+call dein#begin('/home/nananaman/.cache/dein')
 
-  let g:config_dir = expand('~/.vim/dein')
-  let s:toml = g:config_dir . '/plugins.toml'
-  let s:lazy_toml = g:config_dir . '/plugins_lazy.toml'
+" Let dein manage dein
+" Required:
+call dein#add('/home/nananaman/.cache/dein/repos/github.com/Shougo/dein.vim')
 
-  " TOML 読み込み
-  call dein#load_toml(s:toml, {'lazy': 0})
-  call dein#load_toml(s:lazy_toml, {'lazy': 1})
+" Load plugins
+let g:config_dir = expand('~/.config/nvim/dein')
+let s:toml = g:config_dir . '/plugins.toml'
+let s:lazy_toml = g:config_dir . '/plugins_lazy.toml'
 
-  " Required:
-  call dein#end()
-  call dein#save_state()
-endif
+call dein#load_toml(s:toml, {'lazy': 0})
+call dein#load_toml(s:lazy_toml, {'lazy': 1})
 
 " Required:
-filetype plugin indent on
-syntax enable
+call dein#end()
 
 " If you want to install not installed plugins on startup.
 if dein#check_install()
   call dein#install()
 endif
 
-"End dein Scripts-------------------------
-let t_Co=256
+" Required:
+filetype plugin indent on
+syntax enable
 
-autocmd BufNewFile,BufRead *.ts setlocal filetype=typescript
+"End dein Scripts-------------------------
+" init.vimを保存したら自動反映
+autocmd BufWritePost  ~/.config/nvim/init.vim  so ~/.config/nvim/init.vim
 
 """"""""""""""""""""
 " setting
 """"""""""""""""""""
+set modifiable
 " 文字コードをUTF-8に
 set fenc=utf-8
 " バックアップをとらない
@@ -69,6 +62,7 @@ set clipboard+=unnamed
 set updatetime=300
 
 " 見た目系
+set termguicolors
 " 行番号表示
 set number
 " 現在の行を強調表示
@@ -85,6 +79,7 @@ set showmatch
 set laststatus=2
 " コマンドラインの補完
 set wildmode=list:longest
+
 " ins-completion-menu 関連のメッセージを表示しない
 set shortmess+=c
 set signcolumn=yes
@@ -93,6 +88,7 @@ set signcolumn=yes
 " Tabが意味するスペース数
 set tabstop=2
 " 自動インデントで入るスペース数
+
 set shiftwidth=2
 " Tabで入力されるスペース数
 set softtabstop=2
@@ -103,11 +99,13 @@ set autoindent
 " {があると自動でインデント
 set smartindent
 
+
 " 検索系
 " 検索文字列が小文字の場合、大文字小文字を区別しない
 set ignorecase
 " 検索文字列に大文字が含まれている場合、それらを区別
 set smartcase
+
 " 検索文字列入力時に順次ヒット
 set incsearch
 " 検索時に最後まで行ったら最初に戻る
@@ -126,40 +124,67 @@ nmap <silent> <C-w>- :split<CR>
 " tablineを表示
 set showtabline=2
 " Bufferを<C-o><C-p>で切り替え
+
 nmap <C-o> :bprevious<CR>
 nmap <C-p> :bnext<CR>
 
 " vim-ligitline設定
 let g:lightline = {
-      \ 'colorscheme': 'tokyonight',
-      \ 'active': {
-      \   'left': [ [ 'mode', 'paste' ],
-      \             [ 'gitbranch', 'readonly', 'relativepath', 'modified' ] ]
-      \ },
-      \ 'component_function': {
-      \   'gitbranch': 'FugitiveHead',
-      \   'myfilename': 'MyFilename'
-      \ },
-      \ 'separator': { 'left': '', 'right': '' },
-      \ 'subseparator': { 'left': '', 'right': '' },
-      \ 'tabline': {
-      \   'left': [ ['buffers'] ],
-      \   'right': [ ['close'] ]
-      \ },
-      \ 'component_expand': {
-      \   'buffers': 'lightline#bufferline#buffers'
-      \ },
-      \ 'component_type': {
-      \   'buffers': 'tabsel'
-      \ }
-      \ }
+    \ 'colorscheme': 'onedark',
+    \ 'active': {
+    \   'left': [ [ 'mode', 'paste' ],
+    \             [ 'gitbranch', 'readonly', 'relativepath', 'modified' ] ]
+    \ },
+    \ 'component_function': {
+    \   'gitbranch': 'FugitiveHead',
+    \   'myfilename': 'MyFilename'
+    \ },
+    \ 'separator': { 'left': '', 'right': '' },
+    \ 'subseparator': { 'left': '', 'right': '' },
+    \ 'tabline': {
+    \   'left': [ ['buffers'] ],
+    \   'right': [ ['close'] ]
+    \ },
+    \ 'component_expand': {
+    \   'buffers': 'lightline#bufferline#buffers'
+    \ },
+    \ 'component_type': {
+    \   'buffers': 'tabsel'
+    \ }
+  \ }
 
 " lightline-bufferline設定
 let g:lightline#bufferline#show_number     = 0
 let g:lightline#bufferline#unnamed         = '[No Name]'
 let g:lightline#bufferline#enable_nerdfont = 1
 
+" colorscheme設定
+let g:tokyonight_style = 'night'
+let g:tokyonight_italic_comment = 0
+let g:tokyonight_transparent = 1
+colorscheme tokyonight
+
+colorscheme onedark
+
+" fern.vim設定
+map <C-n> :Fern . -reveal=% -drawer -toggle<CR>
+let g:fern#renderer = "nerdfont"
+
+" EasyMotion設定
+" s{char}{char}{label}で移動
+
+nmap s <Plug>(easymotion-s2)
+
+highlight Normal ctermbg=NONE guibg=NONE
+highlight NonText ctermbg=NONE guibg=NONE
+highlight LineNr ctermbg=NONE guibg=NONE
+
+
 " coc.nvim設定
+" 起動時に必ず入れる拡張機能
+let g:coc_global_extensions = [
+  \'coc-fzf-preview',
+\]
 " タブキーで補完候補選択
 inoremap <silent><expr><TAB> pumvisible() ? "<C-n>" : <SID>check_back_space() ? "\<TAB>" : coc#refresh()
 inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
@@ -169,18 +194,23 @@ function! s:check_back_space() abort
   return !col || getline('.')[col - 1] =~# '\s'
 endfunction
 
+
 " <c-space>で補完
 inoremap <silent><expr> <c-space> coc#refresh()
 
 " Use `[g` and `]g` to navigate diagnostics
 nmap <silent> [g <Plug>(coc-diagnostic-prev)
+
 nmap <silent> ]g <Plug>(coc-diagnostic-next)
 
 " 定義ジャンプ
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
+nmap <silent> ge :CocCommand fzf-preview.CocDiagnostics<CR>
+nmap <silent> gce :CocCommand fzf-preview.CocCurrentDiagnostics<CR>
+nmap <silent> gd :CocCommand fzf-preview.CocDefinition<CR>
+" nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy :CocCommand fzf-preview.CocTypeDefinition<CR>
+nmap <silent> gi :CocCommand fzf-preview.CocImplementations<CR>
+nmap <silent> gr :CocCommand fzf-preview.CocReferences<CR>
 
 " Kでドキュメントを開く
 nnoremap <silent> K :call <SID>show_documentation()<CR>
@@ -198,6 +228,7 @@ nnoremap <nowait><expr> <C-k> coc#float#has_scroll() ? coc#float#scroll(0) : "\<
 inoremap <nowait><expr> <C-j> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<CR>" : "\<Right>"
 inoremap <nowait><expr> <C-k> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<CR>" : "\<Left>"
 
+
 " カーソル下のカッコをハイライトする
 autocmd CursorHold * silent call CocActionAsync('highlight')
 
@@ -214,6 +245,7 @@ augroup mygroup
   autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
 
+
 " Remap for do codeAction of selected region, ex: `<leader>aap` for current paragraph
 xmap <leader>a  <Plug>(coc-codeaction-selected)
 nmap <leader>a  <Plug>(coc-codeaction-selected)
@@ -221,6 +253,7 @@ nmap <leader>a  <Plug>(coc-codeaction-selected)
 " Remap for do codeAction of current line
 nmap <leader>ac  <Plug>(coc-codeaction)
 " Fix autofix problem of current line
+
 nmap <leader>qf  <Plug>(coc-fix-current)
 
 " Create mappings for function text object, requires document symbols feature of languageserver.
@@ -230,11 +263,13 @@ omap if <Plug>(coc-funcobj-i)
 omap af <Plug>(coc-funcobj-a)
 
 " Use <C-d> for select selections ranges, needs server support, like: coc-tsserver, coc-python
+
 nmap <silent> <C-d> <Plug>(coc-range-select)
 xmap <silent> <C-d> <Plug>(coc-range-select)
 
 " Use `:Format` to format current buffer
 command! -nargs=0 Format :call CocAction('format')
+
 
 " Use `:Fold` to fold current buffer
 command! -nargs=? Fold :call     CocAction('fold', <f-args>)
@@ -243,6 +278,7 @@ command! -nargs=? Fold :call     CocAction('fold', <f-args>)
 command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
 
 " Using CocList
+
 " Show all diagnostics
 nnoremap <silent> <space>a  :<C-u>CocList diagnostics<CR>
 " Manage extensions
@@ -260,18 +296,19 @@ nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list
 nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 
-" fern.vim設定
-map <C-n> :Fern . -reveal=% -drawer -toggle<CR>
-let g:fern#renderer = "nerdfont"
+" fzf-preview.vim
+set shell=/usr/bin/bash
+let $SHELL='/usr/bin/bash'
+let g:fzf_preview_command = 'bat --color=always --plain {-1}'
+let g:fzf_preview_lines_command = 'bat --color=always --plain --number'
+nnoremap <silent> ,f :CocCommand fzf-preview.GitFiles<CR>
+nnoremap <silent> ,b :CocCommand fzf-preview.Buffers<CR>
+nnoremap <silent> ,h :CocCommand fzf-preview.ProjectMruFiles<CR>
+nnoremap <silent> ,l :CocCommand fzf-preview.Lines<CR>
+nnoremap ,g :CocCommand fzf-preview.ProjectGrep<Space>
 
-" colorscheme設定
-let g:tokyonight_style = 'night'
-let g:tokyonight_disable_italic_comment = 1
-colorscheme tokyonight
-
-" instant_markdown設定
-" markdownを自動で開かない
-let g:instant_markdown_autostart = 0
+" nvim-colorizer.lua設定
+lua require 'colorizer'.setup{'css';'javascript';'html'}
 
 " vim-indent-guides設定
 let g:indent_guides_enable_on_vim_startup = 1
@@ -279,49 +316,20 @@ let g:indent_guides_guide_size = 2
 let g:indent_guides_start_level = 2
 let g:indent_guides_auto_colors = 1
 
-" EasyMotion設定
-" s{char}{char}{label}で移動
-nmap s <Plug>(easymotion-s2)
-
-highlight Normal ctermbg=NONE guibg=NONE
-highlight NonText ctermbg=NONE guibg=NONE
-highlight LineNr ctermbg=NONE guibg=NONE
-
-" vim-fugitive設定
-nnoremap <leader>ga :Git add %:p<CR><CR>
-nnoremap <leader>gc :Gcommit<CR><CR>
-nnoremap <leader>gs :Gstatus<CR>
-nnoremap <leader>gp :Gpush<CR>
-nnoremap <leader>gd :Gdiff<CR>
-nnoremap <leader>gl :Glog<CR>
-nnoremap <leader>gb :Gblame<CR>
-
-" Start interactive EasyAlign in visual mode (e.g. vipga)
-xmap ga <Plug>(EasyAlign)
-
-" Start interactive EasyAlign for a motion/text object (e.g. gaip)
-nmap ga <Plug>(EasyAlign)
-
-" fzf設定
-command! -bang -nargs=* GGrep
-      \ call fzf#vim#grep(
-      \ 'git grep --line-number -- '.shellescape(<q-args>), 0,
-      \ fzf#vim#with_preview({'dir': systemlist('git rev-parse --show-toplevel')[0]}), <bang>0
-      \)
-
-nnoremap <silent> ,f :GFiles<CR>
-nnoremap <silent> ,F :GFiles?<CR>
-nnoremap <silent> ,b :Buffers<CR>
-nnoremap <silent> ,l :BLines<CR>
-nnoremap <silent> ,h :History<CR>
-nnoremap <silent> ,m :Mark<CR>
-nnoremap ,g :GGrep<Space>
-
-command! Terminal call popup_create(term_start([&shell], #{ hidden: 1, term_finish: 'close' }), #{ border: [], minwidth: winwidth(0)/2, minheight: &lines/2 })
-command! Term :Terminal
-
-" coc-go
-autocmd BufWritePre *.go :call CocAction('runCommand', 'editor.action.organizeImport')
-
 " sonictemplate.vim
-let g:sonictemplate_vim_template_dir = [ '~/.vim/sonictemplate' ]
+" <C-y><C-b>で後方補完
+let g:sonictemplate_vim_template_dir = [ '~/.config/nvim/sonictemplate' ]
+
+" Gina.vim設定
+nnoremap <leader>gc :Gina commit<CR><CR>
+nnoremap <leader>ga :CocCommand fzf-preview.GitActions<CR>
+nnoremap <leader>gs :CocCommand fzf-preview.GitStatus<CR>
+
+nnoremap <leader>gp :Gina push<CR>
+nnoremap <leader>gd :Gina diff<CR>
+nnoremap <leader>gl :Gina log<CR>
+nnoremap <leader>gb :Gina blame<CR>
+
+" vim-expand-region設定
+map + <Plug>(expand_region_expand)
+map - <Plug>(expand_region_shrink)

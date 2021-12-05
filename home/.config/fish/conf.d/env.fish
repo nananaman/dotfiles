@@ -17,3 +17,6 @@ if not type -q starship
 end
 
 starship init fish | source
+
+# truecolor
+set TERM alacritty

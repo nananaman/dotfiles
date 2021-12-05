@@ -9,7 +9,7 @@ echo "[Info] Install tmux..."
 bash install_tmux.sh
 
 echo "[Info] Install vim8..."
-bash install_vim8.sh
+bash install_nvim.sh
 
 echo "[Info] Install fish..."
 bash install_fish.sh
