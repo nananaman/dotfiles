@@ -24,3 +24,5 @@ if !(type make >/dev/null 2>&1); then
 fi
 make deploy
 make init
+
+echo '[INFO] Please install Alacritty from "https://github.com/alacritty/alacritty/releases"'

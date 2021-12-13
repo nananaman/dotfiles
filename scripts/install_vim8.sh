@@ -32,10 +32,15 @@ fi
 if [ "$(uname)" == 'Darwin' ]; then
   # Mac
   cd ~/Library/Fonts && curl -fLo "HackGenNerdConsole-Bold.ttf" https://github.com/yuru7/HackGen/raw/master/build/HackGenNerdConsole-Bold.ttf
+  cd /tmp && wget https://github.com/yuru7/HackGen/releases/download/v2.5.2/HackGenNerd_v2.5.2.zip \
+	  && unzip HackGenNerd_v2.5.2.zip \
+	  && cp HackGenNerd_v2.5.2/HackGenNerdConsole-Bold.ttf ~/Library/Fonts
 elif [ "$(expr substr $(uname -s) 1 5)" == 'Linux' ]; then
-  # nerd fonts
+  sudo apt-get install unzip
   mkdir -p ~/.local/share/fonts
-  cd ~/.local/share/fonts && curl -fLo "HackGenNerdConsole-Bold.ttf" https://github.com/yuru7/HackGen/raw/master/build/HackGenNerdConsole-Bold.ttf
+  cd /tmp && wget https://github.com/yuru7/HackGen/releases/download/v2.5.2/HackGenNerd_v2.5.2.zip \
+	  && unzip HackGenNerd_v2.5.2.zip \
+	  && cp HackGenNerd_v2.5.2/HackGenNerdConsole-Bold.ttf ~/.local/share/fonts
 
 elif [ "$(expr substr $(uname -s) 1 10)" == 'MINGW32_NT' ]; then
   cd /mnt/c/Users/foola/AppData/Local/Microsoft/Windows/Fonts && curl -fLo "HackGenNerdConsole-Bold.ttf" https://github.com/yuru7/HackGen/raw/master/build/HackGenNerdConsole-Bold.ttf

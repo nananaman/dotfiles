@@ -15,8 +15,8 @@ elif [ "$(expr substr $(uname -s) 1 5)" == 'Linux' ]; then
   if !(type wget >/dev/null 2>&1); then
     sudo apt-get install wget
   fi
-  wget https://golang.org/dl/go1.16.6.linux-amd64.tar.gz
-  sudo tar -C /usr/local/ -xzf go1.16.6.linux-amd64.tar.gz
+  wget https://go.dev/dl/go1.17.4.linux-amd64.tar.gz
+  sudo tar -C /usr/local/ -xzf go1.17.4.linux-amd64.tar.gz
   export PATH=$PATH:/usr/local/go/bin
   cd -
 else
@@ -25,10 +25,10 @@ else
 fi
 
 # ghq
-go get github.com/x-motemen/ghq
+go install github.com/x-motemen/ghq@latest
 
 # memo
-go get github.com/mattn/memo
+go install github.com/mattn/memo@latest
 
 # code2img
 git clone https://github.com/skanehira/code2img
@@ -48,12 +48,14 @@ fi
 cargo install lsd
 
 # bat
-cargo install bat
-
 # fd
-cargo install fd-find
+if [ "$(uname)" == 'Darwin' ]; then
+  sudo apt-get install bat fd-find
+  sudo ln -s /usr/bin/batcat /usr/local/bin/bat
+elif [ "$(expr substr $(uname -s) 1 5)" == 'Linux' ]; then
+  brew install bat fd-find
+fi
 
 # starship
-sh -c "$(curl -fsSL https://starship.rs/install.sh)"
 curl -fsSL https://starship.rs/install.sh > /tmp/install_starship.sh
 sh /tmp/install_starship.sh -y
