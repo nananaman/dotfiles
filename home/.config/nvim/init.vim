@@ -4,14 +4,14 @@ if &compatible
 endif
 
 " Required:
-set runtimepath+=/home/nananaman/.cache/dein/repos/github.com/Shougo/dein.vim
+set runtimepath+=~/.cache/dein/repos/github.com/Shougo/dein.vim
 
 " Required:
-call dein#begin('/home/nananaman/.cache/dein')
+call dein#begin('~/.cache/dein')
 
 " Let dein manage dein
 " Required:
-call dein#add('/home/nananaman/.cache/dein/repos/github.com/Shougo/dein.vim')
+call dein#add('~/.cache/dein/repos/github.com/Shougo/dein.vim')
 
 " Load plugins
 let g:config_dir = expand('~/.config/nvim/dein')
@@ -25,17 +25,15 @@ call dein#load_toml(s:lazy_toml, {'lazy': 1})
 call dein#end()
 
 " If you want to install not installed plugins on startup.
-if dein#check_install()
-  call dein#install()
-endif
+" if dein#check_install()
+"   call dein#install()
+" endif
 
 " Required:
 filetype plugin indent on
 syntax enable
 
 "End dein Scripts-------------------------
-" init.vimを保存したら自動反映
-autocmd BufWritePost  ~/.config/nvim/init.vim  so ~/.config/nvim/init.vim
 
 """"""""""""""""""""
 " setting
@@ -204,13 +202,13 @@ nmap <silent> [g <Plug>(coc-diagnostic-prev)
 nmap <silent> ]g <Plug>(coc-diagnostic-next)
 
 " 定義ジャンプ
-nmap <silent> ge :CocCommand fzf-preview.CocDiagnostics<CR>
-nmap <silent> gce :CocCommand fzf-preview.CocCurrentDiagnostics<CR>
-nmap <silent> gd :CocCommand fzf-preview.CocDefinition<CR>
-" nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy :CocCommand fzf-preview.CocTypeDefinition<CR>
-nmap <silent> gi :CocCommand fzf-preview.CocImplementations<CR>
-nmap <silent> gr :CocCommand fzf-preview.CocReferences<CR>
+nmap <silent> ge :<C-u>CocCommand fzf-preview.CocDiagnostics<CR>
+nmap <silent> gce :<C-u>CocCommand fzf-preview.CocCurrentDiagnostics<CR>
+" nmap <silent> gd :<C-u>CocCommand fzf-preview.CocDefinition<CR>
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy :<C-u>CocCommand fzf-preview.CocTypeDefinition<CR>
+nmap <silent> gi :<C-u>CocCommand fzf-preview.CocImplementations<CR>
+nmap <silent> gr :<C-u>CocCommand fzf-preview.CocReferences<CR>
 
 " Kでドキュメントを開く
 nnoremap <silent> K :call <SID>show_documentation()<CR>
@@ -297,15 +295,15 @@ nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
 nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 
 " fzf-preview.vim
-set shell=/usr/bin/bash
-let $SHELL='/usr/bin/bash'
+set shell=/bin/bash
+let $SHELL='/bin/bash'
 let g:fzf_preview_command = 'bat --color=always --plain {-1}'
 let g:fzf_preview_lines_command = 'bat --color=always --plain --number'
-nnoremap <silent> ,f :CocCommand fzf-preview.GitFiles<CR>
-nnoremap <silent> ,b :CocCommand fzf-preview.Buffers<CR>
-nnoremap <silent> ,h :CocCommand fzf-preview.ProjectMruFiles<CR>
-nnoremap <silent> ,l :CocCommand fzf-preview.Lines<CR>
-nnoremap ,g :CocCommand fzf-preview.ProjectGrep<Space>
+nnoremap <silent> ,f :<C-u>CocCommand fzf-preview.GitFiles<CR>
+nnoremap <silent> ,b :<C-u>CocCommand fzf-preview.Buffers<CR>
+nnoremap <silent> ,h :<C-u>CocCommand fzf-preview.ProjectMruFiles<CR>
+nnoremap <silent> ,l :<C-u>CocCommand fzf-preview.Lines<CR>
+nnoremap ,g :<C-u>CocCommand fzf-preview.ProjectGrep<Space>
 
 " nvim-colorizer.lua設定
 lua require 'colorizer'.setup{'css';'javascript';'html'}
@@ -322,8 +320,8 @@ let g:sonictemplate_vim_template_dir = [ '~/.config/nvim/sonictemplate' ]
 
 " Gina.vim設定
 nnoremap <leader>gc :Gina commit<CR><CR>
-nnoremap <leader>ga :CocCommand fzf-preview.GitActions<CR>
-nnoremap <leader>gs :CocCommand fzf-preview.GitStatus<CR>
+nnoremap <leader>ga :<C-u>CocCommand fzf-preview.GitActions<CR>
+nnoremap <leader>gs :<C-u>CocCommand fzf-preview.GitStatus<CR>
 
 nnoremap <leader>gp :Gina push<CR>
 nnoremap <leader>gd :Gina diff<CR>

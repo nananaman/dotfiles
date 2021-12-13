@@ -32,7 +32,7 @@ repo = 'lambdalisue/fern-renderer-nerdfont.vim'
 repo = 'neoclide/coc.nvim'
 rev = 'release'
 on_i = 1
-lerged = '0'
+merged = '0'
 hook_source = 'call coc#util#install()'
 
 [[plugins]]
