@@ -10,15 +10,3 @@ on_ft = ['ruby']
 repo = 'chrisbra/csv.vim'
 on_ft = ['csv']
 
-[[plugins]]
-repo = 'previm/previm'
-on_ft = ['markdown']
-hook_add = '''
-  nnoremap <silent> <C-m> :PrevimOpen<CR>
-  let g:vim_markdown_folding_disabled=1
-  let g:previm_enable_realtime=1
-'''
-
-[[plugins]]
-repo = 'tyru/open-browser.vim'
-on_ft = ['markdown']

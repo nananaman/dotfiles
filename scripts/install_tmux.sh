@@ -27,3 +27,6 @@ fi
 
 # tpm
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+
+# kube-tmux
+cd ~/.tmux && wget https://raw.githubusercontent.com/jonmosco/kube-tmux/master/kube.tmux && cd -
