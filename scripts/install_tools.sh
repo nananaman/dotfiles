@@ -56,6 +56,9 @@ elif [ "$(expr substr $(uname -s) 1 5)" == 'Linux' ]; then
   brew install bat fd-find
 fi
 
+# silicon
+cargo install silicon
+
 # starship
 curl -fsSL https://starship.rs/install.sh > /tmp/install_starship.sh
 sh /tmp/install_starship.sh -y

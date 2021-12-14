@@ -25,9 +25,9 @@ call dein#load_toml(s:lazy_toml, {'lazy': 1})
 call dein#end()
 
 " If you want to install not installed plugins on startup.
-" if dein#check_install()
-"   call dein#install()
-" endif
+if dein#check_install()
+  call dein#install()
+endif
 
 " Required:
 filetype plugin indent on
@@ -65,8 +65,6 @@ set termguicolors
 set number
 " 現在の行を強調表示
 set cursorline
-" 現在の行を強調表示(縦)
-"set cursorcolumn
 " 行末の１文字先までカーソル移動可能
 set virtualedit=onemore
 " スマートインデント
@@ -126,9 +124,17 @@ set showtabline=2
 nmap <C-o> :bprevious<CR>
 nmap <C-p> :bnext<CR>
 
+" term周りの設定
+" デフォルトでinsertモード
+autocmd TermOpen * startinsert
+" :T で下側にwindow作ってtermに入る
+command! -nargs=* T split | wincmd j | resize 20 | terminal fish
+" Escでinsertを抜ける
+:tnoremap <Esc> <C-\><C-n>
+
 " vim-ligitline設定
 let g:lightline = {
-    \ 'colorscheme': 'onedark',
+    \ 'colorscheme': 'PaperColor',
     \ 'active': {
     \   'left': [ [ 'mode', 'paste' ],
     \             [ 'gitbranch', 'readonly', 'relativepath', 'modified' ] ]
@@ -156,17 +162,24 @@ let g:lightline#bufferline#show_number     = 0
 let g:lightline#bufferline#unnamed         = '[No Name]'
 let g:lightline#bufferline#enable_nerdfont = 1
 
-" colorscheme設定
-let g:tokyonight_style = 'night'
-let g:tokyonight_italic_comment = 0
-let g:tokyonight_transparent = 1
-colorscheme tokyonight
-
-colorscheme onedark
+" olorscheme設定
+colorscheme PaperColor
 
 " fern.vim設定
-map <C-n> :Fern . -reveal=% -drawer -toggle<CR>
+map <silent> <C-n> :Fern . -reveal=% -drawer -toggle<CR>
 let g:fern#renderer = "nerdfont"
+function! s:fern_settings() abort
+  nmap <silent> <buffer> p     <Plug>(fern-action-preview:toggle)
+  nmap <silent> <buffer> <C-p> <Plug>(fern-action-preview:auto:toggle)
+  nmap <silent> <buffer> <C-d> <Plug>(fern-action-preview:scroll:down:half)
+  nmap <silent> <buffer> <C-u> <Plug>(fern-action-preview:scroll:up:half)
+endfunction
+
+augroup fern-settings
+  autocmd!
+  autocmd FileType fern call s:fern_settings()
+  autocmd FileType fern call glyph_palette#apply()
+augroup END
 
 " EasyMotion設定
 " s{char}{char}{label}で移動
@@ -177,6 +190,12 @@ highlight Normal ctermbg=NONE guibg=NONE
 highlight NonText ctermbg=NONE guibg=NONE
 highlight LineNr ctermbg=NONE guibg=NONE
 
+" vim-highlightedundo
+nmap u     <Plug>(highlightedundo-undo)
+nmap <C-r> <Plug>(highlightedundo-redo)
+nmap U     <Plug>(highlightedundo-Undo)
+nmap g-    <Plug>(highlightedundo-gminus)
+nmap g+    <Plug>(highlightedundo-gplus)
 
 " coc.nvim設定
 " 起動時に必ず入れる拡張機能
@@ -331,3 +350,20 @@ nnoremap <leader>gb :Gina blame<CR>
 " vim-expand-region設定
 map + <Plug>(expand_region_expand)
 map - <Plug>(expand_region_shrink)
+
+" treesitter設定
+lua <<EOF
+require'nvim-treesitter.configs'.setup {
+  highlight = {
+    enable = true,
+    disable = {
+      'lua',
+      'ruby',
+      'toml',
+      'c_sharp',
+      'vue',
+    }
+  },
+  ensure_installed = 'maintained'
+}
+EOF

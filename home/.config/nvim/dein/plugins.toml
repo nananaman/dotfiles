@@ -2,16 +2,14 @@
 repo = 'itchyny/lightline.vim'
 
 [[plugins]]
-repo = 'folke/tokyonight.nvim'
-
-[[plugins]]
-repo = 'joshdick/onedark.vim'
-
-[[plugins]]
 repo = 'wsdjeg/dein-ui.vim'
 
 [[plugins]]
 repo = 'easymotion/vim-easymotion'
+
+[[plugins]]
+repo = 'lambdalisue/fern.vim'
+depends = ['fern-preview.vim', 'fern-renderer-nerdfont.vim', 'glyph-palette.vim']
 
 [[plugins]]
 repo = 'mengelbrecht/lightline-bufferline'
@@ -20,19 +18,13 @@ repo = 'mengelbrecht/lightline-bufferline'
 repo = 'ryanoasis/vim-devicons'
 
 [[plugins]]
-repo = 'lambdalisue/fern.vim'
-
-[[plugins]]
 repo = 'lambdalisue/nerdfont.vim'
-
-[[plugins]]
-repo = 'lambdalisue/fern-renderer-nerdfont.vim'
 
 [[plugins]]
 repo = 'neoclide/coc.nvim'
 rev = 'release'
 on_i = 1
-merged = '0'
+merged = 0
 hook_source = 'call coc#util#install()'
 
 [[plugins]]
@@ -59,6 +51,9 @@ repo = 'tpope/vim-repeat'
 repo = 'machakann/vim-highlightedyank'
 
 [[plugins]]
+repo = 'machakann/vim-highlightedundo'
+
+[[plugins]]
 repo = 'rhysd/clever-f.vim'
 
 [[plugins]]
@@ -81,3 +76,19 @@ repo = 'lambdalisue/gina.vim'
 
 [[plugins]]
 repo = 'terryma/vim-expand-region'
+
+[[plugins]]
+repo = 'nvim-treesitter/nvim-treesitter'
+merged = 0
+
+[[plugins]]
+repo = 'NLKNguyen/papercolor-theme'
+
+[[plugins]]
+repo = 'segeljakt/vim-silicon'
+
+[[plugins]]
+repo = 'folke/todo-comments.nvim'
+
+[[plugins]]
+repo = 'rcarriga/nvim-notify'
