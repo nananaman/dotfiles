@@ -82,7 +82,7 @@ repo = 'nvim-treesitter/nvim-treesitter'
 merged = 0
 
 [[plugins]]
-repo = 'NLKNguyen/papercolor-theme'
+repo = 'sainnhe/sonokai'
 
 [[plugins]]
 repo = 'segeljakt/vim-silicon'

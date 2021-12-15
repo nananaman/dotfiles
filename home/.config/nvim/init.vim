@@ -134,7 +134,7 @@ command! -nargs=* T split | wincmd j | resize 20 | terminal fish
 
 " vim-ligitline設定
 let g:lightline = {
-    \ 'colorscheme': 'PaperColor',
+    \ 'colorscheme': 'sonokai',
     \ 'active': {
     \   'left': [ [ 'mode', 'paste' ],
     \             [ 'gitbranch', 'readonly', 'relativepath', 'modified' ] ]
@@ -164,6 +164,13 @@ let g:lightline#bufferline#enable_nerdfont = 1
 
 " olorscheme設定
 colorscheme PaperColor
+
+" The configuration options should be placed before `colorscheme sonokai`.
+let g:sonokai_style = 'espresso'
+let g:sonokai_enable_italic = 0
+let g:sonokai_disable_italic_comment = 0
+
+colorscheme sonokai
 
 " fern.vim設定
 map <silent> <C-n> :Fern . -reveal=% -drawer -toggle<CR>
