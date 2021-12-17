@@ -194,9 +194,7 @@ let g:lightline#bufferline#show_number     = 0
 let g:lightline#bufferline#unnamed         = '[No Name]'
 let g:lightline#bufferline#enable_nerdfont = 1
 
-" olorscheme設定
-colorscheme PaperColor
-
+" colorscheme設定
 " The configuration options should be placed before `colorscheme sonokai`.
 let g:sonokai_style = 'espresso'
 let g:sonokai_enable_italic = 0
