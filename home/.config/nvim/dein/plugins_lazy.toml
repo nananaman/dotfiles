@@ -11,5 +11,44 @@ repo = 'yuki-yano/fern-preview.vim'
 repo = 'lambdalisue/glyph-palette.vim'
 
 [[plugins]]
+repo = 'kevinhwang91/nvim-hlslens'
+
+[[plugins]]
 repo = 'mattn/vim-maketable'
 on_cmd = ['MakeTable']
+
+[[plugins]]
+repo = 'andymass/vim-matchup'
+
+[[plugins]]
+repo = 'tpope/vim-surround'
+
+[[plugins]]
+repo = 'tpope/vim-repeat'
+
+[[plugins]]
+repo = 'rhysd/clever-f.vim'
+
+[[plugins]]
+repo = 'jiangmiao/auto-pairs'
+
+[[plugins]]
+repo = 'tpope/vim-commentary'
+
+[[plugins]]
+repo = 'segeljakt/vim-silicon'
+
+[[plugins]]
+repo = 'machakann/vim-highlightedyank'
+
+[[plugins]]
+repo = 'kyazdani42/nvim-web-devicons'
+
+[[plugins]]
+repo = 'terryma/vim-expand-region'
+
+[[plugins]]
+repo = 'folke/todo-comments.nvim'
+
+[[plugins]]
+repo = 'lukas-reineke/indent-blankline.nvim'

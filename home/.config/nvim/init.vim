@@ -6,23 +6,26 @@ endif
 " Required:
 set runtimepath+=~/.cache/dein/repos/github.com/Shougo/dein.vim
 
-" Required:
-call dein#begin('~/.cache/dein')
+if dein#load_state('~/.cache/dein')
+  " Required:
+  call dein#begin('~/.cache/dein')
 
-" Let dein manage dein
-" Required:
-call dein#add('~/.cache/dein/repos/github.com/Shougo/dein.vim')
+  " Let dein manage dein
+  " Required:
+  call dein#add('~/.cache/dein/repos/github.com/Shougo/dein.vim')
 
-" Load plugins
-let g:config_dir = expand('~/.config/nvim/dein')
-let s:toml = g:config_dir . '/plugins.toml'
-let s:lazy_toml = g:config_dir . '/plugins_lazy.toml'
+  " Load plugins
+  let g:config_dir = expand('~/.config/nvim/dein')
+  let s:toml = g:config_dir . '/plugins.toml'
+  let s:lazy_toml = g:config_dir . '/plugins_lazy.toml'
 
-call dein#load_toml(s:toml, {'lazy': 0})
-call dein#load_toml(s:lazy_toml, {'lazy': 1})
+  call dein#load_toml(s:toml, {'lazy': 0})
+  call dein#load_toml(s:lazy_toml, {'lazy': 0})
 
-" Required:
-call dein#end()
+  " Required:
+  call dein#end()
+  call dein#save_state()
+endif
 
 " If you want to install not installed plugins on startup.
 if dein#check_install()
@@ -164,43 +167,7 @@ augroup END
 " ## Plugins  ##
 " ##############
 
-" vim-ligitline設定
-let g:lightline = {
-    \ 'colorscheme': 'sonokai',
-    \ 'active': {
-    \   'left': [ [ 'mode', 'paste' ],
-    \             [ 'gitbranch', 'readonly', 'relativepath', 'modified' ] ]
-    \ },
-    \ 'component_function': {
-    \   'gitbranch': 'FugitiveHead',
-    \   'myfilename': 'MyFilename'
-    \ },
-    \ 'separator': { 'left': '', 'right': '' },
-    \ 'subseparator': { 'left': '', 'right': '' },
-    \ 'tabline': {
-    \   'left': [ ['buffers'] ],
-    \   'right': [ ['close'] ]
-    \ },
-    \ 'component_expand': {
-    \   'buffers': 'lightline#bufferline#buffers'
-    \ },
-    \ 'component_type': {
-    \   'buffers': 'tabsel'
-    \ }
-  \ }
-
-" lightline-bufferline設定
-let g:lightline#bufferline#show_number     = 0
-let g:lightline#bufferline#unnamed         = '[No Name]'
-let g:lightline#bufferline#enable_nerdfont = 1
-
-" colorscheme設定
-" The configuration options should be placed before `colorscheme sonokai`.
-let g:sonokai_style = 'espresso'
-let g:sonokai_enable_italic = 0
-let g:sonokai_disable_italic_comment = 0
-
-colorscheme sonokai
+colorscheme kanagawa
 
 " fern.vim設定
 map <silent> <C-n> :Fern . -reveal=% -drawer -toggle<CR>
@@ -218,26 +185,11 @@ augroup fern-settings
   autocmd FileType fern call glyph_palette#apply()
 augroup END
 
-" EasyMotion設定
-" s{char}{char}{label}で移動
-
-nmap s <Plug>(easymotion-s2)
-
-highlight Normal ctermbg=NONE guibg=NONE
-highlight NonText ctermbg=NONE guibg=NONE
-highlight LineNr ctermbg=NONE guibg=NONE
-
-" vim-highlightedundo
-nmap u     <Plug>(highlightedundo-undo)
-nmap <C-r> <Plug>(highlightedundo-redo)
-nmap U     <Plug>(highlightedundo-Undo)
-nmap g-    <Plug>(highlightedundo-gminus)
-nmap g+    <Plug>(highlightedundo-gplus)
-
 " coc.nvim設定
 " 起動時に必ず入れる拡張機能
 let g:coc_global_extensions = [
   \'coc-fzf-preview',
+  \'coc-spell-checker',
 \]
 " タブキーで補完候補選択
 inoremap <silent><expr><TAB> pumvisible() ? "<C-n>" : <SID>check_back_space() ? "\<TAB>" : coc#refresh()
@@ -361,15 +313,6 @@ nnoremap <silent> ,h :<C-u>CocCommand fzf-preview.ProjectMruFiles<CR>
 nnoremap <silent> ,l :<C-u>CocCommand fzf-preview.Lines<CR>
 nnoremap ,g :<C-u>CocCommand fzf-preview.ProjectGrep<Space>
 
-" nvim-colorizer.lua設定
-lua require 'colorizer'.setup{'css';'javascript';'html'}
-
-" vim-indent-guides設定
-let g:indent_guides_enable_on_vim_startup = 1
-let g:indent_guides_guide_size = 2
-let g:indent_guides_start_level = 2
-let g:indent_guides_auto_colors = 1
-
 " sonictemplate.vim
 " <C-y><C-b>で後方補完
 let g:sonictemplate_vim_template_dir = [ '~/.config/nvim/sonictemplate' ]
@@ -388,8 +331,7 @@ nnoremap <leader>gb :Gina blame<CR>
 map + <Plug>(expand_region_expand)
 map - <Plug>(expand_region_shrink)
 
-" treesitter設定
-lua <<EOF
+lua << EOF
 require'nvim-treesitter.configs'.setup {
   highlight = {
     enable = true,
@@ -397,4 +339,37 @@ require'nvim-treesitter.configs'.setup {
   },
   ensure_installed = 'maintained'
 }
+
+require'lualine'.setup { options = {theme = 'kanagawa'} }
+
+require('indent_blankline').setup {
+    show_current_context = true,
+    show_current_context_start = true,
+}
+
+require('bufferline').setup {
+  options = {
+    show_buffer_close_icons = false,
+    show_close_icon = false,
+    diagnostics = 'coc',
+    diagnostics_indicator = function(count, level, diagnostics_dict, context)
+      local s = ' '
+      for e, n in pairs(diagnostics_dict) do
+        local sym = e == 'error' and ' '
+          or (e == 'warning' and ' ' or '' )
+        s = s .. sym .. n
+      end
+      return s
+    end,
+  }
+}
+
+require'colorizer'.setup {'css';'javascript';'html';'dart';'vue'}
+require'hop'.setup ()
 EOF
+
+" hop.nvim
+nnoremap so :<C-u>HopChar1<CR>
+nnoremap st :<C-u>HopChar2<CR>
+nnoremap sl <Cmd>HopLine<CR>
+nnoremap sw <Cmd>HopWord<CR>
