@@ -124,8 +124,8 @@ nmap <silent> <C-w>- :split<CR>
 set showtabline=2
 " Bufferを<C-o><C-p>で切り替え
 
-nmap <C-o> :bprevious<CR>
-nmap <C-p> :bnext<CR>
+nmap <silent> <C-o> :bprevious<CR>
+nmap <silent> <C-p> :bnext<CR>
 
 " term周りの設定
 " デフォルトでinsertモード
@@ -340,7 +340,25 @@ require'nvim-treesitter.configs'.setup {
   ensure_installed = 'maintained'
 }
 
-require'lualine'.setup { options = {theme = 'kanagawa'} }
+require'lualine'.setup {
+  options = {theme = 'kanagawa'},
+  sections = {
+    lualine_c = {
+      {
+        'filename',
+        file_status = true,   -- displays file status (readonly status, modified status)
+        path = 1,             -- 0 = just filename, 1 = relative path, 2 = absolute path
+        shorting_target = 40, -- Shortens path to leave 40 space in the window
+                              -- for other components. Terrible name any suggestions?
+        symbols = {
+          modified = '[+]',      -- when the file was modified
+          readonly = '[-]',      -- if the file is not modifiable or readonly
+          unnamed = '[No Name]', -- default display name for unnamed buffers
+        }
+      }
+    }
+  }
+}
 
 require('indent_blankline').setup {
     show_current_context = true,
@@ -361,6 +379,7 @@ require('bufferline').setup {
       end
       return s
     end,
+    separator_style = "slant",
   }
 }
 
