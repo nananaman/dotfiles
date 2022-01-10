@@ -11,6 +11,9 @@ set PATH $HOME/go/bin $PATH
 # fzf
 fzf_configure_bindings --directory=\cf
 
+# deno
+set PATH $HOME/.deno/bin $PATH
+
 # starship
 if not type -q starship
   sh -c "(curl -fsSL https://starship.rs/install.sh)"
