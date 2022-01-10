@@ -332,7 +332,7 @@ map + <Plug>(expand_region_expand)
 map - <Plug>(expand_region_shrink)
 
 lua << EOF
-require'nvim-treesitter.configs'.setup {
+require('nvim-treesitter.configs').setup {
   highlight = {
     enable = true,
     disable = {}
@@ -340,7 +340,7 @@ require'nvim-treesitter.configs'.setup {
   ensure_installed = 'maintained'
 }
 
-require'lualine'.setup {
+require('lualine').setup {
   options = {theme = 'kanagawa'},
   sections = {
     lualine_c = {
@@ -383,8 +383,8 @@ require('bufferline').setup {
   }
 }
 
-require'colorizer'.setup {'css';'javascript';'html';'dart';'vue'}
-require'hop'.setup ()
+require('colorizer').setup {'css';'javascript';'html';'dart';'vue'}
+require('hop').setup ()
 EOF
 
 " hop.nvim
@@ -392,3 +392,27 @@ nnoremap so :<C-u>HopChar1<CR>
 nnoremap st :<C-u>HopChar2<CR>
 nnoremap sl <Cmd>HopLine<CR>
 nnoremap sw <Cmd>HopWord<CR>
+
+" wilder.nvim
+call wilder#setup({'modes': [':', '/', '?']})
+call wilder#set_option('renderer', wilder#popupmenu_renderer(wilder#popupmenu_border_theme({
+      \ 'highlighter': wilder#basic_highlighter(),
+      \ 'highlights': {
+      \   'border': 'Normal',
+      \ },
+      \ 'border': 'rounded',
+      \ 'left': [
+      \   ' ', wilder#popupmenu_devicons(),
+      \ ],
+      \ 'right': [
+      \   ' ', wilder#popupmenu_scrollbar(),
+      \ ],
+      \ })))
+
+" dex
+command! -nargs=* -bang Dex silent only! | botright 12 split |
+    \ execute 'terminal' (has('nvim') ? '' : '++curwin') 'dex'
+    \   (<bang>0 ? '--clear ' : '') <q-args> ' ' expand('%:p') |
+    \ stopinsert | execute 'normal! G' | set bufhidden=wipe |
+    \ execute 'autocmd BufEnter <buffer> if winnr("$") == 1 | quit! | endif' |
+    \ wincmd k

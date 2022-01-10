@@ -35,6 +35,12 @@ git clone https://github.com/skanehira/code2img
 cd code2img && go install
 
 
+# deno
+curl -fsSL https://deno.land/x/install/install.sh | sh
+# dex
+deno install --allow-read --allow-write --allow-run --reload --force --name dex https://pax.deno.dev/kawarimidoll/deno-dex/main.ts
+
+
 # install rust
 curl https://sh.rustup.rs -sSf > /tmp/install_rust.sh
 sh /tmp/install_rust.sh -y

@@ -21,7 +21,7 @@ on_cmd = ['MakeTable']
 repo = 'andymass/vim-matchup'
 
 [[plugins]]
-repo = 'tpope/vim-surround'
+repo = 'machakann/vim-sandwich'
 
 [[plugins]]
 repo = 'tpope/vim-repeat'
@@ -52,3 +52,20 @@ repo = 'folke/todo-comments.nvim'
 
 [[plugins]]
 repo = 'lukas-reineke/indent-blankline.nvim'
+
+[[plugins]]
+repo = 'gelguy/wilder.nvim'
+
+[[plugins]]
+repo = '4513ECHO/vim-readme-viewer'
+on_cmd = ['DeinReadme']
+hook_add = '''
+let g:readme_viewer#plugin_manager = 'dein.vim'
+'''
+
+[[plugins]]
+repo = 'vim-denops/denops.vim'
+
+[[plugins]]
+repo = 'kat0h/bufpreview.vim'
+on_ft = 'markdown'
