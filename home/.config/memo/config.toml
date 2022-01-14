@@ -1,11 +1,11 @@
-memodir = "/Users/j.watanabe/.config/memo/_posts"
-editor = "vim"
+memodir = "~/.config/memo/_posts"
+editor = "nvim"
 column = 20
 width = 0
 selectcmd = "fzf --reverse"
 grepcmd = "grep -nH ${PATTERN} ${FILES}"
 memotemplate = "~/.config/memo/template.txt"
 assetsdir = "."
-pluginsdir = "/Users/j.watanabe/.config/memo/plugins"
+pluginsdir = "~/.config/memo/plugins"
 templatedirfile = ""
 templatebodyfile = ""
