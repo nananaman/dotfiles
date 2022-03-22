@@ -47,3 +47,6 @@ repo = 'norcalli/nvim-colorizer.lua'
 
 [[plugins]]
 repo = 'phaazon/hop.nvim'
+
+[[plugins]]
+repo = 'xiyaowong/nvim-transparent'

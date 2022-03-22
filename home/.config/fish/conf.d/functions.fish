@@ -112,6 +112,6 @@ function f -d 'ghqで管理してるプロジェクトをfzfで検索してsessi
   end
 end
 
-if status --is-login
-  inittmux
-end
+# if status --is-login
+#   inittmux
+# end

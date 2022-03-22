@@ -167,8 +167,6 @@ augroup END
 " ## Plugins  ##
 " ##############
 
-colorscheme kanagawa
-
 " fern.vim設定
 map <silent> <C-n> :Fern . -reveal=% -drawer -toggle<CR>
 let g:fern#renderer = "nerdfont"
@@ -332,6 +330,43 @@ map + <Plug>(expand_region_expand)
 map - <Plug>(expand_region_shrink)
 
 lua << EOF
+-- Default options:
+require('kanagawa').setup({
+    undercurl = true,           -- enable undercurls
+    commentStyle = "NONE",      -- 日本語を italic にすると崩れるので回避
+    functionStyle = "NONE",
+    keywordStyle = "italic",
+    statementStyle = "bold",
+    typeStyle = "NONE",
+    variablebuiltinStyle = "italic",
+    specialReturn = true,       -- special highlight for the return keyword
+    specialException = true,    -- special highlight for exception handling keywords
+    transparent = false,        -- do not set background color
+    dimInactive = false,        -- dim inactive window `:h hl-NormalNC`
+    globalStatus = false,       -- adjust window separators highlight for laststatus=3
+    colors = {},
+    overrides = {},
+})
+
+-- setup must be called before loading
+vim.cmd("colorscheme kanagawa")
+
+require("transparent").setup({
+  enable = true, -- boolean: enable transparent
+  extra_groups = { -- table/string: additional groups that should be clear
+    -- In particular, when you set it to 'all', that means all avaliable groups
+
+    -- example of akinsho/nvim-bufferline.lua
+    "BufferLineTabClose",
+    "BufferlineBufferSelected",
+    "BufferLineFill",
+    "BufferLineBackground",
+    "BufferLineSeparator",
+    "BufferLineIndicatorSelected",
+  },
+  exclude = {}, -- table: groups you don't want to clear
+})
+
 require('nvim-treesitter.configs').setup {
   highlight = {
     enable = true,
