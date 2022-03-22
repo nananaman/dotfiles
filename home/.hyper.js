@@ -154,7 +154,7 @@ module.exports = {
   //   `project#1.0.1`
   plugins: [
     "hyperterm-mild-dark",
-    "hyperpower",
+    // "hyperpower",
     "hyper-opacity",
     "hyperterm-summon",
     "hyperminimal",
