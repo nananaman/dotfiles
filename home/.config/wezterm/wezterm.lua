@@ -191,6 +191,9 @@ return {
   ---------------------------------------------------------------
   leader = { key="g", mods="CTRL", timeout_milliseconds=1000 },
   keys = {
+    -- Hide
+    { key = "T", mods = "CTRL|SHIFT", action = "HideApplication" },
+
     -- Font Size
     { key = "=", mods = "ALT", action = "ResetFontSize" },
     { key = "+", mods = "ALT|SHIFT", action = "IncreaseFontSize" },
