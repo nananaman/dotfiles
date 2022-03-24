@@ -421,7 +421,7 @@ require('bufferline').setup {
   }
 }
 
-require('colorizer').setup {'css';'javascript';'html';'dart';'vue'}
+require('colorizer').setup {'css';'javascript';'html';'dart';'vue';'lua'}
 require('hop').setup ()
 EOF
 
