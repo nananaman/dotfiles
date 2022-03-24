@@ -1,4 +1,7 @@
-local wezterm = require 'wezterm';
+local wezterm = require('wezterm');
+local io = require("io");
+local os = require("os");
+
 
 ---------------------------------------------------------------
 --- wezterm on
@@ -12,10 +15,10 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_wid
 		}
 	end
 
-	local title = wezterm.truncate_right(basename(tab.active_pane.foreground_process_name), max_width)
+	local title = wezterm.truncate_right(getBaseName(tab.active_pane.foreground_process_name), max_width)
 	if title == "" then
 		local uri = convert_home_dir(tab.active_pane.current_working_dir)
-		local basename = basename(uri)
+		local basename = getBaseName(uri)
 		if basename == "" then
 			basename = uri
 		end
@@ -31,8 +34,12 @@ wezterm.on("update-right-status", function(window, pane)
   local cells = {};
   table.insert(cells, window:active_workspace())
 
-  local kube_ctx = string.gsub(execCommand("/usr/local/bin/kubectl config current-context"), "[\n\r]", "");
-  table.insert(cells, "⎈ " .. kube_ctx);
+  local success, stdout, stderr = wezterm.run_child_process({"which", "kubectl"})
+  if success then
+    local success, stdout, stderr = wezterm.run_child_process({"kubectl", "config", "current-context"})
+    local kube_ctx = string.gsub(stdout, "[\n\r]", "");
+    table.insert(cells, "⎈ " .. kube_ctx);
+  end
 
   -- An entry for each battery (typically 0 or 1 battery)
   for _, b in ipairs(wezterm.battery_info()) do
@@ -103,12 +110,37 @@ wezterm.on("update-right-status", function(window, pane)
   window:set_right_status(wezterm.format(elements));
 end)
 
+wezterm.on("trigger-open-ghq-project", function(window, pane)
+	local name = os.tmpname();
+
+  local command = "ghq list | fzf +m --reverse --prompt='Project > ' > " .. name;
+  window:perform_action(wezterm.action{SpawnCommandInNewTab={
+    args={"/bin/sh", "-c", command}}
+  }, pane);
+
+  wezterm.sleep_ms(1000);
+	local f = io.open(name, "r");
+  local tgt = f:read();
+	f:close();
+	os.remove(name);
+
+  local workspace_name = getBaseName(tgt);
+  local ghq_root = execCommand("ghq root");
+  local cwd = ghq_root .. "/" .. tgt;
+  wezterm.error_log(cwd);
+
+  wezterm.action{SwitchToWorkspace={
+    name=workspace_name,
+    spawn = {
+      cwd=cwd,
+    }
+  }};
+end)
+
+
 ---------------------------------------------------------------
 --- Functions
 ---------------------------------------------------------------
-local io = require("io")
-local os = require("os")
-
 function execCommand(command)
   local handle = io.popen(command, "r")
   local content = handle:read("*all")
@@ -116,7 +148,7 @@ function execCommand(command)
   return content
 end
 
-function basename(s)
+function getBaseName(s)
   return string.gsub(s, "(.*[/\\])(.*)", "%2")
 end
 
@@ -138,6 +170,7 @@ return {
   tab_bar_at_bottom = true,
   use_fancy_tab_bar = false,
   tab_max_width = 16,
+  audible_bell = "Disabled",
 
   ---------------------------------------------------------------
   --- Layout
@@ -241,5 +274,9 @@ return {
     {key="UpArrow", mods="SHIFT", action=wezterm.action{ActivatePaneDirection="Up"}},
     {key="DownArrow", mods="SHIFT", action=wezterm.action{ActivatePaneDirection="Down"}},
   	{ key = "x", mods = "LEADER|CTRL", action = wezterm.action({ CloseCurrentPane = { confirm = false } }) },
+  	{ key = "z", mods = "LEADER|CTRL", action = "TogglePaneZoomState"},
+
+  	{ key = "f", mods = "SHIFT|CTRL", action = wezterm.action{EmitEvent="trigger-open-ghq-project"}},
+  	{ key = "n", mods = "SHIFT|CTRL", action = "ToggleFullScreen"},
   },
 }

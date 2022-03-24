@@ -329,6 +329,9 @@ nnoremap <leader>gb :Gina blame<CR>
 map + <Plug>(expand_region_expand)
 map - <Plug>(expand_region_shrink)
 
+" bufferline.nvim
+nnoremap <silent> gb :BufferLinePick<CR>
+
 lua << EOF
 -- Default options:
 require('kanagawa').setup({
