@@ -51,10 +51,10 @@ repo = 'terryma/vim-expand-region'
 repo = 'folke/todo-comments.nvim'
 
 [[plugins]]
-repo = 'lukas-reineke/indent-blankline.nvim'
+repo = 'gelguy/wilder.nvim'
 
 [[plugins]]
-repo = 'gelguy/wilder.nvim'
+repo = 'lukas-reineke/indent-blankline.nvim'
 
 [[plugins]]
 repo = '4513ECHO/vim-readme-viewer'

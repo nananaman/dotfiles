@@ -122,10 +122,10 @@ nmap <silent> <C-w>- :split<CR>
 
 " tablineを表示
 set showtabline=2
-" Bufferを<C-o><C-p>で切り替え
 
-nmap <silent> <C-o> :bprevious<CR>
-nmap <silent> <C-p> :bnext<CR>
+" Bufferを<C-o><C-p>で切り替え
+" nmap <silent> <C-o> :bprevious<CR>
+" nmap <silent> <C-p> :bnext<CR>
 
 " term周りの設定
 " デフォルトでinsertモード
@@ -329,9 +329,6 @@ nnoremap <leader>gb :Gina blame<CR>
 map + <Plug>(expand_region_expand)
 map - <Plug>(expand_region_shrink)
 
-" bufferline.nvim
-nnoremap <silent> gb :BufferLinePick<CR>
-
 lua << EOF
 -- Default options:
 require('kanagawa').setup({
@@ -403,6 +400,13 @@ require('indent_blankline').setup {
     show_current_context_start = true,
 }
 
+-- bufferline.nvim
+-- Bufferを<C-o><C-p>で切り替え
+vim.api.nvim_set_keymap('n', '<C-o>', ':BufferLineCyclePrev<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<C-p>', ':BufferLineCycleNext<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', 'gb', ':BufferLinePick<CR>', { noremap = true, silent = true })
+
+local groups = require 'bufferline.groups'
 require('bufferline').setup {
   options = {
     show_buffer_close_icons = false,
@@ -417,35 +421,62 @@ require('bufferline').setup {
       end
       return s
     end,
-    separator_style = "slant",
+    separator_style = { '▎', '▎' },
+    groups = {
+      options = {
+        toggle_hidden_on_enter = true,
+      },
+      items = {
+        groups.builtin.ungrouped,
+        {
+          highlight = { guisp = '#7E9CD8', gui = 'underline' },
+          name = 'tests',
+          icon = '',
+          matcher = function(buf)
+            return buf.filename:match '_spec' or buf.filename:match 'test'
+          end,
+        },
+       {
+         name = 'view models',
+         highlight = { guisp = '#D27E99', gui = 'underline' },
+         matcher = function(buf)
+           return buf.filename:match 'view_model%.dart'
+         end,
+       },
+       {
+         highlight = { guisp = '#98BB6C', gui = 'underline' },
+         name = 'docs',
+         matcher = function(buf)
+          return buf.name:match('%.md') or buf.name:match('%.txt')
+         end
+       }
+      }
+    }
   }
 }
 
-require('colorizer').setup {'css';'javascript';'html';'dart';'vue';'lua'}
-require('hop').setup ()
+require('colorizer').setup {'css';'javascript';'html';'dart';'vue';'lua';'vim'}
+
+require('hop').setup()
+vim.api.nvim_set_keymap('n', 'so', ':<C-u>HopChar1<CR>', { noremap = true })
+vim.api.nvim_set_keymap('n', 'st', ':<C-u>HopChar2<CR>', { noremap = true })
+vim.api.nvim_set_keymap('n', 'sl', ':<Cmd>HopLine<CR>', { noremap = true })
+vim.api.nvim_set_keymap('n', 'sw', ':<Cmd>HopWord<CR>', { noremap = true })
+
+local wilder = require('wilder')
+wilder.setup({modes = {':', '/', '?'}})
+wilder.set_option('renderer', wilder.popupmenu_renderer(
+  wilder.popupmenu_border_theme({
+    highlighter = wilder.basic_highlighter(),
+    highlights = {
+      border = 'Normal',
+    },
+    border = 'rounded',
+    left = { ' ', wilder.popupmenu_devicons() },
+    right = { ' ', wilder.popupmenu_scrollbar() },
+  })
+))
 EOF
-
-" hop.nvim
-nnoremap so :<C-u>HopChar1<CR>
-nnoremap st :<C-u>HopChar2<CR>
-nnoremap sl <Cmd>HopLine<CR>
-nnoremap sw <Cmd>HopWord<CR>
-
-" wilder.nvim
-call wilder#setup({'modes': [':', '/', '?']})
-call wilder#set_option('renderer', wilder#popupmenu_renderer(wilder#popupmenu_border_theme({
-      \ 'highlighter': wilder#basic_highlighter(),
-      \ 'highlights': {
-      \   'border': 'Normal',
-      \ },
-      \ 'border': 'rounded',
-      \ 'left': [
-      \   ' ', wilder#popupmenu_devicons(),
-      \ ],
-      \ 'right': [
-      \   ' ', wilder#popupmenu_scrollbar(),
-      \ ],
-      \ })))
 
 " dex
 command! -nargs=* -bang Dex silent only! | botright 12 split |
@@ -454,3 +485,21 @@ command! -nargs=* -bang Dex silent only! | botright 12 split |
     \ stopinsert | execute 'normal! G' | set bufhidden=wipe |
     \ execute 'autocmd BufEnter <buffer> if winnr("$") == 1 | quit! | endif' |
     \ wincmd k
+
+" silicon
+let g:silicon = {
+  \   'theme':              'Dracula',
+  \   'font':               'Ricty Discord for Powerline',
+  \   'background':         '#AAAAFF',
+  \   'shadow-color':       '#555555',
+  \   'line-pad':                   2,
+  \   'pad-horiz':                 80,
+  \   'pad-vert':                 100,
+  \   'shadow-blur-radius':         0,
+  \   'shadow-offset-x':            0,
+  \   'shadow-offset-y':            0,
+  \   'line-number':           v:true,
+  \   'round-corner':          v:true,
+  \   'window-controls':       v:true,
+  \   'output': '~/Desktop/silicon-{time:%Y-%m-%d-%H%M%S}.png',
+  \ }

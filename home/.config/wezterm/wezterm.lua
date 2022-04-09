@@ -10,24 +10,7 @@ local os = require("os")
 wezterm.on("format-tab-title", functions.format_tab_title)
 wezterm.on("update-right-status", functions.update_right_status)
 wezterm.on("trigger-open-ghq-project", functions.trigger_open_ghq_project)
-wezterm.on("trigger-nvim-with-scrollback", function(window, pane)
-  local scrollback = pane:get_lines_as_text()
-  local name = os.tmpname()
-  local f = io.open(name, "w+")
-  f:write(scrollback)
-  f:flush()
-  f:close()
-  window:perform_action(
-    wezterm.action({
-      SpawnCommandInNewTab = {
-        args = { "/usr/local/bin/fish", "-l", "-c", "nvim " .. name },
-      },
-    }),
-    pane
-  )
-  wezterm.sleep_ms(1000)
-  os.remove(name)
-end)
+wezterm.on("trigget-nvim-with-scrollback", functions.trigger_nvim_with_scrollback)
 
 local win_config = {
   default_prog = { "wsl.exe" },
@@ -44,7 +27,7 @@ local common_config = {
   hide_tab_bar_if_only_one_tab = false,
   tab_bar_at_bottom = true,
   use_fancy_tab_bar = false,
-  tab_max_width = 16,
+  tab_max_width = 32,
   audible_bell = "Disabled",
 
   ---------------------------------------------------------------
@@ -110,6 +93,9 @@ local common_config = {
     -- Copy Mode
     { key = " ", mods = "LEADER", action = "ActivateCopyMode" },
 
+    -- Quick Select
+    { key = "Q", mods = "CTRL|SHIFT", action = "QuickSelect" },
+
     -- Workspace
     -- Switch to the default workspace
     -- {key="d", mods="LEADER|CTRL", action=wezterm.action{SwitchToWorkspace={
@@ -135,13 +121,13 @@ local common_config = {
         },
       }),
     },
-    { key = "j", mods = "LEADER|CTRL", action = wezterm.action({ SwitchWorkspaceRelative = -1 }) },
-    { key = "k", mods = "LEADER|CTRL", action = wezterm.action({ SwitchWorkspaceRelative = 1 }) },
+    { key = "j", mods = "SHIFT|CTRL", action = wezterm.action({ SwitchWorkspaceRelative = -1 }) },
+    { key = "k", mods = "SHIFT|CTRL", action = wezterm.action({ SwitchWorkspaceRelative = 1 }) },
 
     -- Tab
-    { key = "w", mods = "LEADER|CTRL", action = wezterm.action({ SpawnTab = "CurrentPaneDomain" }) },
-    { key = "h", mods = "LEADER|CTRL", action = wezterm.action({ ActivateTabRelative = -1 }) },
-    { key = "l", mods = "LEADER|CTRL", action = wezterm.action({ ActivateTabRelative = 1 }) },
+    { key = "w", mods = "SHIFT|CTRL", action = wezterm.action({ SpawnTab = "CurrentPaneDomain" }) },
+    { key = "h", mods = "SHIFT|CTRL", action = wezterm.action({ ActivateTabRelative = -1 }) },
+    { key = "l", mods = "SHIFT|CTRL", action = wezterm.action({ ActivateTabRelative = 1 }) },
 
     -- Pane
     {
@@ -158,12 +144,12 @@ local common_config = {
     { key = "RightArrow", mods = "SHIFT", action = wezterm.action({ ActivatePaneDirection = "Right" }) },
     { key = "UpArrow", mods = "SHIFT", action = wezterm.action({ ActivatePaneDirection = "Up" }) },
     { key = "DownArrow", mods = "SHIFT", action = wezterm.action({ ActivatePaneDirection = "Down" }) },
-    { key = "x", mods = "LEADER|CTRL", action = wezterm.action({ CloseCurrentPane = { confirm = false } }) },
-    { key = "z", mods = "LEADER|CTRL", action = "TogglePaneZoomState" },
+    { key = "x", mods = "SHIFT|CTRL", action = wezterm.action({ CloseCurrentPane = { confirm = false } }) },
+    { key = "z", mods = "SHIFT|CTRL", action = "TogglePaneZoomState" },
 
     { key = "f", mods = "SHIFT|CTRL", action = wezterm.action({ EmitEvent = "trigger-open-ghq-project" }) },
+    { key = "v", mods = "SHIFT|CTRL", action = wezterm.action({ EmitEvent = "trigget-nvim-with-scrollback" }) },
     { key = "n", mods = "SHIFT|CTRL", action = "ToggleFullScreen" },
-    { key = "e", mods = "ALT", action = wezterm.action({ EmitEvent = "trigger-nvim-with-scrollback" }) },
   },
 }
 
