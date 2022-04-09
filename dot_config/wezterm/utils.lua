@@ -25,7 +25,7 @@ end
 function M.execCommand(command)
   local handle = io.popen(command, "r")
   local content = handle:read("*all")
-  local rc = {handle: close()}
+  local rc = { handle:close() }
   return rc[1], content
 end
 

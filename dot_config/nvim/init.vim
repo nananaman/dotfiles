@@ -198,13 +198,11 @@ function! s:check_back_space() abort
   return !col || getline('.')[col - 1] =~# '\s'
 endfunction
 
-
 " <c-space>で補完
 inoremap <silent><expr> <c-space> coc#refresh()
 
 " Use `[g` and `]g` to navigate diagnostics
 nmap <silent> [g <Plug>(coc-diagnostic-prev)
-
 nmap <silent> ]g <Plug>(coc-diagnostic-next)
 
 " 定義ジャンプ
@@ -232,7 +230,6 @@ nnoremap <nowait><expr> <C-k> coc#float#has_scroll() ? coc#float#scroll(0) : "\<
 inoremap <nowait><expr> <C-j> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<CR>" : "\<Right>"
 inoremap <nowait><expr> <C-k> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<CR>" : "\<Left>"
 
-
 " カーソル下のカッコをハイライトする
 autocmd CursorHold * silent call CocActionAsync('highlight')
 
@@ -249,7 +246,6 @@ augroup mygroup
   autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
 
-
 " Remap for do codeAction of selected region, ex: `<leader>aap` for current paragraph
 xmap <leader>a  <Plug>(coc-codeaction-selected)
 nmap <leader>a  <Plug>(coc-codeaction-selected)
@@ -257,7 +253,6 @@ nmap <leader>a  <Plug>(coc-codeaction-selected)
 " Remap for do codeAction of current line
 nmap <leader>ac  <Plug>(coc-codeaction)
 " Fix autofix problem of current line
-
 nmap <leader>qf  <Plug>(coc-fix-current)
 
 " Create mappings for function text object, requires document symbols feature of languageserver.
@@ -267,13 +262,11 @@ omap if <Plug>(coc-funcobj-i)
 omap af <Plug>(coc-funcobj-a)
 
 " Use <C-d> for select selections ranges, needs server support, like: coc-tsserver, coc-python
-
 nmap <silent> <C-d> <Plug>(coc-range-select)
 xmap <silent> <C-d> <Plug>(coc-range-select)
 
 " Use `:Format` to format current buffer
 command! -nargs=0 Format :call CocAction('format')
-
 
 " Use `:Fold` to fold current buffer
 command! -nargs=? Fold :call     CocAction('fold', <f-args>)
@@ -282,7 +275,6 @@ command! -nargs=? Fold :call     CocAction('fold', <f-args>)
 command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
 
 " Using CocList
-
 " Show all diagnostics
 nnoremap <silent> <space>a  :<C-u>CocList diagnostics<CR>
 " Manage extensions
@@ -300,206 +292,6 @@ nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list
 nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 
-" fzf-preview.vim
-set shell=/bin/bash
-let $SHELL='/bin/bash'
-let g:fzf_preview_command = 'bat --color=always --plain {-1}'
-let g:fzf_preview_lines_command = 'bat --color=always --plain --number'
-nnoremap <silent> ,f :<C-u>CocCommand fzf-preview.GitFiles<CR>
-nnoremap <silent> ,b :<C-u>CocCommand fzf-preview.Buffers<CR>
-nnoremap <silent> ,h :<C-u>CocCommand fzf-preview.ProjectMruFiles<CR>
-nnoremap <silent> ,l :<C-u>CocCommand fzf-preview.Lines<CR>
-nnoremap ,g :<C-u>CocCommand fzf-preview.ProjectGrep<Space>
-
-" sonictemplate.vim
-" <C-y><C-b>で後方補完
-let g:sonictemplate_vim_template_dir = [ '~/.config/nvim/sonictemplate' ]
-
-" Gina.vim設定
-nnoremap <leader>gc :Gina commit<CR><CR>
-nnoremap <leader>ga :<C-u>CocCommand fzf-preview.GitActions<CR>
-nnoremap <leader>gs :<C-u>CocCommand fzf-preview.GitStatus<CR>
-
-nnoremap <leader>gp :Gina push<CR>
-nnoremap <leader>gd :Gina diff<CR>
-nnoremap <leader>gl :Gina log<CR>
-nnoremap <leader>gb :Gina blame<CR>
-
-" vim-expand-region設定
-map + <Plug>(expand_region_expand)
-map - <Plug>(expand_region_shrink)
-
 lua << EOF
--- Default options:
-require('kanagawa').setup({
-    undercurl = true,           -- enable undercurls
-    commentStyle = "NONE",      -- 日本語を italic にすると崩れるので回避
-    functionStyle = "NONE",
-    keywordStyle = "italic",
-    statementStyle = "bold",
-    typeStyle = "NONE",
-    variablebuiltinStyle = "italic",
-    specialReturn = true,       -- special highlight for the return keyword
-    specialException = true,    -- special highlight for exception handling keywords
-    transparent = false,        -- do not set background color
-    dimInactive = false,        -- dim inactive window `:h hl-NormalNC`
-    globalStatus = false,       -- adjust window separators highlight for laststatus=3
-    colors = {},
-    overrides = {},
-})
-
--- setup must be called before loading
-vim.cmd("colorscheme kanagawa")
-
-require("transparent").setup({
-  enable = true, -- boolean: enable transparent
-  extra_groups = { -- table/string: additional groups that should be clear
-    -- In particular, when you set it to 'all', that means all avaliable groups
-
-    -- example of akinsho/nvim-bufferline.lua
-    "BufferLineTabClose",
-    "BufferlineBufferSelected",
-    "BufferLineFill",
-    "BufferLineBackground",
-    "BufferLineSeparator",
-    "BufferLineIndicatorSelected",
-  },
-  exclude = {}, -- table: groups you don't want to clear
-})
-
-require('nvim-treesitter.configs').setup {
-  highlight = {
-    enable = true,
-    disable = {}
-  },
-  ensure_installed = 'maintained'
-}
-
-require('lualine').setup {
-  options = {theme = 'kanagawa'},
-  sections = {
-    lualine_c = {
-      {
-        'filename',
-        file_status = true,   -- displays file status (readonly status, modified status)
-        path = 1,             -- 0 = just filename, 1 = relative path, 2 = absolute path
-        shorting_target = 40, -- Shortens path to leave 40 space in the window
-                              -- for other components. Terrible name any suggestions?
-        symbols = {
-          modified = '[+]',      -- when the file was modified
-          readonly = '[-]',      -- if the file is not modifiable or readonly
-          unnamed = '[No Name]', -- default display name for unnamed buffers
-        }
-      }
-    }
-  }
-}
-
-require('indent_blankline').setup {
-    show_current_context = true,
-    show_current_context_start = true,
-}
-
--- bufferline.nvim
--- Bufferを<C-o><C-p>で切り替え
-vim.api.nvim_set_keymap('n', '<C-o>', ':BufferLineCyclePrev<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<C-p>', ':BufferLineCycleNext<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', 'gb', ':BufferLinePick<CR>', { noremap = true, silent = true })
-
-local groups = require 'bufferline.groups'
-require('bufferline').setup {
-  options = {
-    show_buffer_close_icons = false,
-    show_close_icon = false,
-    diagnostics = 'coc',
-    diagnostics_indicator = function(count, level, diagnostics_dict, context)
-      local s = ' '
-      for e, n in pairs(diagnostics_dict) do
-        local sym = e == 'error' and ' '
-          or (e == 'warning' and ' ' or '' )
-        s = s .. sym .. n
-      end
-      return s
-    end,
-    separator_style = { '▎', '▎' },
-    groups = {
-      options = {
-        toggle_hidden_on_enter = true,
-      },
-      items = {
-        groups.builtin.ungrouped,
-        {
-          highlight = { guisp = '#7E9CD8', gui = 'underline' },
-          name = 'tests',
-          icon = '',
-          matcher = function(buf)
-            return buf.filename:match '_spec' or buf.filename:match 'test'
-          end,
-        },
-       {
-         name = 'view models',
-         highlight = { guisp = '#D27E99', gui = 'underline' },
-         matcher = function(buf)
-           return buf.filename:match 'view_model%.dart'
-         end,
-       },
-       {
-         highlight = { guisp = '#98BB6C', gui = 'underline' },
-         name = 'docs',
-         matcher = function(buf)
-          return buf.filename:match('%.md') or buf.filename:match('%.txt')
-         end
-       }
-      }
-    }
-  }
-}
-
-require('colorizer').setup {'css';'javascript';'html';'dart';'vue';'lua';'vim'}
-
-require('hop').setup()
-vim.api.nvim_set_keymap('n', 'so', ':<C-u>HopChar1<CR>', { noremap = true })
-vim.api.nvim_set_keymap('n', 'st', ':<C-u>HopChar2<CR>', { noremap = true })
-vim.api.nvim_set_keymap('n', 'sl', ':<Cmd>HopLine<CR>', { noremap = true })
-vim.api.nvim_set_keymap('n', 'sw', ':<Cmd>HopWord<CR>', { noremap = true })
-
-local wilder = require('wilder')
-wilder.setup({modes = {':', '/', '?'}})
-wilder.set_option('renderer', wilder.popupmenu_renderer(
-  wilder.popupmenu_border_theme({
-    highlighter = wilder.basic_highlighter(),
-    highlights = {
-      border = 'Normal',
-    },
-    border = 'rounded',
-    left = { ' ', wilder.popupmenu_devicons() },
-    right = { ' ', wilder.popupmenu_scrollbar() },
-  })
-))
+require('config')
 EOF
-
-" dex
-command! -nargs=* -bang Dex silent only! | botright 12 split |
-    \ execute 'terminal' (has('nvim') ? '' : '++curwin') 'dex'
-    \   (<bang>0 ? '--clear ' : '') <q-args> ' ' expand('%:p') |
-    \ stopinsert | execute 'normal! G' | set bufhidden=wipe |
-    \ execute 'autocmd BufEnter <buffer> if winnr("$") == 1 | quit! | endif' |
-    \ wincmd k
-
-" silicon
-let g:silicon = {
-  \   'theme':              'Dracula',
-  \   'font':               'Ricty Discord for Powerline',
-  \   'background':         '#AAAAFF',
-  \   'shadow-color':       '#555555',
-  \   'line-pad':                   2,
-  \   'pad-horiz':                 80,
-  \   'pad-vert':                 100,
-  \   'shadow-blur-radius':         0,
-  \   'shadow-offset-x':            0,
-  \   'shadow-offset-y':            0,
-  \   'line-number':           v:true,
-  \   'round-corner':          v:true,
-  \   'window-controls':       v:true,
-  \   'output': '~/Desktop/silicon-{time:%Y-%m-%d-%H%M%S}.png',
-  \ }

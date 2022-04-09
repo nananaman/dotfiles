@@ -11,7 +11,7 @@ function M.format_tab_title(tab, tabs, panes, config, hover, max_width)
   end
 
   -- local title = wezterm.truncate_right(utils.get_basename(tab.active_pane.foreground_process_name), max_width)
-  local title = "";
+  local title = ""
   if title == "" then
     local uri = utils.convert_home_dir(tab.active_pane.current_working_dir)
     local basename = utils.get_basename(uri)
@@ -123,21 +123,21 @@ function M.trigger_open_ghq_project(window, pane)
 end
 
 function M.trigger_nvim_with_scrollback(window, pane)
-	local scrollback = pane:get_lines_as_text()
-	local name = os.tmpname()
-	local f = io.open(name, "w+")
-	f:write(scrollback)
-	f:flush()
-	f:close()
-  local command = "nvim " .. name;
-	window:perform_action(
-		wezterm.action({ SpawnCommandInNewTab = {
-			args = { "/usr/local/bin/fish", "-l", "-c", command },
-		} }),
-		pane
-	)
-	wezterm.sleep_ms(1000)
-	os.remove(name)
+  local scrollback = pane:get_lines_as_text()
+  local name = os.tmpname()
+  local f = io.open(name, "w+")
+  f:write(scrollback)
+  f:flush()
+  f:close()
+  local command = "nvim " .. name
+  window:perform_action(
+    wezterm.action({ SpawnCommandInNewTab = {
+      args = { "/usr/local/bin/fish", "-l", "-c", command },
+    } }),
+    pane
+  )
+  wezterm.sleep_ms(1000)
+  os.remove(name)
 end
 
 return M
