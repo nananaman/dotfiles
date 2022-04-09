@@ -11,6 +11,9 @@ bash install_nvim.sh
 echo "[Info] Install fish..."
 bash install_fish.sh
 
+echo "[Info] Install fonts..."
+bash install_fonts.sh
+
 echo "[Info] Install wezterm..."
 bash install_wezterm.sh
 
