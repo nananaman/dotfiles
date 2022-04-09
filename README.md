@@ -1,7 +1,13 @@
 # dotfiles
+My dotfiles managed by chezmoi
 
 ## Installation
-
 ```
-$ curl -L raw.githubusercontent.com/nananaman/dotfiles/main/install.sh | bash
+$ sh -c "$(curl -fsLS chezmoi.io/get)" -- init --apply nananaman
+```
+
+## Install Tools
+Vim, fish, wezterm, etc.
+```
+$ chezmoi cd && bash ./scripts/init.sh
 ```

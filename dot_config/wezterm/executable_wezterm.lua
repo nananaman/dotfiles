@@ -1,8 +1,6 @@
 local wezterm = require("wezterm")
 local functions = require("functions")
 local utils = require("utils")
-local io = require("io")
-local os = require("os")
 
 ---------------------------------------------------------------
 --- wezterm on

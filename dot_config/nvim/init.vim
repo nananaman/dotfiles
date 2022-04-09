@@ -447,7 +447,7 @@ require('bufferline').setup {
          highlight = { guisp = '#98BB6C', gui = 'underline' },
          name = 'docs',
          matcher = function(buf)
-          return buf.name:match('%.md') or buf.name:match('%.txt')
+          return buf.filename:match('%.md') or buf.filename:match('%.txt')
          end
        }
       }
