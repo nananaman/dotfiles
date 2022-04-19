@@ -1,37 +1,20 @@
+# 見た目
+# 背景透過
 [[plugins]]
-repo = 'wsdjeg/dein-ui.vim'
+repo = 'xiyaowong/nvim-transparent'
 
 [[plugins]]
-repo = 'lambdalisue/fern.vim'
-depends = ['fern-preview.vim', 'fern-renderer-nerdfont.vim', 'glyph-palette.vim']
+repo = 'wsdjeg/dein-ui.vim'
 
 [[plugins]]
 repo = 'lambdalisue/nerdfont.vim'
 
 [[plugins]]
-repo = 'neoclide/coc.nvim'
-rev = 'release'
-on_i = 1
-merged = 0
-# hook_source = 'call coc#util#install()'
-
-[[plugins]]
 repo = 'nathom/filetype.nvim'
-
-[[plugins]]
-repo = 'junegunn/fzf'
-build = './install --all'
-merged = 0
 
 [[plugins]]
 repo = 'nvim-treesitter/nvim-treesitter'
 merged = 0
-
-[[plugins]]
-repo = 'mattn/vim-sonictemplate'
-
-[[plugins]]
-repo = 'lambdalisue/gina.vim'
 
 [[plugins]]
 repo = 'rebelot/kanagawa.nvim'
@@ -46,7 +29,7 @@ repo = 'akinsho/bufferline.nvim'
 repo = 'norcalli/nvim-colorizer.lua'
 
 [[plugins]]
-repo = 'phaazon/hop.nvim'
+repo = 'machakann/vim-highlightedyank'
 
 [[plugins]]
-repo = 'xiyaowong/nvim-transparent'
+repo = 'terryma/vim-expand-region'

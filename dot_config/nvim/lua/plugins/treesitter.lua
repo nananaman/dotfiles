@@ -3,5 +3,8 @@ require("nvim-treesitter.configs").setup({
     enable = true,
     disable = {},
   },
-  ensure_installed = "maintained",
+  autotag = {
+    enable = true,
+  },
+  ensure_installed = "all",
 })

@@ -18,9 +18,11 @@ if dein#load_state('~/.cache/dein')
   let g:config_dir = expand('~/.config/nvim/dein')
   let s:toml = g:config_dir . '/plugins.toml'
   let s:lazy_toml = g:config_dir . '/plugins_lazy.toml'
+  let s:cmp_toml = g:config_dir . '/nvim_cmp.toml'
 
   call dein#load_toml(s:toml, {'lazy': 0})
-  call dein#load_toml(s:lazy_toml, {'lazy': 0})
+  call dein#load_toml(s:lazy_toml, {'lazy': 1})
+  call dein#load_toml(s:cmp_toml, {'lazy': 1})
 
   " Required:
   call dein#end()
@@ -94,9 +96,9 @@ set softtabstop=2
 " Tabでスペースが入力される
 set expandtab
 " 自動インデント
-set autoindent
+" set autoindent
 " {があると自動でインデント
-set smartindent
+" set smartindent
 
 
 " 検索系
@@ -182,115 +184,6 @@ augroup fern-settings
   autocmd FileType fern call s:fern_settings()
   autocmd FileType fern call glyph_palette#apply()
 augroup END
-
-" coc.nvim設定
-" 起動時に必ず入れる拡張機能
-let g:coc_global_extensions = [
-  \'coc-fzf-preview',
-  \'coc-spell-checker',
-\]
-" タブキーで補完候補選択
-inoremap <silent><expr><TAB> pumvisible() ? "<C-n>" : <SID>check_back_space() ? "\<TAB>" : coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1] =~# '\s'
-endfunction
-
-" <c-space>で補完
-inoremap <silent><expr> <c-space> coc#refresh()
-
-" Use `[g` and `]g` to navigate diagnostics
-nmap <silent> [g <Plug>(coc-diagnostic-prev)
-nmap <silent> ]g <Plug>(coc-diagnostic-next)
-
-" 定義ジャンプ
-nmap <silent> ge :<C-u>CocCommand fzf-preview.CocDiagnostics<CR>
-nmap <silent> gce :<C-u>CocCommand fzf-preview.CocCurrentDiagnostics<CR>
-" nmap <silent> gd :<C-u>CocCommand fzf-preview.CocDefinition<CR>
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy :<C-u>CocCommand fzf-preview.CocTypeDefinition<CR>
-nmap <silent> gi :<C-u>CocCommand fzf-preview.CocImplementations<CR>
-nmap <silent> gr :<C-u>CocCommand fzf-preview.CocReferences<CR>
-
-" Kでドキュメントを開く
-nnoremap <silent> K :call <SID>show_documentation()<CR>
-
-function! s:show_documentation()
-  if (index(['vim', 'help'],  &filetype) >= 0)
-    execute 'h '.expand('<cword>')
-  else
-    call CocAction('doHover')
-  endif
-endfunction
-
-nnoremap <nowait><expr> <C-j> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-j>"
-nnoremap <nowait><expr> <C-k> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-k>"
-inoremap <nowait><expr> <C-j> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<CR>" : "\<Right>"
-inoremap <nowait><expr> <C-k> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<CR>" : "\<Left>"
-
-" カーソル下のカッコをハイライトする
-autocmd CursorHold * silent call CocActionAsync('highlight')
-
-" rn でリネーム
-nmap <leader>rn <Plug>(coc-rename)
-
-" <leader>fでフォーマット
-xmap <leader>f <Plug>(coc-format)
-nmap <leader>f <Plug>(coc-format)
-
-augroup mygroup
-  autocmd!
-  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
-  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
-augroup end
-
-" Remap for do codeAction of selected region, ex: `<leader>aap` for current paragraph
-xmap <leader>a  <Plug>(coc-codeaction-selected)
-nmap <leader>a  <Plug>(coc-codeaction-selected)
-
-" Remap for do codeAction of current line
-nmap <leader>ac  <Plug>(coc-codeaction)
-" Fix autofix problem of current line
-nmap <leader>qf  <Plug>(coc-fix-current)
-
-" Create mappings for function text object, requires document symbols feature of languageserver.
-xmap if <Plug>(coc-funcobj-i)
-xmap af <Plug>(coc-funcobj-a)
-omap if <Plug>(coc-funcobj-i)
-omap af <Plug>(coc-funcobj-a)
-
-" Use <C-d> for select selections ranges, needs server support, like: coc-tsserver, coc-python
-nmap <silent> <C-d> <Plug>(coc-range-select)
-xmap <silent> <C-d> <Plug>(coc-range-select)
-
-" Use `:Format` to format current buffer
-command! -nargs=0 Format :call CocAction('format')
-
-" Use `:Fold` to fold current buffer
-command! -nargs=? Fold :call     CocAction('fold', <f-args>)
-
-" use `:OR` for organize import of current buffer
-command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
-
-" Using CocList
-" Show all diagnostics
-nnoremap <silent> <space>a  :<C-u>CocList diagnostics<CR>
-" Manage extensions
-nnoremap <silent> <space>e  :<C-u>CocList extensions<CR>
-" Show commands
-nnoremap <silent> <space>c  :<C-u>CocList commands<CR>
-" Find symbol of current document
-nnoremap <silent> <space>o  :<C-u>CocList outline<CR>
-" Search workspace symbols
-nnoremap <silent> <space>s  :<C-u>CocList -I symbols<CR>
-" Do default action for next item.
-nnoremap <silent> <space>j  :<C-u>CocNext<CR>
-" Do default action for previous item.
-nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
-" Resume latest coc list
-nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 
 lua << EOF
 require('config')

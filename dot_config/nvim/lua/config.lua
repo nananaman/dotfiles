@@ -1,12 +1,11 @@
-require("plugins.fzf_preview")
+require("plugins.telescope")
 require("plugins.transparent")
 require("plugins.treesitter")
-require("plugins.silicon")
-require("plugins.wilder")
 require("plugins.hop")
 require("plugins.bufferline")
 require("plugins.lualine")
 require("plugins.kanagawa")
+require("plugins.trouble")
 
 -- aliases
 local cmd = vim.cmd -- to execute Vim commands e.g. cmd('pwd')
@@ -29,8 +28,8 @@ cmd('let g:sonictemplate_vim_template_dir = [ "~/.config/nvim/sonictemplate" ]')
 
 -- Gina.vim設定
 map("n", "<leader>gc", ":Gina commit<CR><CR>")
-map("n", "<leader>ga", ":<C-u>CocCommand fzf-preview.GitActions<CR>")
-map("n", "<leader>gs", ":<C-u>CocCommand fzf-preview.GitStatus<CR>")
+-- map("n", "<leader>ga", ":<C-u>CocCommand fzf-preview.GitActions<CR>")
+-- map("n", "<leader>gs", ":<C-u>CocCommand fzf-preview.GitStatus<CR>")
 
 map("n", "<leader>gp", ":Gina push<CR>")
 map("n", "<leader>gd", ":Gina diff<CR>")
@@ -40,10 +39,5 @@ map("n", "<leader>gb", ":Gina blame<CR>")
 -- vim-expand-region設定
 map("", "+", "<Plug>(expand_region_expand)", { noremap = false })
 map("", "-", "<Plug>(expand_region_shrink)", { noremap = false })
-
-require("indent_blankline").setup({
-  show_current_context = true,
-  show_current_context_start = true,
-})
 
 require("colorizer").setup({ "css", "javascript", "html", "dart", "vue", "lua", "vim" })
