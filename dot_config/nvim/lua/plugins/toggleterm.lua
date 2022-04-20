@@ -11,9 +11,7 @@ end
 vim.cmd("autocmd! TermOpen term://* lua set_terminal_keymaps()")
 
 local float_handler = function(term)
-  if vim.fn.mapcheck("jk", "t") ~= "" then
-    vim.api.nvim_buf_del_keymap(term.bufnr, "t", "<esc>")
-  end
+  vim.api.nvim_buf_del_keymap(term.bufnr, "t", "<esc>")
 end
 
 require("toggleterm").setup({
