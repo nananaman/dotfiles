@@ -28,7 +28,7 @@ repo = 'akinsho/bufferline.nvim'
 [[plugins]]
 repo = 'norcalli/nvim-colorizer.lua'
 hook_source = '''
-lua require("colorizer").setup({ "css", "javascript", "html", "dart", "vue", "lua", "vim" })
+lua require('colorizer').setup({ 'css', 'javascript', 'html', 'dart', 'vue', 'lua', 'vim' })
 '''
 
 [[plugins]]
