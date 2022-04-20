@@ -27,17 +27,15 @@ end
 cmd('let g:sonictemplate_vim_template_dir = [ "~/.config/nvim/sonictemplate" ]')
 
 -- Gina.vim設定
-map("n", "<leader>gc", ":Gina commit<CR><CR>")
+-- map("n", "<leader>gc", ":Gina commit<CR><CR>")
 -- map("n", "<leader>ga", ":<C-u>CocCommand fzf-preview.GitActions<CR>")
 -- map("n", "<leader>gs", ":<C-u>CocCommand fzf-preview.GitStatus<CR>")
 
-map("n", "<leader>gp", ":Gina push<CR>")
-map("n", "<leader>gd", ":Gina diff<CR>")
-map("n", "<leader>gl", ":Gina log<CR>")
+-- map("n", "<leader>gp", ":Gina push<CR>")
+-- map("n", "<leader>gd", ":Gina diff<CR>")
+-- map("n", "<leader>gl", ":Gina log<CR>")
 map("n", "<leader>gb", ":Gina blame<CR>")
 
 -- vim-expand-region設定
 map("", "+", "<Plug>(expand_region_expand)", { noremap = false })
 map("", "-", "<Plug>(expand_region_shrink)", { noremap = false })
-
-require("colorizer").setup({ "css", "javascript", "html", "dart", "vue", "lua", "vim" })

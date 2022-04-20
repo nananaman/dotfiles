@@ -30,6 +30,9 @@ go install github.com/x-motemen/ghq@latest
 # memo
 go install github.com/mattn/memo@latest
 
+# lazygit
+go install github.com/jesseduffield/lazygit@latest
+
 # code2img
 git clone https://github.com/skanehira/code2img
 cd code2img && go install
@@ -61,6 +64,9 @@ if [ "$(uname)" == 'Darwin' ]; then
 elif [ "$(expr substr $(uname -s) 1 5)" == 'Linux' ]; then
   brew install bat fd-find
 fi
+
+# delta
+cargo install delta
 
 # silicon
 cargo install silicon

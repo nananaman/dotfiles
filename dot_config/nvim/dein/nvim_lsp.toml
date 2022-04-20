@@ -13,7 +13,9 @@ repo = 'folke/lsp-colors.nvim'
 [[plugins]]
 repo = 'tami5/lspsaga.nvim'
 on_source = ['nvim-lspconfig', 'nvim-cmp']
-hook_source = '''lua require("lspsaga").setup()'''
+hook_source = '''
+lua require("lspsaga").setup()
+'''
 
 [[plugins]]
 repo = 'hrsh7th/nvim-cmp'

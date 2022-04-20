@@ -109,3 +109,10 @@ lua require('telescope').load_extension('fzf')
 repo = 'nvim-telescope/telescope-fzf-native.nvim'
 on_source = ['telescope.nvim']
 build = 'make'
+
+[[plugins]]
+repo = "akinsho/toggleterm.nvim"
+on_event = 'VimEnter'
+hook_source = '''
+lua require("plugins.toggleterm")
+'''
