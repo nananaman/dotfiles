@@ -18,7 +18,7 @@ if dein#load_state('~/.cache/dein')
   let g:config_dir = expand('~/.config/nvim/dein')
   let s:toml = g:config_dir . '/plugins.toml'
   let s:lazy_toml = g:config_dir . '/plugins_lazy.toml'
-  let s:cmp_toml = g:config_dir . '/nvim_cmp.toml'
+  let s:cmp_toml = g:config_dir . '/nvim_lsp.toml'
 
   call dein#load_toml(s:toml, {'lazy': 0})
   call dein#load_toml(s:lazy_toml, {'lazy': 1})
@@ -131,11 +131,11 @@ set showtabline=2
 
 " term周りの設定
 " デフォルトでinsertモード
-autocmd TermOpen * startinsert
+" autocmd TermOpen * startinsert
 " :T で下側にwindow作ってtermに入る
-command! -nargs=* T split | wincmd j | resize 20 | terminal fish
+" command! -nargs=* T split | wincmd j | resize 20 | terminal fish
 " Escでinsertを抜ける
-:tnoremap <Esc> <C-\><C-n>
+" :tnoremap <Esc> <C-\><C-n>
 
 " Markdownのとき, 選択した文字列にpでリンクを追加する
 let s:clipboard_register = has('linux') || has('unix') ? '+' : '*'

@@ -5,8 +5,6 @@ local lsp_installer = require("nvim-lsp-installer")
 -- Mappings.
 local map_opts = { noremap = true, silent = true }
 vim.api.nvim_set_keymap("n", "<space>e", "<cmd>lua vim.diagnostic.open_float()<CR>", map_opts)
-vim.api.nvim_set_keymap("n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<CR>", map_opts)
-vim.api.nvim_set_keymap("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>", map_opts)
 vim.api.nvim_set_keymap("n", "<space>q", "<cmd>lua vim.diagnostic.setloclist()<CR>", map_opts)
 
 local on_attach = function(client, bufnr)
@@ -16,15 +14,17 @@ local on_attach = function(client, bufnr)
 
   buf_set_keymap("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", map_opts)
   buf_set_keymap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", map_opts)
-  buf_set_keymap("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", map_opts)
+  buf_set_keymap("n", "gj", "<cmd>Lspsaga diagnostic_jump_next<CR>", map_opts)
+  buf_set_keymap("n", "gk", "<cmd>Lspsaga diagnostic_jump_prev<CR>", map_opts)
+  buf_set_keymap("n", "K", "<cmd>Lspsaga hover_doc<CR>", map_opts)
   buf_set_keymap("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", map_opts)
-  buf_set_keymap("n", "<C-k>", "<cmd>lua vim.lsp.buf.signature_help()<CR>", map_opts)
+  buf_set_keymap("n", "<C-k>", "<cmd>Lspsaga signature_help<CR>", map_opts)
   buf_set_keymap("n", "<leader>wa", "<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>", map_opts)
   buf_set_keymap("n", "<leader>wr", "<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>", map_opts)
   buf_set_keymap("n", "<leader>wl", "<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>", map_opts)
   buf_set_keymap("n", "<leader>D", "<cmd>lua vim.lsp.buf.type_definition()<CR>", map_opts)
-  buf_set_keymap("n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", map_opts)
-  buf_set_keymap("n", "<leader>ac", "<cmd>lua vim.lsp.buf.code_action()<CR>", map_opts)
+  buf_set_keymap("n", "<leader>rn", "<cmd>Lspsaga rename<CR>", map_opts)
+  buf_set_keymap("n", "<leader>ac", "<cmd>Lspsaga code_action<CR>", map_opts)
   -- buf_set_keymap("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", map_opts)
   buf_set_keymap("n", "<leader>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", map_opts)
 end
@@ -89,8 +89,8 @@ lsp_installer.settings({
 })
 
 vim.opt.completeopt = "menu,menuone,noselect"
-vim.opt.spell = true
-vim.opt.spelllang = { "en_us" }
+-- vim.opt.spell = true
+-- vim.opt.spelllang = { "en_us" }
 
 -- Setup nvim-cmp.
 local cmp = require("cmp")
