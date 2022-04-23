@@ -15,9 +15,10 @@ local float_handler = function(term)
 end
 
 require("toggleterm").setup({
-  open_mapping = [[<c-\>]],
+  open_mapping = [[,t]],
   shade_filetypes = { "none" },
-  direction = "horizontal",
+  shade_terminals = false,
+  direction = "vertical",
   insert_mappings = false,
   start_in_insert = true,
   float_opts = { border = "rounded", winblend = 3 },
@@ -35,6 +36,7 @@ local Terminal = require("toggleterm.terminal").Terminal
 local lazygit = Terminal:new({
   cmd = "lazygit -ucd ~/.config/lazygit",
   dir = "git_dir",
+  shade_terminals = true,
   direction = "float",
   float_opts = {
     border = "double",
