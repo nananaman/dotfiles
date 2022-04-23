@@ -1,7 +1,7 @@
 # 依存
 [[plugins]]
 repo = 'nvim-lua/plenary.nvim'
-on_source = ['todo-comments.nvim', 'telescope.nvim']
+on_source = ['todo-comments.nvim', 'telescope.nvim', 'null-ls.nvim']
 
 # その他
 [[plugins]]
