@@ -25,6 +25,7 @@ repo = 'lambdalisue/glyph-palette.vim'
 
 [[plugins]]
 repo = 'mattn/vim-sonictemplate'
+on_event = 'VimEnter'
 
 [[plugins]]
 repo = 'kevinhwang91/nvim-hlslens'

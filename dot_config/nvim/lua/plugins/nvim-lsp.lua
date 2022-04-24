@@ -1,4 +1,5 @@
 local nvim_lsp = require("lspconfig")
+local nullls = require("null-ls")
 local capabilities = require("cmp_nvim_lsp").update_capabilities(vim.lsp.protocol.make_client_capabilities())
 local lsp_installer = require("nvim-lsp-installer")
 
@@ -36,6 +37,11 @@ table.insert(runtime_path, "lua/?/init.lua")
 local function detected_root_dir(root_dir)
   return not not (root_dir(vim.api.nvim_buf_get_name(0), vim.api.nvim_get_current_buf()))
 end
+
+local deno_root_dir = nvim_lsp.util.root_pattern("deno.json", "deno.jsonc", "deps.ts")
+local node_root_dir = nvim_lsp.util.root_pattern("package.json", "node_modules")
+local is_deno_proj = detected_root_dir(deno_root_dir)
+local is_node_proj = not (is_deno_proj)
 
 local enhance_server_opts = {
   ["sumneko_lua"] = function(opts)
@@ -108,30 +114,33 @@ local enhance_server_opts = {
     }
   end,
   ["tsserver"] = function(opts)
-    local root_dir = nvim_lsp.util.root_pattern("package.json", "node_modules")
-    opts.root_dir = root_dir
-    opts.autostart = detected_root_dir(root_dir)
-    opts.init_options = { lint = true, unstable = true }
-    opts.on_attach = function(client, bufnr)
-      client.resolved_capabilities.document_formatting = false
-      on_attach(client, bufnr)
+    opts.autostart = is_node_proj
+    if is_node_proj then
+      opts.root_dir = node_root_dir
+      opts.init_options = { lint = true, unstable = true }
+      opts.on_attach = function(client, bufnr)
+        client.resolved_capabilities.document_formatting = false
+        on_attach(client, bufnr)
+      end
     end
   end,
   ["eslint"] = function(opts)
-    local root_dir = nvim_lsp.util.root_pattern("package.json", "node_modules")
-    opts.root_dir = root_dir
-    opts.autostart = detected_root_dir(root_dir)
-    opts.init_options = { lint = true, unstable = true }
-    opts.on_attach = function(client, bufnr)
-      client.resolved_capabilities.document_formatting = false
-      on_attach(client, bufnr)
+    opts.autostart = is_node_proj
+    if is_node_proj then
+      opts.root_dir = node_root_dir
+      opts.init_options = { lint = true, unstable = true }
+      opts.on_attach = function(client, bufnr)
+        client.resolved_capabilities.document_formatting = false
+        on_attach(client, bufnr)
+      end
     end
   end,
   ["denols"] = function(opts)
-    local root_dir = nvim_lsp.util.root_pattern("deno.json", "deno.jsonc", "deps.ts")
-    opts.root_dir = root_dir
-    opts.autostart = detected_root_dir(root_dir)
-    opts.init_options = { lint = true, unstable = true }
+    opts.autostart = is_deno_proj
+    if is_deno_proj then
+      opts.root_dir = deno_root_dir
+      opts.init_options = { lint = true, unstable = true }
+    end
   end,
 }
 
@@ -217,4 +226,17 @@ cmp.setup({
       maxwidth = 50, -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
     }),
   },
+})
+
+
+-- null-ls
+local sources = { nullls.builtins.completion.spell }
+
+-- Prettier for Node.js
+if (is_node_proj) then
+  table.insert(sources, nullls.builtins.formatting.prettier)
+end
+
+nullls.setup({
+  sources = sources,
 })

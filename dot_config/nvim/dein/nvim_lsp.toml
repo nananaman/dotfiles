@@ -75,4 +75,3 @@ lua require('nvim-autopairs').setup{}
 [[plugins]]
 repo = 'jose-elias-alvarez/null-ls.nvim'
 on_source = 'nvim-lspconfig'
-hook_source = ''' lua require('plugins.null-ls').setup() '''
