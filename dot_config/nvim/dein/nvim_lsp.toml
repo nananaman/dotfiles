@@ -60,6 +60,17 @@ on_source = ['nvim-lspconfig', 'nvim-cmp']
 [[plugins]]
 repo = 'hrsh7th/vim-vsnip'
 on_source = 'nvim-lspconfig'
+hook_source = '''
+let g:vsnip_snippet_dir = expand('~/.config/nvim/vsnip')
+'''
+
+[[plugins]]
+repo = 'hrsh7th/vim-vsnip-integ'
+on_source = 'nvim-lspconfig'
+
+[[plugins]]
+repo = 'rafamadriz/friendly-snippets'
+on_source = 'nvim-lspconfig'
 
 [[plugins]]
 repo = 'onsails/lspkind-nvim'

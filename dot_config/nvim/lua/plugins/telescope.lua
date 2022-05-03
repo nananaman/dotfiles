@@ -10,3 +10,5 @@ map("n", ",f", ":Telescope find_files<CR>", { silent = true })
 map("n", ",b", ":Telescope buffers<CR>", { silent = true })
 map("n", ",g", ":Telescope live_grep<CR>")
 map("n", ",h", ":Telescope help_tags<CR>")
+
+-- map("n", "gr", ":Telescope lsp_references<CR>")

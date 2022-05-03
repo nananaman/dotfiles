@@ -13,7 +13,7 @@ local on_attach = function(client, bufnr)
     vim.api.nvim_buf_set_keymap(bufnr, ...)
   end
 
-  buf_set_keymap("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", map_opts)
+  buf_set_keymap("n", "gD", "<cmd>lua vim.lsp.buf.type_definition()<CR>", map_opts)
   buf_set_keymap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", map_opts)
   buf_set_keymap("n", "gj", "<cmd>Lspsaga diagnostic_jump_next<CR>", map_opts)
   buf_set_keymap("n", "gk", "<cmd>Lspsaga diagnostic_jump_prev<CR>", map_opts)
@@ -41,7 +41,7 @@ end
 local deno_root_dir = nvim_lsp.util.root_pattern("deno.json", "deno.jsonc", "deps.ts")
 local node_root_dir = nvim_lsp.util.root_pattern("package.json", "node_modules")
 local is_deno_proj = detected_root_dir(deno_root_dir)
-local is_node_proj = not (is_deno_proj)
+local is_node_proj = not is_deno_proj
 
 local enhance_server_opts = {
   ["sumneko_lua"] = function(opts)
@@ -71,46 +71,46 @@ local enhance_server_opts = {
         schemas = {
           {
             fileMatch = { "package.json" },
-            url = "https://json.schemastore.org/package.json"
+            url = "https://json.schemastore.org/package.json",
           },
           {
             fileMatch = { "tsconfig*.json" },
-            url = "https://json.schemastore.org/tsconfig.json"
+            url = "https://json.schemastore.org/tsconfig.json",
           },
           {
             fileMatch = {
               ".prettierrc",
               ".prettierrc.json",
-              "prettier.config.json"
+              "prettier.config.json",
             },
-            url = "https://json.schemastore.org/prettierrc.json"
+            url = "https://json.schemastore.org/prettierrc.json",
           },
           {
             fileMatch = { ".eslintrc", ".eslintrc.json" },
-            url = "https://json.schemastore.org/eslintrc.json"
+            url = "https://json.schemastore.org/eslintrc.json",
           },
           {
             fileMatch = { ".babelrc", ".babelrc.json", "babel.config.json" },
-            url = "https://json.schemastore.org/babelrc.json"
+            url = "https://json.schemastore.org/babelrc.json",
           },
           {
             fileMatch = { "lerna.json" },
-            url = "https://json.schemastore.org/lerna.json"
+            url = "https://json.schemastore.org/lerna.json",
           },
           {
             fileMatch = { "now.json", "vercel.json" },
-            url = "https://json.schemastore.org/now.json"
+            url = "https://json.schemastore.org/now.json",
           },
           {
             fileMatch = {
               ".stylelintrc",
               ".stylelintrc.json",
-              "stylelint.config.json"
+              "stylelint.config.json",
             },
-            url = "http://json.schemastore.org/stylelintrc.json"
-          }
-        }
-      }
+            url = "http://json.schemastore.org/stylelintrc.json",
+          },
+        },
+      },
     }
   end,
   ["tsserver"] = function(opts)
@@ -186,9 +186,9 @@ cmp.setup({
   mapping = cmp.mapping.preset.insert({
     ["<C-b>"] = cmp.mapping.scroll_docs(-4),
     ["<C-f>"] = cmp.mapping.scroll_docs(4),
-    ["<C-Space>"] = cmp.mapping.complete(),
+    -- ["<Space>"] = cmp.mapping.complete(),
     ["<C-e>"] = cmp.mapping.abort(),
-    -- ["<CR>"] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+    ["<CR>"] = cmp.mapping.confirm({ select = false }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
     ["<Tab>"] = function(fallback)
       if cmp.visible() then
         cmp.select_next_item()
@@ -228,12 +228,11 @@ cmp.setup({
   },
 })
 
-
 -- null-ls
 local sources = { nullls.builtins.completion.spell }
 
 -- Prettier for Node.js
-if (is_node_proj) then
+if is_node_proj then
   table.insert(sources, nullls.builtins.formatting.prettier)
 end
 
