@@ -239,3 +239,22 @@ end
 nullls.setup({
   sources = sources,
 })
+
+-- flutter-tools
+require("flutter-tools").setup({
+  ui = {
+    notification_style = 'plugin'
+  },
+  widget_guides = {
+    enabled = true,
+  },
+  lsp = {
+    color = {
+      enabled = true,
+      background = true,
+      virtual_text = false,
+    },
+    on_attach = on_attach,
+    capabilities = capabilities
+  }
+})
