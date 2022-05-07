@@ -87,7 +87,7 @@ hook_source = '''lua require('plugins.indent-blankline')'''
 
 [[plugins]]
 repo = 'windwp/nvim-ts-autotag'
-on_ft = ['html', 'vue']
+on_event = 'VimEnter'
 
 [[plugins]]
 repo = 'goolord/alpha-nvim'

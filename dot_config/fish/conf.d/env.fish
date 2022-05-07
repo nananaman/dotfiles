@@ -11,6 +11,9 @@ set PATH $HOME/go/bin $PATH
 # fzf
 fzf_configure_bindings --directory=\cf
 
+# node
+eval (nodenv init - | source)
+
 # deno
 set PATH $HOME/.deno/bin $PATH
 
