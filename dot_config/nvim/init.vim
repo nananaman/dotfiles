@@ -190,6 +190,21 @@ smap <expr> <C-j> vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<C-j>'
 imap <expr> <C-k> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<C-k>'
 smap <expr> <C-k> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<C-k>'
 
+if system('uname -a | grep microsoft') != ""
+  let g:clipboard = {
+        \ 'name': 'myClipboard',
+        \ 'copy': {
+        \   '+': '/mnt/c/Tools/win32yank/win32yank.exe -i',
+        \   '*': '/mnt/c/Tools/win32yank/win32yank.exe -i',
+        \ },
+        \ 'paste': {
+        \   '+': '/mnt/c/Tools/win32yank/win32yank.exe -o',
+        \   '*': '/mnt/c/Tools/win32yank/win32yank.exe -o',
+        \ },
+        \ 'cache_enabled': 1,
+        \}
+endif
+
 lua << EOF
 require('config')
 EOF

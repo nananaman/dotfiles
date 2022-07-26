@@ -109,11 +109,6 @@ function M.trigger_open_ghq_project(window, pane)
   local command = "cd (ghq root)/(ghq list | fzf +m --reverse --prompt='Project > ') && vim"
   window:perform_action(
     wezterm.action({
-      -- SwitchToWorkspace = {
-      --   spawn = {
-      --     args = { "/usr/local/bin/fish", "-l", "-c", command },
-      --   },
-      -- },
       SpawnCommandInNewTab = {
         args = { "/usr/local/bin/fish", "-l", "-c", command },
       },

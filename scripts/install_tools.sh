@@ -57,12 +57,11 @@ fi
 cargo install lsd
 
 # bat
-# fd
 if [ "$(uname)" == 'Darwin' ]; then
   sudo apt-get install bat fd-find
   sudo ln -s /usr/bin/batcat /usr/local/bin/bat
 elif [ "$(expr substr $(uname -s) 1 5)" == 'Linux' ]; then
-  brew install bat fd-find
+  brew install bat
 fi
 
 # delta
