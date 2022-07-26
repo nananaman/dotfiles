@@ -3,6 +3,10 @@
 repo = 'nvim-lua/plenary.nvim'
 on_source = ['todo-comments.nvim', 'telescope.nvim', 'null-ls.nvim', 'flutter-tools.nvim']
 
+[[plugins]]
+repo = 'vim-denops/denops.vim'
+on_source = ['fuzzy-motion.vim']
+
 # その他
 [[plugins]]
 repo = 'lambdalisue/fern.vim'
@@ -58,10 +62,6 @@ on_event = 'VimEnter'
 [[plugins]]
 repo = 'tpope/vim-commentary'
 on_event = 'VimEnter'
-
-[[plugins]]
-repo = 'phaazon/hop.nvim'
-hook_source = '''lua require('hop').setup()'''
 
 [[plugins]]
 repo = 'kyazdani42/nvim-web-devicons'
@@ -125,3 +125,6 @@ lua require('plugins.toggleterm')
 [[plugins]]
 repo = 'rcarriga/nvim-notify'
 on_event = 'VimEnter'
+
+[[plugins]]
+repo = 'yuki-yano/fuzzy-motion.vim'

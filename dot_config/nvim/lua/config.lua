@@ -1,11 +1,11 @@
 require("plugins.telescope")
 require("plugins.transparent")
-require("plugins.treesitter")
-require("plugins.hop")
 require("plugins.bufferline")
+require("plugins.treesitter")
 require("plugins.lualine")
 require("plugins.kanagawa")
 require("plugins.trouble")
+require("plugins.dap")
 
 -- aliases
 local cmd = vim.cmd -- to execute Vim commands e.g. cmd('pwd')
@@ -36,6 +36,9 @@ cmd('let g:sonictemplate_vim_template_dir = [ "~/.config/nvim/sonictemplate" ]')
 -- map("n", "<leader>gl", ":Gina log<CR>")
 map("n", "<leader>gb", ":Gina blame<CR>")
 
--- vim-expand-region設定
+-- vim-expand-region
 map("", "+", "<Plug>(expand_region_expand)", { noremap = false })
 map("", "-", "<Plug>(expand_region_shrink)", { noremap = false })
+
+-- fuzzy-motion.vim
+map("", "  ", ":FuzzyMotion<CR>")

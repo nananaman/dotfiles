@@ -4,7 +4,11 @@ on_event = 'VimEnter'
 hook_source = '''lua require('plugins.nvim-lsp')'''
 
 [[plugins]]
-repo = 'williamboman/nvim-lsp-installer'
+repo = 'williamboman/mason.nvim'
+on_source = 'nvim-lspconfig'
+
+[[plugins]]
+repo = 'williamboman/mason-lspconfig.nvim'
 on_source = 'nvim-lspconfig'
 
 [[plugins]]
@@ -90,3 +94,17 @@ on_source = 'nvim-lspconfig'
 [[plugins]]
 repo = 'akinsho/flutter-tools.nvim'
 on_source = 'nvim-lspconfig'
+
+[[plugins]]
+repo = 'golang/vscode-go'
+
+[[plugins]]
+repo = "mfussenegger/nvim-dap"
+on_source = ['nvim-dap-ui']
+
+[[plugins]]
+repo = "rcarriga/nvim-dap-ui"
+on_event = 'VimEnter'
+hook_source = '''
+lua require('dapui').setup{}
+'''

@@ -13,10 +13,6 @@ repo = 'lambdalisue/nerdfont.vim'
 repo = 'nathom/filetype.nvim'
 
 [[plugins]]
-repo = 'nvim-treesitter/nvim-treesitter'
-merged = 0
-
-[[plugins]]
 repo = 'rebelot/kanagawa.nvim'
 
 [[plugins]]
@@ -36,3 +32,7 @@ repo = 'machakann/vim-highlightedyank'
 
 [[plugins]]
 repo = 'terryma/vim-expand-region'
+
+[[plugins]]
+repo = 'nvim-treesitter/nvim-treesitter'
+merged = 0

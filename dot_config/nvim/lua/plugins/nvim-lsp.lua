@@ -1,7 +1,17 @@
-local nvim_lsp = require("lspconfig")
+local lspconfig = require("lspconfig")
 local nullls = require("null-ls")
 local capabilities = require("cmp_nvim_lsp").update_capabilities(vim.lsp.protocol.make_client_capabilities())
-local lsp_installer = require("nvim-lsp-installer")
+local mason = require("mason")
+
+mason.setup({
+  ui = {
+    icons = {
+      server_installed = "✓",
+      server_pending = "➜",
+      server_uninstalled = "✗",
+    },
+  },
+})
 
 -- Mappings.
 local map_opts = { noremap = true, silent = true }
@@ -27,7 +37,7 @@ local on_attach = function(client, bufnr)
   buf_set_keymap("n", "<leader>rn", "<cmd>Lspsaga rename<CR>", map_opts)
   buf_set_keymap("n", "<leader>ac", "<cmd>Lspsaga code_action<CR>", map_opts)
   -- buf_set_keymap("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", map_opts)
-  buf_set_keymap("n", "<leader>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", map_opts)
+  buf_set_keymap("n", "<leader>f", "<cmd>lua vim.lsp.buf.format { async = true }<CR>", map_opts)
 end
 
 local runtime_path = vim.split(package.path, ";")
@@ -38,8 +48,8 @@ local function detected_root_dir(root_dir)
   return not not (root_dir(vim.api.nvim_buf_get_name(0), vim.api.nvim_get_current_buf()))
 end
 
-local deno_root_dir = nvim_lsp.util.root_pattern("deno.json", "deno.jsonc", "deps.ts")
-local node_root_dir = nvim_lsp.util.root_pattern("package.json", "node_modules")
+local deno_root_dir = lspconfig.util.root_pattern("deno.json", "deno.jsonc", "deps.ts")
+local node_root_dir = lspconfig.util.root_pattern("package.json", "node_modules")
 local is_deno_proj = detected_root_dir(deno_root_dir)
 local is_node_proj = not is_deno_proj
 
@@ -144,28 +154,22 @@ local enhance_server_opts = {
   end,
 }
 
-lsp_installer.on_server_ready(function(server)
+local mason_lspconfig = require('mason-lspconfig')
+mason_lspconfig.setup_handlers({ function(server_name)
   local opts = {
     on_attach = on_attach,
     capabilities = capabilities,
   }
 
-  if enhance_server_opts[server.name] then
-    enhance_server_opts[server.name](opts)
+  if enhance_server_opts[server_name] then
+    enhance_server_opts[server_name](opts)
   end
 
-  server:setup(opts)
-end)
 
-lsp_installer.settings({
-  ui = {
-    icons = {
-      server_installed = "✓",
-      server_pending = "➜",
-      server_uninstalled = "✗",
-    },
-  },
-})
+  lspconfig[server_name].setup {
+    on_attach = on_attach,
+  }
+end })
 
 vim.opt.completeopt = "menu,menuone,noselect"
 
