@@ -5,7 +5,6 @@ require("plugins.treesitter")
 require("plugins.lualine")
 require("plugins.kanagawa")
 require("plugins.trouble")
-require("plugins.dap")
 
 -- aliases
 local cmd = vim.cmd -- to execute Vim commands e.g. cmd('pwd')
