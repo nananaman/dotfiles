@@ -1,5 +1,5 @@
 local lspconfig = require("lspconfig")
-local nullls = require("null-ls")
+local null_ls = require("null-ls")
 local capabilities = require("cmp_nvim_lsp").update_capabilities(vim.lsp.protocol.make_client_capabilities())
 local mason = require("mason")
 
@@ -52,6 +52,8 @@ local deno_root_dir = lspconfig.util.root_pattern("deno.json", "deno.jsonc", "de
 local node_root_dir = lspconfig.util.root_pattern("package.json", "node_modules")
 local is_deno_proj = detected_root_dir(deno_root_dir)
 local is_node_proj = not is_deno_proj
+
+local is_python_proj = lspconfig.util.root_pattern("pyproject.toml", "Pipfile")
 
 local enhance_server_opts = {
   ["sumneko_lua"] = function(opts)
@@ -233,14 +235,46 @@ cmp.setup({
 })
 
 -- null-ls
-local sources = { nullls.builtins.completion.spell }
+-- vim辞書がなければダウンロード
+if vim.fn.filereadable('~/.local/share/cspell/vim.txt.gz') ~= 1 then
+  local vim_dictionary_url = 'https://github.com/iamcco/coc-spell-checker/raw/master/dicts/vim/vim.txt.gz'
+  io.popen('curl -fsSLo ~/.local/share/cspell/vim.txt.gz --create-dirs ' .. vim_dictionary_url)
+end
+
+-- ユーザー辞書がなければ作成
+if vim.fn.filereadable('~/.local/share/cspell/user.txt') ~= 1 then
+  io.popen('mkdir -p ~/.local/share/cspell')
+  io.popen('touch ~/.local/share/cspell/user.txt')
+end
+
+local sources = {
+  null_ls.builtins.completion.spell,
+  null_ls.builtins.diagnostics.cspell.with({
+    diagnostics_postprocess = function(diagnostic)
+      -- レベルをWARNに変更（デフォルトはERROR）
+      diagnostic.severity = vim.diagnostic.severity["WARN"]
+    end,
+    condition = function()
+      -- cspellが実行できるときのみ有効
+      return vim.fn.executable('cspell') > 0
+    end,
+    -- 起動時に設定ファイル読み込み
+    extra_args = { "--config", "~/.config/cspell/cspell.json" }
+  })
+}
 
 -- Prettier for Node.js
 if is_node_proj then
-  table.insert(sources, nullls.builtins.formatting.prettier)
+  table.insert(sources, null_ls.builtins.formatting.prettier)
 end
 
-nullls.setup({
+-- Python
+if is_python_proj then
+  table.insert(sources, null_ls.builtins.formatting.black)
+  table.insert(sources, null_ls.builtins.formatting.isort)
+end
+
+null_ls.setup({
   sources = sources,
 })
 

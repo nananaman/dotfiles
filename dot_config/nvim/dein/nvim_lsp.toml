@@ -88,10 +88,6 @@ lua require('nvim-autopairs').setup{}
 '''
 
 [[plugins]]
-repo = 'jose-elias-alvarez/null-ls.nvim'
-on_source = 'nvim-lspconfig'
-
-[[plugins]]
 repo = 'akinsho/flutter-tools.nvim'
 on_source = 'nvim-lspconfig'
 

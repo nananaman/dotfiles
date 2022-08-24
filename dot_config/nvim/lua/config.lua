@@ -41,3 +41,6 @@ map("", "-", "<Plug>(expand_region_shrink)", { noremap = false })
 
 -- fuzzy-motion.vim
 map("", "  ", ":FuzzyMotion<CR>")
+
+map("", '<C-w>|', ":vsplit<CR>", { noremap = false })
+map("", '<C-w>-', ":split<CR>", { noremap = false })
