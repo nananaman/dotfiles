@@ -10,9 +10,6 @@ repo = 'wsdjeg/dein-ui.vim'
 repo = 'lambdalisue/nerdfont.vim'
 
 [[plugins]]
-repo = 'nathom/filetype.nvim'
-
-[[plugins]]
 repo = 'rebelot/kanagawa.nvim'
 
 [[plugins]]
@@ -36,3 +33,10 @@ repo = 'terryma/vim-expand-region'
 [[plugins]]
 repo = 'nvim-treesitter/nvim-treesitter'
 merged = 0
+
+[[plugins]]
+repo = 'lewis6991/impatient.nvim'
+hook_source = '''
+lua require('impatient')
+lua require('impatient').enable_profile()
+'''
