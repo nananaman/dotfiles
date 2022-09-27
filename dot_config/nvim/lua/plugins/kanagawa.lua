@@ -4,7 +4,7 @@ require("kanagawa").setup({
   commentStyle = { italic = false }, -- 日本語を italic にすると崩れるので回避
   functionStyle = {},
   keywordStyle = { italic = true },
-  statementStyle = { bold = true},
+  statementStyle = { bold = true },
   typeStyle = {},
   variablebuiltinStyle = { italic = true },
   specialReturn = true, -- special highlight for the return keyword

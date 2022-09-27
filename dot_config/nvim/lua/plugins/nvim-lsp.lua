@@ -156,22 +156,23 @@ local enhance_server_opts = {
   end,
 }
 
-local mason_lspconfig = require('mason-lspconfig')
-mason_lspconfig.setup_handlers({ function(server_name)
-  local opts = {
-    on_attach = on_attach,
-    capabilities = capabilities,
-  }
+local mason_lspconfig = require("mason-lspconfig")
+mason_lspconfig.setup_handlers({
+  function(server_name)
+    local opts = {
+      on_attach = on_attach,
+      capabilities = capabilities,
+    }
 
-  if enhance_server_opts[server_name] then
-    enhance_server_opts[server_name](opts)
-  end
+    if enhance_server_opts[server_name] then
+      enhance_server_opts[server_name](opts)
+    end
 
-
-  lspconfig[server_name].setup {
-    on_attach = on_attach,
-  }
-end })
+    lspconfig[server_name].setup({
+      on_attach = on_attach,
+    })
+  end,
+})
 
 vim.opt.completeopt = "menu,menuone,noselect"
 
@@ -236,15 +237,15 @@ cmp.setup({
 
 -- null-ls
 -- vim辞書がなければダウンロード
-if vim.fn.filereadable('~/.local/share/cspell/vim.txt.gz') ~= 1 then
-  local vim_dictionary_url = 'https://github.com/iamcco/coc-spell-checker/raw/master/dicts/vim/vim.txt.gz'
-  io.popen('curl -fsSLo ~/.local/share/cspell/vim.txt.gz --create-dirs ' .. vim_dictionary_url)
+if vim.fn.filereadable("~/.local/share/cspell/vim.txt.gz") ~= 1 then
+  local vim_dictionary_url = "https://github.com/iamcco/coc-spell-checker/raw/master/dicts/vim/vim.txt.gz"
+  io.popen("curl -fsSLo ~/.local/share/cspell/vim.txt.gz --create-dirs " .. vim_dictionary_url)
 end
 
 -- ユーザー辞書がなければ作成
-if vim.fn.filereadable('~/.local/share/cspell/user.txt') ~= 1 then
-  io.popen('mkdir -p ~/.local/share/cspell')
-  io.popen('touch ~/.local/share/cspell/user.txt')
+if vim.fn.filereadable("~/.local/share/cspell/user.txt") ~= 1 then
+  io.popen("mkdir -p ~/.local/share/cspell")
+  io.popen("touch ~/.local/share/cspell/user.txt")
 end
 
 local sources = {
@@ -256,11 +257,11 @@ local sources = {
     end,
     condition = function()
       -- cspellが実行できるときのみ有効
-      return vim.fn.executable('cspell') > 0
+      return vim.fn.executable("cspell") > 0
     end,
     -- 起動時に設定ファイル読み込み
-    extra_args = { "--config", "~/.config/cspell/cspell.json" }
-  })
+    extra_args = { "--config", "~/.config/cspell/cspell.json" },
+  }),
 }
 
 -- Prettier for Node.js
@@ -281,7 +282,7 @@ null_ls.setup({
 -- flutter-tools
 require("flutter-tools").setup({
   ui = {
-    notification_style = 'plugin'
+    notification_style = "plugin",
   },
   widget_guides = {
     enabled = true,
@@ -293,6 +294,6 @@ require("flutter-tools").setup({
       virtual_text = false,
     },
     on_attach = on_attach,
-    capabilities = capabilities
-  }
+    capabilities = capabilities,
+  },
 })

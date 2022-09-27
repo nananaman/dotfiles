@@ -11,7 +11,7 @@ wezterm.on("trigger-open-ghq-project", functions.trigger_open_ghq_project)
 wezterm.on("trigget-nvim-with-scrollback", functions.trigger_nvim_with_scrollback)
 
 local win_config = {
-	default_prog = {"wsl.exe", "~", "--distribution", "Ubuntu-22.04"},
+  default_prog = { "wsl.exe", "~", "--distribution", "Ubuntu-22.04" },
 }
 
 local mac_config = {
