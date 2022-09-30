@@ -1,10 +1,12 @@
+vim.g.jetpack_copy_method = "copy"
+
 vim.cmd("packadd vim-jetpack")
 require("jetpack").startup(function(use)
   use({ "tani/vim-jetpack", opt = 1 }) -- bootstrap
   -- 依存
   use({ "nvim-lua/plenary.nvim" })
   use({ "vim-denops/denops.vim" })
-  use ({ 'lewis6991/impatient.nvim' })
+  use({ 'lewis6991/impatient.nvim' })
 
   use({ "nvim-treesitter/nvim-treesitter" })
   -- fern
@@ -92,15 +94,13 @@ end)
 
 local opts = { noremap = true, silent = true }
 
-for k, v in
-  pairs({
-    ["<C-n>"] = "<CMD>Fern . -reveal=% -drawer -toggle<CR>",
-    ["<C-w>|"] = "<CMD>vsplit<CR>",
-    ["<C-w>-"] = "<CMD>split<CR>",
-    ["<Space><Space>"] = "<CMD>FuzzyMotion<CR>",
-    ["<Esc><Esc>"] = "<CMD>nohlsearch<CR><Esc>",
-  })
-do
+for k, v in pairs({
+  ["<C-n>"] = "<CMD>Fern . -reveal=% -drawer -toggle<CR>",
+  ["<C-w>|"] = "<CMD>vsplit<CR>",
+  ["<C-w>-"] = "<CMD>split<CR>",
+  ["<Space><Space>"] = "<CMD>FuzzyMotion<CR>",
+  ["<Esc><Esc>"] = "<CMD>nohlsearch<CR><Esc>",
+}) do
   vim.api.nvim_set_keymap("", k, v, opts)
 end
 

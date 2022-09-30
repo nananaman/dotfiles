@@ -6,5 +6,9 @@ require("nvim-treesitter.configs").setup({
   autotag = {
     enable = true,
   },
-  ensure_installed = "all",
+  matchup = {
+    enable = true,              -- mandatory, false will disable the whole extension
+  },
+  auto_install = true,
+  -- ensure_installed = "all",
 })
