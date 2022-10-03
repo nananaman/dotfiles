@@ -6,7 +6,11 @@ require("jetpack").startup(function(use)
   -- 依存
   use({ "nvim-lua/plenary.nvim" })
   use({ "vim-denops/denops.vim" })
-  use({ 'lewis6991/impatient.nvim' })
+  use({ "MunifTanjim/nui.nvim" })
+  use({ "rcarriga/nvim-notify" })
+
+  -- 高速化
+  use({ "lewis6991/impatient.nvim" })
 
   use({ "nvim-treesitter/nvim-treesitter" })
   -- fern
@@ -38,12 +42,16 @@ require("jetpack").startup(function(use)
   use({ "machakann/vim-highlightedyank" })
   use({ "kyazdani42/nvim-web-devicons" })
   use({ "folke/todo-comments.nvim" })
-  use({ 'kevinhwang91/nvim-hlslens' })
+  use({ "kevinhwang91/nvim-hlslens" })
+
+  use({
+    "folke/noice.nvim",
+    event = "VimEnter",
+  })
 
   use({ "akinsho/toggleterm.nvim" })
   use({ "yuki-yano/fuzzy-motion.vim" })
   use({ "jose-elias-alvarez/null-ls.nvim" })
-  use({ "rcarriga/nvim-notify" })
 
   use({ "nvim-telescope/telescope.nvim", requires = { { "nvim-lua/plenary.nvim" } } })
   use({ "nvim-telescope/telescope-fzf-native.nvim", requires = { { "nvim-telescope/telescope.nvim" } }, run = "make" })
@@ -55,9 +63,6 @@ require("jetpack").startup(function(use)
   use({
     "goolord/alpha-nvim",
     requires = { "kyazdani42/nvim-web-devicons" },
-    config = function()
-      require("alpha").setup(require("alpha.themes.startify").config)
-    end,
   })
 
   -- TypeScript
@@ -105,8 +110,8 @@ for k, v in pairs({
 end
 
 -- settings
-require('impatient')
-require('impatient').enable_profile()
+require("impatient")
+require("impatient").enable_profile()
 
 require("plugins.bufferline")
 require("plugins.chowcho")
@@ -122,3 +127,6 @@ require("plugins.transparent")
 require("plugins.treesitter")
 require("plugins.trouble")
 require("plugins.wilder")
+require("plugins.noice")
+require("plugins.notify")
+require("plugins.alpha")
