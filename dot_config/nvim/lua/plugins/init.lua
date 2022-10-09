@@ -1,3 +1,11 @@
+-- install vim-jetpack
+local fn = vim.fn
+local jetpackfile = fn.stdpath('data') .. '/site/pack/jetpack/opt/vim-jetpack/plugin/jetpack.vim'
+local jetpackurl = 'https://raw.githubusercontent.com/tani/vim-jetpack/master/plugin/jetpack.vim'
+if fn.filereadable(jetpackfile) == 0 then
+  fn.system('curl -fsSLo ' .. jetpackfile .. ' --create-dirs ' .. jetpackurl)
+end
+
 vim.g.jetpack_copy_method = "copy"
 
 vim.cmd("packadd vim-jetpack")
@@ -127,6 +135,6 @@ require("plugins.transparent")
 require("plugins.treesitter")
 require("plugins.trouble")
 require("plugins.wilder")
-require("plugins.noice")
-require("plugins.notify")
 require("plugins.alpha")
+require("plugins.notify")
+require("plugins.noice")
