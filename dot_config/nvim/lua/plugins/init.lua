@@ -9,7 +9,7 @@ end
 vim.g.jetpack_copy_method = "copy"
 
 vim.cmd("packadd vim-jetpack")
-require("jetpack").startup(function(use)
+require("jetpack.packer").startup(function(use)
   use({ "tani/vim-jetpack", opt = 1 }) -- bootstrap
   -- 依存
   use({ "nvim-lua/plenary.nvim" })
@@ -50,7 +50,9 @@ require("jetpack").startup(function(use)
   use({ "machakann/vim-highlightedyank" })
   use({ "kyazdani42/nvim-web-devicons" })
   use({ "folke/todo-comments.nvim" })
-  use({ "kevinhwang91/nvim-hlslens" })
+  use({ "kevinhwang91/nvim-hlslens", config = function()
+    require('hlslens').setup()
+  end })
 
   use({
     "folke/noice.nvim",
