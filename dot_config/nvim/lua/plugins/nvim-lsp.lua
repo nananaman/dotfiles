@@ -44,6 +44,7 @@ local runtime_path = vim.split(package.path, ";")
 table.insert(runtime_path, "lua/?.lua")
 table.insert(runtime_path, "lua/?/init.lua")
 
+local is_node_proj = lspconfig.util.root_pattern("package.json")
 local is_python_proj = lspconfig.util.root_pattern("pyproject.toml", "Pipfile")
 
 local enhance_server_opts = {
