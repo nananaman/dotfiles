@@ -1,6 +1,6 @@
 local config = {
   cmdline = {
-    view = "cmdline", -- view for rendering the cmdline. Change to `cmdline` to get a classic cmdline at the bottom
+    view = "cmdline_popup", -- view for rendering the cmdline. Change to `cmdline` to get a classic cmdline at the bottom
     opts = { buf_options = { filetype = "vim" } }, -- enable syntax highlighting in the cmdline
     icons = {
       ["/"] = { icon = " ", hl_group = "DiagnosticWarn" },

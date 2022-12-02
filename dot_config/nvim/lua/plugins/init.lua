@@ -54,20 +54,16 @@ require("jetpack.packer").startup(function(use)
     require('hlslens').setup()
   end })
 
-  use({
-    "folke/noice.nvim",
-    event = "VimEnter",
-  })
+  use({ "folke/noice.nvim" })
 
   use({ "akinsho/toggleterm.nvim" })
   use({ "yuki-yano/fuzzy-motion.vim" })
   use({ "jose-elias-alvarez/null-ls.nvim" })
 
-  use({ "nvim-telescope/telescope.nvim", requires = { { "nvim-lua/plenary.nvim" } } })
-  use({ "nvim-telescope/telescope-fzf-native.nvim", requires = { { "nvim-telescope/telescope.nvim" } }, run = "make" })
+  use({ "nvim-telescope/telescope.nvim", tag = '0.1.0' })
+  use({ "nvim-telescope/telescope-fzf-native.nvim", run = "make" })
 
   use({ "folke/trouble.nvim" })
-  use({ "gelguy/wilder.nvim" })
 
   -- メニュー
   use({
@@ -89,6 +85,7 @@ require("jetpack.packer").startup(function(use)
   use({ "hrsh7th/cmp-nvim-lsp-signature-help" })
   use({ "hrsh7th/cmp-buffer" })
   use({ "hrsh7th/cmp-path" })
+  use({ "hrsh7th/cmp-cmdline" })
   use({ "hrsh7th/cmp-emoji" })
   use({ "hrsh7th/cmp-calc" })
   use({ "f3fora/cmp-spell" })
@@ -136,7 +133,6 @@ require("plugins.toggleterm")
 require("plugins.transparent")
 require("plugins.treesitter")
 require("plugins.trouble")
-require("plugins.wilder")
 require("plugins.alpha")
 require("plugins.notify")
 require("plugins.noice")
