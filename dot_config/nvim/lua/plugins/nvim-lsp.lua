@@ -44,15 +44,6 @@ local runtime_path = vim.split(package.path, ";")
 table.insert(runtime_path, "lua/?.lua")
 table.insert(runtime_path, "lua/?/init.lua")
 
-local function detected_root_dir(root_dir)
-  return not not (root_dir(vim.api.nvim_buf_get_name(0), vim.api.nvim_get_current_buf()))
-end
-
-local deno_root_dir = lspconfig.util.root_pattern("deno.json", "deno.jsonc", "deps.ts")
-local node_root_dir = lspconfig.util.root_pattern("package.json", "node_modules")
-local is_deno_proj = detected_root_dir(deno_root_dir)
-local is_node_proj = not is_deno_proj
-
 local is_python_proj = lspconfig.util.root_pattern("pyproject.toml", "Pipfile")
 
 local enhance_server_opts = {
@@ -126,33 +117,36 @@ local enhance_server_opts = {
     }
   end,
   ["tsserver"] = function(opts)
-    opts.autostart = is_node_proj
-    if is_node_proj then
-      opts.root_dir = node_root_dir
-      opts.init_options = { lint = true, unstable = true }
-      opts.on_attach = function(client, bufnr)
-        client.resolved_capabilities.document_formatting = false
-        on_attach(client, bufnr)
-      end
+    opts.root_dir = lspconfig.util.root_pattern("package.json")
+    opts.init_options = { lint = true, unstable = true }
+    opts.on_attach = function(client, bufnr)
+      client.resolved_capabilities.document_formatting = false
+      on_attach(client, bufnr)
     end
   end,
   ["eslint"] = function(opts)
-    opts.autostart = is_node_proj
-    if is_node_proj then
-      opts.root_dir = node_root_dir
-      opts.init_options = { lint = true, unstable = true }
-      opts.on_attach = function(client, bufnr)
-        client.resolved_capabilities.document_formatting = false
-        on_attach(client, bufnr)
-      end
+    opts.root_dir = lspconfig.util.root_pattern("package.json")
+    opts.init_options = { lint = true, unstable = true }
+    opts.on_attach = function(client, bufnr)
+      client.resolved_capabilities.document_formatting = false
+      on_attach(client, bufnr)
     end
   end,
   ["denols"] = function(opts)
-    opts.autostart = is_deno_proj
-    if is_deno_proj then
-      opts.root_dir = deno_root_dir
-      opts.init_options = { lint = true, unstable = true }
-    end
+    opts.root_dir = lspconfig.util.root_pattern("deno.json")
+    opts.init_options = {
+      lint = true,
+      unstable = true,
+      suggest = {
+        imports = {
+          hosts = {
+            ["https://deno.land"] = true,
+            ["https://cdn.nest.land"] = true,
+            ["https://crux.land"] = true,
+          },
+        },
+      },
+    }
   end,
 }
 
