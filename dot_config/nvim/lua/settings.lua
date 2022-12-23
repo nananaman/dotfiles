@@ -17,6 +17,8 @@ vim.opt.number = true
 vim.opt.cursorline = true
 -- ステータスラインを常に表示
 vim.opt.laststatus = 2
+-- signcolumn を常に表示
+vim.o.signcolumn = "yes"
 -- vim.opt.autoindent = true
 vim.opt.expandtab = true
 vim.opt.tabstop = 2

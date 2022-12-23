@@ -35,6 +35,7 @@ require("jetpack.packer").startup(function(use)
   use({ "tpope/repeat" })
   use({ "tpope/vim-commentary" })
   use({ "rhysd/clever-f.vim" })
+  use({ "monaqa/dial.nvim" })
 
   use({ "segeljakt/vim-silicon" })
 
@@ -65,11 +66,16 @@ require("jetpack.packer").startup(function(use)
 
   use({ "folke/trouble.nvim" })
 
+  use({ 'stevearc/aerial.nvim' })
+
   -- メニュー
   use({
     "goolord/alpha-nvim",
     requires = { "kyazdani42/nvim-web-devicons" },
   })
+
+  -- Git
+  use({ "lewis6991/gitsigns.nvim" })
 
   -- TypeScript
   use({ "windwp/nvim-ts-autotag" })
@@ -136,3 +142,6 @@ require("plugins.trouble")
 require("plugins.alpha")
 require("plugins.notify")
 require("plugins.noice")
+require("plugins.gitsigns")
+require("plugins.aerial")
+require("plugins.dial")
