@@ -18,6 +18,16 @@ eval (nodenv init - | source)
 # deno
 set PATH $HOME/.deno/bin $PATH
 
+# 1password
+if type -q starship
+  op completion fish | source
+end
+
+# kubernetes
+if count $HOME/.kube/*.yaml >/dev/null
+  set -x KUBECONFIG (ls $HOME/.kube/*.yaml | tr '\n' ':'):(echo $KUBECONFIG)
+end
+
 # starship
 if not type -q starship
   sh -c "(curl -fsSL https://starship.rs/install.sh)"

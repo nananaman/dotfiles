@@ -1,4 +1,5 @@
 local wezterm = require("wezterm")
+local act = wezterm.action
 local functions = require("functions")
 local utils = require("utils")
 
@@ -78,6 +79,7 @@ local common_config = {
   ---------------------------------------------------------------
   --- Key Bindings
   ---------------------------------------------------------------
+  disable_default_key_bindings = true,
   leader = { key = "g", mods = "CTRL", timeout_milliseconds = 1000 },
   keys = {
     -- Hide
@@ -124,8 +126,8 @@ local common_config = {
 
     -- Tab
     { key = "w", mods = "SHIFT|CTRL", action = wezterm.action({ SpawnTab = "CurrentPaneDomain" }) },
-    { key = "h", mods = "SHIFT|CTRL", action = wezterm.action({ ActivateTabRelative = -1 }) },
-    { key = "l", mods = "SHIFT|CTRL", action = wezterm.action({ ActivateTabRelative = 1 }) },
+    { key = "h", mods = "SHIFT|CTRL", action = act.ActivateTabRelative(-1) },
+    { key = "l", mods = "SHIFT|CTRL", action = act.ActivateTabRelative(1) },
 
     -- Pane
     {
