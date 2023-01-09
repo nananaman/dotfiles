@@ -83,7 +83,7 @@ local common_config = {
   leader = { key = "g", mods = "CTRL", timeout_milliseconds = 1000 },
   keys = {
     -- Hide
-    { key = "T", mods = "CTRL|SHIFT", action = "HideApplication" },
+    { key = "T", mods = "CTRL|SHIFT", action = "Hide" },
 
     -- Font Size
     { key = "=", mods = "ALT", action = "ResetFontSize" },
