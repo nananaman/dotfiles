@@ -3,6 +3,7 @@ require("telescope").setup({
     layout_strategy = "horizontal",
     sorting_strategy = "ascending",
     layout_config = { prompt_position = "top" },
+    file_ignore_patterns = { "node_modules" }
   }
 })
 require('telescope').load_extension('fzf')
