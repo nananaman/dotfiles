@@ -1,0 +1,9 @@
+{{- if eq .chezmoi.os "linux" -}}
+{{-   if (.chezmoi.kernel.osrelease | lower | contains "microsoft") -}}
+#!/bin/bash
+
+WEZTERM_DIR=$(dirname $(which wezterm.exe))
+rm $WEZTERM_DIR/*.lua
+cp ~/.config/wezterm/* $WEZTERM_DIR/
+{{-   end -}}
+{{- end -}}

@@ -1,0 +1,18 @@
+alias cat='bat'
+alias ls='lsd'
+alias la='lsd -a'
+alias reload='exec fish'
+alias vi='nvim'
+alias vim='nvim'
+
+alias k='kubectl'
+alias kc='kubectx'
+alias kn='kubens'
+
+# for WSL
+{{- if eq .chezmoi.os "linux" -}}
+{{-   if (.chezmoi.kernel.osrelease | lower | contains "microsoft") -}}
+alias win32yank='/mnt/c/Tools/win32yank/win32yank.exe'
+alias clip='win32yank -i'
+{{-   end -}}
+{{- end -}}

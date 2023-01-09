@@ -7,7 +7,9 @@ end
 function M.convert_home_dir(path)
   local cwd = path
   local home = os.getenv("HOME")
-  cwd = cwd:gsub("^" .. home .. "/", "~/")
+  if home ~= nil then
+    cwd = cwd:gsub("^" .. home .. "/", "~/")
+  end
   return cwd
 end
 
