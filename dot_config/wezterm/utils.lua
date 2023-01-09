@@ -46,7 +46,7 @@ end
 
 -- OS に依るコマンドの差異を補正する
 function M.correct_command(command)
-  if wezterm.target_triple == "x86_64-pc-windows-msvc" then
+  if M.is_wsl() then
     local wsl_prefix = { "wsl.exe", "--distribution", "Ubuntu-22.04" }
 
     for i = 1, #wsl_prefix do
@@ -54,6 +54,10 @@ function M.correct_command(command)
     end
   end
   return command
+end
+
+function M.is_wsl()
+  return wezterm.target_triple == "x86_64-pc-windows-msvc"
 end
 
 return M

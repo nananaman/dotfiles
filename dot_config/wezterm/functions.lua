@@ -114,13 +114,20 @@ function M.trigger_nvim_with_scrollback(window, pane)
   local scrollback = pane:get_lines_as_text()
   local name = os.tmpname()
   local f = io.open(name, "w+")
-  f:write(scrollback)
-  f:flush()
-  f:close()
-  local command = "nvim " .. name
-  utils.spawn_command_in_new_tab(window, pane, command)
-  wezterm.sleep_ms(1000)
-  os.remove(name)
+  if f ~= nil then
+    f:write(string.match(scrollback, "^%s*(.-)%s*$"))
+    f:flush()
+    f:close()
+
+    if utils.is_wsl() then
+      name = string.gsub(string.gsub(name, "\\", "/"), "C:", "/mnt/c")
+    end
+    local command = "nvim " .. name .. " -c 'setfiletype bash'"
+    utils.spawn_command_in_new_tab(window, pane, command)
+    -- nvim で開いたら消す
+    wezterm.sleep_ms(1000)
+    os.remove(name)
+  end
 end
 
 return M
