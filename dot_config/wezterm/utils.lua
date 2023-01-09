@@ -1,3 +1,5 @@
+local wezterm = require("wezterm")
+
 local M = {}
 
 function M.get_basename(s)
@@ -24,11 +26,21 @@ function M.merge_tables(t1, t2)
   return t1
 end
 
-function M.execCommand(command)
-  local handle = io.popen(command, "r")
-  local content = handle:read("*all")
-  local rc = { handle:close() }
-  return rc[1], content
+function M.run_child_process(command)
+  if wezterm.target_triple == "x86_64-pc-windows-msvc" then
+    local wsl_prefix = { "wsl.exe" }
+
+    local wsl_distro_name = os.getenv("WSL_DISTRO_NAME")
+    if wsl_distro_name ~= nil then
+      wsl_prefix = { "wsl.exe", "--distribution", wsl_distro_name }
+    end
+
+    for i = 1, #wsl_prefix do
+      table.insert(command, i, wsl_prefix[i])
+    end
+  end
+  local success, stdout, stderr = wezterm.run_child_process(command)
+  return success, stdout, stderr
 end
 
 return M

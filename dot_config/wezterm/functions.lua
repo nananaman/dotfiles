@@ -30,7 +30,7 @@ function M.update_right_status(window, pane)
   local cells = {}
   table.insert(cells, window:active_workspace())
 
-  local success, stdout, stderr = wezterm.run_child_process({ "/usr/local/bin/kubectl", "config", "current-context" })
+  local success, stdout, stderr = utils.run_child_process({ "/usr/local/bin/kubectl", "config", "current-context" })
   if success then
     local kube_ctx = string.gsub(stdout, "[\n\r]", "")
     table.insert(cells, "⎈ " .. kube_ctx)
@@ -85,7 +85,7 @@ function M.update_right_status(window, pane)
   local num_cells = 0
 
   -- Translate a cell into elements
-  function push(text, is_last)
+  local function push(text, is_last)
     local cell_no = num_cells + 1
     table.insert(elements, { Foreground = { Color = text_fg_colors[cell_no] } })
     table.insert(elements, { Background = { Color = colors[cell_no] } })
