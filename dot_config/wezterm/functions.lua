@@ -30,7 +30,7 @@ function M.update_right_status(window, pane)
   local cells = {}
   table.insert(cells, window:active_workspace())
 
-  local success, stdout, stderr = utils.run_child_process({ "/usr/local/bin/kubectl", "config", "current-context" })
+  local success, stdout, stderr = utils.run_child_process({ "kubectl", "config", "current-context" })
   if success then
     local kube_ctx = string.gsub(stdout, "[\n\r]", "")
     table.insert(cells, "⎈ " .. kube_ctx)
@@ -107,14 +107,7 @@ end
 
 function M.trigger_open_ghq_project(window, pane)
   local command = "cd (ghq root)/(ghq list | fzf +m --reverse --prompt='Project > ') && vim"
-  window:perform_action(
-    wezterm.action({
-      SpawnCommandInNewTab = {
-        args = { "/usr/local/bin/fish", "-l", "-c", command },
-      },
-    }),
-    pane
-  )
+  utils.spawn_command_in_new_tab(window, pane, command)
 end
 
 function M.trigger_nvim_with_scrollback(window, pane)
@@ -125,12 +118,7 @@ function M.trigger_nvim_with_scrollback(window, pane)
   f:flush()
   f:close()
   local command = "nvim " .. name
-  window:perform_action(
-    wezterm.action({ SpawnCommandInNewTab = {
-      args = { "/usr/local/bin/fish", "-l", "-c", command },
-    } }),
-    pane
-  )
+  utils.spawn_command_in_new_tab(window, pane, command)
   wezterm.sleep_ms(1000)
   os.remove(name)
 end

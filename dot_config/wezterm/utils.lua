@@ -27,20 +27,33 @@ function M.merge_tables(t1, t2)
 end
 
 function M.run_child_process(command)
-  if wezterm.target_triple == "x86_64-pc-windows-msvc" then
-    local wsl_prefix = { "wsl.exe" }
+  command = M.correct_command(command)
+  local success, stdout, stderr = wezterm.run_child_process(command)
+  return success, stdout, stderr
+end
 
-    local wsl_distro_name = os.getenv("WSL_DISTRO_NAME")
-    if wsl_distro_name ~= nil then
-      wsl_prefix = { "wsl.exe", "--distribution", wsl_distro_name }
-    end
+function M.spawn_command_in_new_tab(window, pane, command)
+  command = M.correct_command({ "fish", "-l", "-c", command })
+  window:perform_action(
+    wezterm.action({
+      SpawnCommandInNewTab = {
+        args = command
+      },
+    }),
+    pane
+  )
+end
+
+-- OS に依るコマンドの差異を補正する
+function M.correct_command(command)
+  if wezterm.target_triple == "x86_64-pc-windows-msvc" then
+    local wsl_prefix = { "wsl.exe", "--distribution", "Ubuntu-22.04" }
 
     for i = 1, #wsl_prefix do
       table.insert(command, i, wsl_prefix[i])
     end
   end
-  local success, stdout, stderr = wezterm.run_child_process(command)
-  return success, stdout, stderr
+  return command
 end
 
 return M
