@@ -27,13 +27,21 @@ function M.merge_tables(t1, t2)
 end
 
 function M.run_child_process(command)
-  command = M.correct_command(command)
+  if M.is_wsl() then
+    command = { "wsl.exe", "--distribution", "Ubuntu-22.04", "fish", "-l", "-c", command }
+  end
+
   local success, stdout, stderr = wezterm.run_child_process(command)
   return success, stdout, stderr
 end
 
 function M.spawn_command_in_new_tab(window, pane, command)
-  command = M.correct_command({ command })
+  if M.is_wsl() then
+    command = { "wsl.exe", "--distribution", "Ubuntu-22.04", "fish", "-l", "-c", command }
+  else
+    command = { "/usr/local/bin/fish", "-l", "-c", command }
+  end
+
   window:perform_action(
     wezterm.action({
       SpawnCommandInNewTab = {
@@ -42,21 +50,6 @@ function M.spawn_command_in_new_tab(window, pane, command)
     }),
     pane
   )
-end
-
--- OS に依るコマンドの差異を補正する
-function M.correct_command(command)
-  local prefix
-  if M.is_wsl() then
-    prefix = { "wsl.exe", "--distribution", "Ubuntu-22.04", "fish", "-l", "-c" }
-  else
-    prefix = { "/usr/local/bin/fish", "-l", "-c" }
-  end
-
-  for i = 1, #prefix do
-    table.insert(command, i, prefix[i])
-  end
-  return command
 end
 
 function M.is_wsl()

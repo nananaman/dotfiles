@@ -30,7 +30,7 @@ function M.update_right_status(window, pane)
   local cells = {}
   table.insert(cells, window:active_workspace())
 
-  local success, stdout, stderr = utils.run_child_process({ "kubectl", "config", "current-context" })
+  local success, stdout, stderr = utils.run_child_process("kubectl config current-context")
   if success then
     local kube_ctx = string.gsub(stdout, "[\n\r]", "")
     table.insert(cells, "⎈ " .. kube_ctx)
