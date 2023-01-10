@@ -33,7 +33,7 @@ function M.run_child_process(command)
 end
 
 function M.spawn_command_in_new_tab(window, pane, command)
-  command = M.correct_command({ "fish", "-l", "-c", command })
+  command = M.correct_command({ command })
   window:perform_action(
     wezterm.action({
       SpawnCommandInNewTab = {
@@ -46,12 +46,15 @@ end
 
 -- OS に依るコマンドの差異を補正する
 function M.correct_command(command)
+  local prefix
   if M.is_wsl() then
-    local wsl_prefix = { "wsl.exe", "--distribution", "Ubuntu-22.04" }
+    prefix = { "wsl.exe", "--distribution", "Ubuntu-22.04", "fish", "-l", "-c" }
+  else
+    prefix = { "/usr/local/bin/fish", "-l", "-c" }
+  end
 
-    for i = 1, #wsl_prefix do
-      table.insert(command, i, wsl_prefix[i])
-    end
+  for i = 1, #prefix do
+    table.insert(command, i, prefix[i])
   end
   return command
 end
