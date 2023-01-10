@@ -27,25 +27,15 @@ function M.merge_tables(t1, t2)
 end
 
 function M.run_child_process(command)
-  if M.is_wsl() then
-    command = { "wsl.exe", "--distribution", "Ubuntu-22.04", "fish", "-l", "-c", command }
-  end
-
-  local success, stdout, stderr = wezterm.run_child_process(command)
+  local success, stdout, stderr = wezterm.run_child_process(M.correct_command(command))
   return success, stdout, stderr
 end
 
 function M.spawn_command_in_new_tab(window, pane, command)
-  if M.is_wsl() then
-    command = { "wsl.exe", "--distribution", "Ubuntu-22.04", "fish", "-l", "-c", command }
-  else
-    command = { "/usr/local/bin/fish", "-l", "-c", command }
-  end
-
   window:perform_action(
     wezterm.action({
       SpawnCommandInNewTab = {
-        args = command
+        args = M.correct_command(command)
       },
     }),
     pane
@@ -54,6 +44,15 @@ end
 
 function M.is_wsl()
   return wezterm.target_triple == "x86_64-pc-windows-msvc"
+end
+
+-- OS に依るコマンドの差異を補正する
+function M.correct_command(command)
+  if M.is_wsl() then
+    return { "wsl.exe", "--distribution", "Ubuntu-22.04", "fish", "-l", "-c", command }
+  else
+    return { "/usr/local/bin/fish", "-l", "-c", command }
+  end
 end
 
 return M
