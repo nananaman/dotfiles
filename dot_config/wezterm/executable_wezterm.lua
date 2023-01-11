@@ -150,9 +150,9 @@ local common_config = {
 }
 
 if wezterm.target_triple == "x86_64-pc-windows-msvc" then
-  return utils.merge_tables(win_config, common_config)
+  return utils.merge_tables(common_config, win_config)
 elseif wezterm.target_triple == "x86_64-apple-darwin" then
-  return utils.merge_tables(mac_config, common_config)
+  return utils.merge_tables(common_config, mac_config)
 else
   return common_config
 end
