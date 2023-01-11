@@ -17,6 +17,10 @@ local win_config = {
 
 local mac_config = {
   default_prog = { "/usr/local/bin/fish", "-l" },
+  keys = {
+    -- Hide
+    { key = "T", mods = "CTRL|SHIFT", action = act.HideApplication },
+  }
 }
 
 local common_config = {
@@ -83,18 +87,18 @@ local common_config = {
   leader = { key = "g", mods = "CTRL", timeout_milliseconds = 1000 },
   keys = {
     -- Hide
-    { key = "T", mods = "CTRL|SHIFT", action = "Hide" },
+    { key = "T", mods = "CTRL|SHIFT", action = act.Hide },
 
     -- Font Size
-    { key = "=", mods = "ALT", action = "ResetFontSize" },
-    { key = "+", mods = "ALT|SHIFT", action = "IncreaseFontSize" },
-    { key = "-", mods = "ALT", action = "DecreaseFontSize" },
+    { key = "=", mods = "ALT", action = act.ResetFontSize },
+    { key = "+", mods = "ALT|SHIFT", action = act.IncreaseFontSize },
+    { key = "-", mods = "ALT", action = act.DecreaseFontSize },
 
     -- Copy Mode
-    { key = " ", mods = "LEADER", action = "ActivateCopyMode" },
+    { key = " ", mods = "LEADER", action = act.ActivateCopyMode },
 
     -- Quick Select
-    { key = "Q", mods = "CTRL|SHIFT", action = "QuickSelect" },
+    { key = "Q", mods = "CTRL|SHIFT", action = act.QuickSelect },
 
     -- Workspace
     -- Switch to the default workspace
@@ -109,47 +113,39 @@ local common_config = {
     --   }
     -- }}},
     -- Create a new workspace with a random name and switch to it
-    { key = "s", mods = "LEADER|SHIFT", action = wezterm.action({ SwitchToWorkspace = {} }) },
+    { key = "s", mods = "LEADER|SHIFT", action = act.SwitchToWorkspace({}) },
     -- Show the launcher in fuzzy selection mode and have it list all workspaces
     -- and allow activating one.
     {
       key = "s",
       mods = "LEADER|CTRL",
-      action = wezterm.action({
-        ShowLauncherArgs = {
-          flags = "FUZZY|WORKSPACES",
-        },
-      }),
+      action = act.ShowLauncherArgs({ flags = "FUZZY|WORKSPACES" }),
     },
-    { key = "j", mods = "SHIFT|CTRL", action = wezterm.action({ SwitchWorkspaceRelative = -1 }) },
-    { key = "k", mods = "SHIFT|CTRL", action = wezterm.action({ SwitchWorkspaceRelative = 1 }) },
+    { key = "j", mods = "SHIFT|CTRL", action = act.SwitchWorkspaceRelative(-1) },
+    { key = "k", mods = "SHIFT|CTRL", action = act.SwitchWorkspaceRelative(1) },
 
     -- Tab
-    { key = "w", mods = "SHIFT|CTRL", action = wezterm.action({ SpawnTab = "CurrentPaneDomain" }) },
+    { key = "w", mods = "SHIFT|CTRL", action = act.SpawnTab("CurrentPaneDomain") },
     { key = "h", mods = "SHIFT|CTRL", action = act.ActivateTabRelative(-1) },
     { key = "l", mods = "SHIFT|CTRL", action = act.ActivateTabRelative(1) },
 
     -- Pane
-    {
-      key = "|",
-      mods = "LEADER|SHIFT",
-      action = wezterm.action({ SplitHorizontal = { domain = "CurrentPaneDomain" } }),
-    },
-    { key = "-", mods = "LEADER", action = wezterm.action({ SplitVertical = { domain = "CurrentPaneDomain" } }) },
-    { key = "LeftArrow", mods = "SHIFT|CTRL", action = wezterm.action({ AdjustPaneSize = { "Left", 1 } }) },
-    { key = "RightArrow", mods = "SHIFT|CTRL", action = wezterm.action({ AdjustPaneSize = { "Right", 1 } }) },
-    { key = "UpArrow", mods = "SHIFT|CTRL", action = wezterm.action({ AdjustPaneSize = { "Up", 1 } }) },
-    { key = "DownArrow", mods = "SHIFT|CTRL", action = wezterm.action({ AdjustPaneSize = { "Down", 1 } }) },
-    { key = "LeftArrow", mods = "SHIFT", action = wezterm.action({ ActivatePaneDirection = "Left" }) },
-    { key = "RightArrow", mods = "SHIFT", action = wezterm.action({ ActivatePaneDirection = "Right" }) },
-    { key = "UpArrow", mods = "SHIFT", action = wezterm.action({ ActivatePaneDirection = "Up" }) },
-    { key = "DownArrow", mods = "SHIFT", action = wezterm.action({ ActivatePaneDirection = "Down" }) },
-    { key = "x", mods = "SHIFT|CTRL", action = wezterm.action({ CloseCurrentPane = { confirm = false } }) },
-    { key = "z", mods = "SHIFT|CTRL", action = "TogglePaneZoomState" },
+    { key = "|", mods = "LEADER|SHIFT", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
+    { key = "-", mods = "LEADER", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
+    { key = "LeftArrow", mods = "SHIFT|CTRL", action = act.AdjustPaneSize({ "Left", 1 }) },
+    { key = "RightArrow", mods = "SHIFT|CTRL", action = act.AdjustPaneSize({ "Right", 1 }) },
+    { key = "UpArrow", mods = "SHIFT|CTRL", action = act.AdjustPaneSize({ "Up", 1 }) },
+    { key = "DownArrow", mods = "SHIFT|CTRL", action = act.AdjustPaneSize({ "Down", 1 }) },
+    { key = "LeftArrow", mods = "SHIFT", action = act.ActivatePaneDirection("Left") },
+    { key = "RightArrow", mods = "SHIFT", action = act.ActivatePaneDirection("Right") },
+    { key = "UpArrow", mods = "SHIFT", action = act.ActivatePaneDirection("Up") },
+    { key = "DownArrow", mods = "SHIFT", action = act.ActivatePaneDirection("Down") },
+    { key = "x", mods = "SHIFT|CTRL", action = act.CloseCurrentPane({ confirm = false }) },
+    { key = "z", mods = "SHIFT|CTRL", action = act.TogglePaneZoomState },
 
-    { key = "f", mods = "SHIFT|CTRL", action = wezterm.action({ EmitEvent = "trigger-open-ghq-project" }) },
-    { key = "v", mods = "SHIFT|CTRL", action = wezterm.action({ EmitEvent = "trigget-nvim-with-scrollback" }) },
-    { key = "n", mods = "SHIFT|CTRL", action = "ToggleFullScreen" },
+    { key = "f", mods = "SHIFT|CTRL", action = act.EmitEvent("trigger-open-ghq-project") },
+    { key = "v", mods = "SHIFT|CTRL", action = act.EmitEvent("trigget-nvim-with-scrollback") },
+    { key = "n", mods = "SHIFT|CTRL", action = act.ToggleFullScreen },
   },
 }
 
