@@ -89,6 +89,9 @@ local common_config = {
     -- Hide
     { key = "T", mods = "CTRL|SHIFT", action = act.Hide },
 
+    -- Paste from Clipboard
+    { key = "v", mods = "SUPER", action = act.PasteFrom("Clipboard") },
+
     -- Font Size
     { key = "=", mods = "ALT", action = act.ResetFontSize },
     { key = "+", mods = "ALT|SHIFT", action = act.IncreaseFontSize },
