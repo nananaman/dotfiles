@@ -23,6 +23,20 @@ local mac_config = {
   }
 }
 
+local apple_silicon_config = {
+  default_prog = { "/opt/homebrew/bin/fish", "-l" },
+  window_padding = {
+    left = 0,
+    right = 0,
+    top = 32,
+    bottom = 0,
+  },
+  keys = {
+    -- Hide
+    { key = "T", mods = "CTRL|SHIFT", action = act.HideApplication },
+  }
+}
+
 local common_config = {
   font = wezterm.font("HackGenNerd Console"),
   font_size = 14,
@@ -156,6 +170,8 @@ if wezterm.target_triple == "x86_64-pc-windows-msvc" then
   return utils.merge_tables(common_config, win_config)
 elseif wezterm.target_triple == "x86_64-apple-darwin" then
   return utils.merge_tables(common_config, mac_config)
+elseif wezterm.target_triple == "aarch64-apple-darwin" then
+  return utils.merge_tables(common_config, apple_silicon_config)
 else
   return common_config
 end

@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# brew
+if [ "$(uname)" == 'Darwin' ]; then
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  brew install wget
+fi
+
 # fzf
 git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
 yes | ~/.fzf/install
@@ -33,16 +39,10 @@ go install github.com/mattn/memo@latest
 # lazygit
 go install github.com/jesseduffield/lazygit@latest
 
-# code2img
-git clone https://github.com/skanehira/code2img
-cd code2img && go install
-
-
 # deno
 curl -fsSL https://deno.land/x/install/install.sh | sh
 # dex
 deno install --allow-read --allow-write --allow-run --reload --force --name dex https://pax.deno.dev/kawarimidoll/deno-dex/main.ts
-
 
 # install rust
 curl https://sh.rustup.rs -sSf > /tmp/install_rust.sh
@@ -65,10 +65,14 @@ elif [ "$(expr substr $(uname -s) 1 5)" == 'Linux' ]; then
 fi
 
 # delta
-cargo install delta
+cargo install git-delta
 
 # silicon
-cargo install silicon
+if [ "$(uname)" == 'Darwin' ]; then
+  cargo install silicon
+elif [ "$(expr substr $(uname -s) 1 5)" == 'Linux' ]; then
+  brew install silicon
+fi
 
 # starship
 curl -fsSL https://starship.rs/install.sh > /tmp/install_starship.sh

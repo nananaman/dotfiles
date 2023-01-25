@@ -20,14 +20,3 @@ if [[ -v $WSL_DISTRO_NAME ]]; then
   chmod +x /tmp/win32yank.exe
   sudo mv /tmp/win32yank.exe /usr/local/bin/
 fi
-
-# nodejs
-# npm
-curl -sL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-sudo apt-get install -y nodejs
-
-# yarn
-sudo npm install -g yarn
-
-# deno
-curl -fsSL https://deno.land/x/install/install.sh | sh
