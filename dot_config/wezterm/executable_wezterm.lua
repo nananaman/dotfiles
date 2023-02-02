@@ -166,11 +166,11 @@ local common_config = {
   },
 }
 
-if wezterm.target_triple == "x86_64-pc-windows-msvc" then
+if utils.is_wsl() then
   return utils.merge_tables(common_config, win_config)
-elseif wezterm.target_triple == "x86_64-apple-darwin" then
+elseif utils.is_intel_mac() then
   return utils.merge_tables(common_config, mac_config)
-elseif wezterm.target_triple == "aarch64-apple-darwin" then
+elseif utils.is_apple_silicon() then
   return utils.merge_tables(common_config, apple_silicon_config)
 else
   return common_config

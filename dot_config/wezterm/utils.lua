@@ -46,10 +46,20 @@ function M.is_wsl()
   return wezterm.target_triple == "x86_64-pc-windows-msvc"
 end
 
+function M.is_apple_silicon()
+  return wezterm.target_triple == "aarch64-apple-darwin"
+end
+
+function M.is_intel_mac()
+  return wezterm.target_triple == "x86_64-apple-darwin"
+end
+
 -- OS に依るコマンドの差異を補正する
 function M.correct_command(command)
   if M.is_wsl() then
     return { "wsl.exe", "--distribution", "Ubuntu-22.04", "fish", "-l", "-c", command }
+  elseif M.is_apple_silicon() then
+    return { "/opt/homebrew/bin/fish", "-l", "-c", command }
   else
     return { "/usr/local/bin/fish", "-l", "-c", command }
   end
