@@ -10,6 +10,16 @@ fi
 git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
 yes | ~/.fzf/install
 
+# ripgrrep
+if [ "$(uname)" == 'Darwin' ]; then
+  brew install ripgrep
+elif [ "$(expr substr $(uname -s) 1 5)" == 'Linux' ]; then
+  sudo apt-get install ripgrep
+else
+  echo "Your platform ($(uname -a)) is not supported."
+  exit 1
+fi
+
 # if use bash
 # echo '[ -f ~/.fzf.bash ] && source ~/.fzf.bash' >> ~/.bashrc
 
