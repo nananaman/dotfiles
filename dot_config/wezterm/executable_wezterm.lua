@@ -13,6 +13,12 @@ wezterm.on("trigget-nvim-with-scrollback", functions.trigger_nvim_with_scrollbac
 
 local win_config = {
   default_prog = { "wsl.exe", "~", "--distribution", "Ubuntu-22.04" },
+  keys = {
+    -- Hide
+    { key = "T", mods = "CTRL|SHIFT", action = act.Hide },
+    -- Paste from Clipboard
+    { key = "v", mods = "CTRL", action = act.PasteFrom("Clipboard") },
+  }
 }
 
 local mac_config = {
@@ -20,6 +26,8 @@ local mac_config = {
   keys = {
     -- Hide
     { key = "T", mods = "CTRL|SHIFT", action = act.HideApplication },
+    -- Paste from Clipboard
+    { key = "v", mods = "SUPER", action = act.PasteFrom("Clipboard") },
   }
 }
 
@@ -34,6 +42,8 @@ local apple_silicon_config = {
   keys = {
     -- Hide
     { key = "T", mods = "CTRL|SHIFT", action = act.HideApplication },
+    -- Paste from Clipboard
+    { key = "v", mods = "SUPER", action = act.PasteFrom("Clipboard") },
   }
 }
 
@@ -100,12 +110,6 @@ local common_config = {
   disable_default_key_bindings = true,
   leader = { key = "g", mods = "CTRL", timeout_milliseconds = 1000 },
   keys = {
-    -- Hide
-    { key = "T", mods = "CTRL|SHIFT", action = act.Hide },
-
-    -- Paste from Clipboard
-    { key = "v", mods = "SUPER", action = act.PasteFrom("Clipboard") },
-
     -- Font Size
     { key = "=", mods = "ALT", action = act.ResetFontSize },
     { key = "+", mods = "ALT|SHIFT", action = act.IncreaseFontSize },
