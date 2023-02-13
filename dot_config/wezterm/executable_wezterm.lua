@@ -36,7 +36,8 @@ local apple_silicon_config = {
   window_padding = {
     left = 0,
     right = 0,
-    top = 32,
+    top = 0,
+    -- top = 32, -- ノッチ対策
     bottom = 0,
   },
   keys = {
