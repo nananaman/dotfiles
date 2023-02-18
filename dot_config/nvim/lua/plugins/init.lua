@@ -80,6 +80,12 @@ require("jetpack.packer").startup(function(use)
   -- TypeScript
   use({ "windwp/nvim-ts-autotag" })
 
+  -- Flutter
+  use({ "akinsho/flutter-tools.nvim" })
+
+  -- Go
+  use({ "golang/vscode-go" })
+
   -- LSP
   use({ "neovim/nvim-lspconfig" })
   use({ "williamboman/mason.nvim" })
@@ -102,10 +108,15 @@ require("jetpack.packer").startup(function(use)
   use({ "rafamadriz/friendly-snippets" })
   use({ "onsails/lspkind-nvim" })
   use({ "windwp/nvim-autopairs" })
-  use({ "akinsho/flutter-tools.nvim" })
-  use({ "golang/vscode-go" })
+
+  -- Debug
   use({ "mfussenegger/nvim-dap" })
   use({ "rcarriga/nvim-dap-ui" })
+  use({ "leoluz/nvim-dap-go" })
+  use({ "theHamsta/nvim-dap-virtual-text" })
+
+  -- Test
+  use({ "vim-test/vim-test" })
 end)
 
 -- keymaps
@@ -145,3 +156,4 @@ require("plugins.noice")
 require("plugins.gitsigns")
 require("plugins.aerial")
 require("plugins.dial")
+require("plugins.dap")
