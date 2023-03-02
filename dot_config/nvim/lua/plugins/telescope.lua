@@ -7,6 +7,7 @@ require("telescope").setup({
   }
 })
 require('telescope').load_extension('fzf')
+require("telescope").load_extension("notify")
 
 local function map(mode, lhs, rhs, opts)
   local options = { noremap = true }
@@ -20,5 +21,7 @@ map("n", ",f", ":Telescope find_files<CR>", { silent = true })
 map("n", ",b", ":Telescope buffers<CR>", { silent = true })
 map("n", ",g", ":Telescope live_grep<CR>")
 map("n", ",h", ":Telescope help_tags<CR>")
+map("n", ",n", ":Telescope notify<CR>")
+map("n", ",d", ":TodoTelescope<CR>", { silent = true, noremap = true })
 
 -- map("n", "gr", ":Telescope lsp_references<CR>")
