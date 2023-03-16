@@ -2,6 +2,7 @@ local lspconfig = require("lspconfig")
 local null_ls = require("null-ls")
 local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
 local mason = require("mason")
+local lspsaga = require("lspsaga")
 
 mason.setup({
   ui = {
@@ -12,6 +13,8 @@ mason.setup({
     },
   },
 })
+
+lspsaga.setup({})
 
 -- Mappings.
 local map_opts = { noremap = true, silent = true }
@@ -24,21 +27,30 @@ local on_attach = function(client, bufnr)
   end
 
   buf_set_keymap("n", "gD", "<cmd>lua vim.lsp.buf.type_definition()<CR>", map_opts)
-  buf_set_keymap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", map_opts)
+  -- buf_set_keymap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", map_opts)
+  buf_set_keymap("n", "gd", "<cmd>Lspsaga peek_definition<CR>", map_opts)
   buf_set_keymap("n", "gj", "<cmd>Lspsaga diagnostic_jump_next<CR>", map_opts)
   buf_set_keymap("n", "gk", "<cmd>Lspsaga diagnostic_jump_prev<CR>", map_opts)
   buf_set_keymap("n", "K", "<cmd>Lspsaga hover_doc<CR>", map_opts)
+  -- buf_set_keymap("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", map_opts)
   buf_set_keymap("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", map_opts)
-  buf_set_keymap("n", "<C-k>", "<cmd>Lspsaga signature_help<CR>", map_opts)
+  -- buf_set_keymap("n", "<C-k>", "<cmd>Lspsaga signature_help<CR>", map_opts)
+  buf_set_keymap("n", "<C-k>", "<cmd>lua vim.lsp.buf.signature_help()<CR>", map_opts)
   buf_set_keymap("n", "<leader>wa", "<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>", map_opts)
   buf_set_keymap("n", "<leader>wr", "<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>", map_opts)
   buf_set_keymap("n", "<leader>wl", "<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>", map_opts)
   buf_set_keymap("n", "<leader>D", "<cmd>lua vim.lsp.buf.type_definition()<CR>", map_opts)
-  buf_set_keymap("n", "<leader>rn", "<cmd>Lspsaga rename<CR>", map_opts)
   buf_set_keymap("n", "<leader>ac", "<cmd>Lspsaga code_action<CR>", map_opts)
+  buf_set_keymap("n", "<leader>rn", "<cmd>Lspsaga rename<CR>", map_opts)
   -- buf_set_keymap("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", map_opts)
   buf_set_keymap("n", "<leader>f", "<cmd>lua vim.lsp.buf.format { async = true }<CR>", map_opts)
+  buf_set_keymap("n", "<leader>o", "<cmd>Lspsaga outline<CR>", map_opts)
 end
+
+
+-- vim.keymap.set("n", "<leader>rn", function()
+--   return ":IncRename " .. vim.fn.expand("<cword>")
+-- end, { expr = true })
 
 local runtime_path = vim.split(package.path, ";")
 table.insert(runtime_path, "lua/?.lua")
@@ -186,7 +198,7 @@ cmp.setup({
     documentation = cmp.config.window.bordered(),
   },
   mapping = cmp.mapping.preset.insert({
-    ["<C-b>"] = cmp.mapping.scroll_docs(-4),
+    ["<C-b>"] = cmp.mapping.scroll_docs( -4),
     ["<C-f>"] = cmp.mapping.scroll_docs(4),
     -- ["<Space>"] = cmp.mapping.complete(),
     ["<C-e>"] = cmp.mapping.abort(),

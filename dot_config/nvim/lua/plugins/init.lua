@@ -1,12 +1,9 @@
 -- install vim-jetpack
-local fn = vim.fn
-local jetpackfile = fn.stdpath('data') .. '/site/pack/jetpack/opt/vim-jetpack/plugin/jetpack.vim'
-local jetpackurl = 'https://raw.githubusercontent.com/tani/vim-jetpack/master/plugin/jetpack.vim'
-if fn.filereadable(jetpackfile) == 0 then
-  fn.system('curl -fsSLo ' .. jetpackfile .. ' --create-dirs ' .. jetpackurl)
+local jetpackfile = vim.fn.stdpath('data') .. '/site/pack/jetpack/opt/vim-jetpack/plugin/jetpack.vim'
+local jetpackurl = "https://raw.githubusercontent.com/tani/vim-jetpack/master/plugin/jetpack.vim"
+if vim.fn.filereadable(jetpackfile) == 0 then
+  vim.fn.system(string.format('curl -fsSLo %s --create-dirs %s', jetpackfile, jetpackurl))
 end
-
-vim.g.jetpack_copy_method = "copy"
 
 vim.cmd("packadd vim-jetpack")
 require("jetpack.packer").startup(function(use)
@@ -32,7 +29,7 @@ require("jetpack.packer").startup(function(use)
   use({ "andymass/vim-matchup" })
   use({ "machakann/vim-sandwich" })
   use({ "terryma/vim-expand-region" })
-  use({ "tpope/repeat" })
+  use({ "tpope/vim-repeat" })
   use({ "tpope/vim-commentary" })
   use({ "rhysd/clever-f.vim" })
   use({ "monaqa/dial.nvim" })
@@ -50,12 +47,18 @@ require("jetpack.packer").startup(function(use)
   use({ "tkmpypy/chowcho.nvim" })
   use({ "machakann/vim-highlightedyank" })
   use({ "kyazdani42/nvim-web-devicons" })
-  use({ "folke/todo-comments.nvim" , config = function ()
-    require('todo-comments').setup()
-  end})
-  use({ "kevinhwang91/nvim-hlslens", config = function()
-    require('hlslens').setup()
-  end })
+  use({
+    "folke/todo-comments.nvim",
+    config = function()
+      require('todo-comments').setup()
+    end
+  })
+  use({
+    "kevinhwang91/nvim-hlslens",
+    config = function()
+      require('hlslens').setup()
+    end
+  })
 
   use({ "folke/noice.nvim" })
 
@@ -93,7 +96,7 @@ require("jetpack.packer").startup(function(use)
   use({ "williamboman/mason.nvim" })
   use({ "williamboman/mason-lspconfig.nvim" })
   use({ "folke/lsp-colors.nvim" })
-  use({ "tami5/lspsaga.nvim" })
+  use({ "glepnir/lspsaga.nvim" })
   use({ "hrsh7th/nvim-cmp" })
   use({ "hrsh7th/cmp-nvim-lsp" })
   use({ "hrsh7th/cmp-nvim-lsp-signature-help" })
@@ -110,6 +113,12 @@ require("jetpack.packer").startup(function(use)
   use({ "rafamadriz/friendly-snippets" })
   use({ "onsails/lspkind-nvim" })
   use({ "windwp/nvim-autopairs" })
+  use({
+    "smjonas/inc-rename.nvim",
+    config = function()
+      require("inc_rename").setup()
+    end
+  })
 
   -- Debug
   use({ "mfussenegger/nvim-dap" })
@@ -120,6 +129,15 @@ require("jetpack.packer").startup(function(use)
   -- Test
   use({ "vim-test/vim-test" })
 end)
+
+-- 起動時にインストール
+local jetpack = require('jetpack')
+for _, name in ipairs(jetpack.names()) do
+  if not jetpack.tap(name) then
+    jetpack.sync()
+    break
+  end
+end
 
 -- keymaps
 
