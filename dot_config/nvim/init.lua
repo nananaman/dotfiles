@@ -1,11 +1,3 @@
--- setup vim-jetpack
-local fn = vim.fn
-local jetpackfile = fn.stdpath('data') .. '/site/pack/jetpack/opt/vim-jetpack/plugin/jetpack.vim'
-local jetpackurl = 'https://raw.githubusercontent.com/tani/vim-jetpack/master/plugin/jetpack.vim'
-if fn.filereadable(jetpackfile) == 0 then
-  fn.system('curl -fsSLo ' .. jetpackfile .. ' --create-dirs ' .. jetpackurl)
-end
-
 local ok, reload = pcall(require, "plenary.reload")
 RELOAD = ok and reload.reload_module or function(...)
   return ...
@@ -16,4 +8,21 @@ function R(name)
 end
 
 R("settings")
-R("plugins")
+
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable", -- latest stable release
+    lazypath,
+  })
+end
+vim.opt.rtp:prepend(lazypath)
+
+-- Example using a list of specs with the default options
+vim.g.mapleader = "\\" -- Make sure to set `mapleader` before lazy so your mappings are correct
+
+require("lazy").setup("plugins")

@@ -1,17 +1,26 @@
--- silicon
-vim.g.silicon = {
-  theme = "Dracula",
-  font = "Ricty Discord for Powerline",
-  background = "#AAAAFF",
-  ["shadow-color"] = "#555555",
-  ["line-pad"] = 2,
-  ["pad-horiz"] = 80,
-  ["pad-vert"] = 100,
-  ["shadow-blur-radius"] = 0,
-  ["shadow-offset-x"] = 0,
-  ["shadow-offset-y"] = 0,
-  ["line-number"] = true,
-  ["round-corner"] = true,
-  ["window-controls"] = true,
-  output = "~/Desktop/silicon-{time:%Y-%m-%d-%H%M%S}.png",
+return {
+  -- {
+  --   'krivahtoo/silicon.nvim',
+  --   build = './install.sh',
+  --   config = function()
+  --     require('silicon').setup({
+  --       theme = 'Dracula',
+  --       font = "Ricty Discord for Powerline",
+  --       background = "#AAAAFF",
+  --       line_number = true,
+  --       line_pad = 2,
+  --       pad_vert = 80,
+  --       pad_horiz = 100,
+  --       output = {
+  --         path = "/home/Desktop/silicon-{time:%Y-%m-%d-%H%M%S}.png",
+  --       },
+  --       watermark = {
+  --         text = ' @nananaman',
+  --       },
+  --       window_title = function()
+  --         return vim.fn.fnamemodify(vim.fn.bufname(vim.fn.bufnr()), ':~:.')
+  --       end,
+  --     })
+  --   end
+  -- }
 }
