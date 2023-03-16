@@ -161,6 +161,17 @@ local enhance_server_opts = {
       },
     }
   end,
+  ["pyright"] = function(opts)
+    opts.settings = {
+      python = {
+        venvPath = ".",
+        pythonPath = "./.venv/bin/python",
+        analysis = {
+          extraPaths = { "." }
+        }
+      }
+    }
+  end,
 }
 
 local mason_lspconfig = require("mason-lspconfig")
@@ -175,9 +186,7 @@ mason_lspconfig.setup_handlers({
       enhance_server_opts[server_name](opts)
     end
 
-    lspconfig[server_name].setup({
-      on_attach = on_attach,
-    })
+    lspconfig[server_name].setup(opts)
   end,
 })
 
