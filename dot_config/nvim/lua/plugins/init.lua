@@ -113,12 +113,6 @@ require("jetpack.packer").startup(function(use)
   use({ "rafamadriz/friendly-snippets" })
   use({ "onsails/lspkind-nvim" })
   use({ "windwp/nvim-autopairs" })
-  use({
-    "smjonas/inc-rename.nvim",
-    config = function()
-      require("inc_rename").setup()
-    end
-  })
 
   -- Debug
   use({ "mfussenegger/nvim-dap" })
