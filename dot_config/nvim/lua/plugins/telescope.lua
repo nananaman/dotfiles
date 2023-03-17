@@ -34,5 +34,6 @@ return {
 
       -- map("n", "gr", ":Telescope lsp_references<CR>")
     end
-  }
+  },
+  { "nvim-telescope/telescope-fzf-native.nvim", build = "make" }
 }
