@@ -20,7 +20,6 @@ return {
   { "machakann/vim-sandwich" },
   { "terryma/vim-expand-region" },
   { "tpope/vim-repeat" },
-  { "tpope/vim-commentary" },
   { "rhysd/clever-f.vim" },
 
   -- 移動
@@ -45,10 +44,6 @@ return {
       require('hlslens').setup()
     end
   },
-
-  { "folke/neodev.nvim" },
-  { "folke/which-key.nvim" },
-  { "folke/neoconf.nvim", cmd = "Neoconf" },
 
   {
     "dstein64/vim-startuptime",
