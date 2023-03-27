@@ -59,7 +59,12 @@ return {
   { "windwp/nvim-ts-autotag" },
 
   -- Flutter
-  { "akinsho/flutter-tools.nvim" },
+  { "akinsho/flutter-tools.nvim",
+    lazy = false,
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+    },
+  },
 
   -- Go
   { "golang/vscode-go" },

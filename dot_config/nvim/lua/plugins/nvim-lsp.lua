@@ -1,22 +1,3 @@
--- flutter-tools
--- require("flutter-tools").setup({
---   ui = {
---     notification_style = "plugin",
---   },
---   widget_guides = {
---     enabled = true,
---   },
---   lsp = {
---     color = {
---       enabled = true,
---       background = true,
---       virtual_text = false,
---     },
---     on_attach = on_attach,
---     capabilities = capabilities,
---   },
--- })
-
 return {
   { "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
@@ -43,6 +24,7 @@ return {
       "rafamadriz/friendly-snippets",
       "onsails/lspkind-nvim",
       "jose-elias-alvarez/null-ls.nvim",
+      "akinsho/flutter-tools.nvim",
     },
     config = function()
       local lspconfig = require("lspconfig")
@@ -364,6 +346,25 @@ return {
 
       null_ls.setup({
         sources = sources,
+      })
+
+      -- flutter-tools
+      require("flutter-tools").setup({
+        ui = {
+          notification_style = "plugin",
+        },
+        widget_guides = {
+          enabled = true,
+        },
+        lsp = {
+          color = {
+            enabled = true,
+            background = true,
+            virtual_text = false,
+          },
+          on_attach = on_attach,
+          capabilities = capabilities,
+        },
       })
     end
   },
