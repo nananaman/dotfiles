@@ -1,7 +1,9 @@
+if vim.loader then vim.loader.enable() end
+
 local ok, reload = pcall(require, "plenary.reload")
 RELOAD = ok and reload.reload_module or function(...)
-  return ...
-end
+      return ...
+    end
 function R(name)
   RELOAD(name)
   return require(name)
