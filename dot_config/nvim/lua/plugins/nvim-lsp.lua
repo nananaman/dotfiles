@@ -7,7 +7,6 @@ return {
       "williamboman/mason.nvim",
       "williamboman/mason-lspconfig.nvim",
       "folke/lsp-colors.nvim",
-      "glepnir/lspsaga.nvim",
       "hrsh7th/nvim-cmp",
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-nvim-lsp-signature-help",
@@ -31,7 +30,6 @@ return {
       local null_ls = require("null-ls")
       local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
       local mason = require("mason")
-      local lspsaga = require("lspsaga")
 
       mason.setup({
         ui = {
@@ -42,8 +40,6 @@ return {
           },
         },
       })
-
-      lspsaga.setup({})
 
       -- Mappings.
       local map_opts = { noremap = true, silent = true }
@@ -57,24 +53,16 @@ return {
 
         buf_set_keymap("n", "gD", "<cmd>lua vim.lsp.buf.type_definition()<CR>", map_opts)
         -- buf_set_keymap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", map_opts)
-        buf_set_keymap("n", "gd", "<cmd>Lspsaga peek_definition<CR>", map_opts)
-        buf_set_keymap("n", "gj", "<cmd>Lspsaga diagnostic_jump_next<CR>", map_opts)
-        buf_set_keymap("n", "gk", "<cmd>Lspsaga diagnostic_jump_prev<CR>", map_opts)
-        buf_set_keymap("n", "K", "<cmd>Lspsaga hover_doc<CR>", map_opts)
-        -- buf_set_keymap("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", map_opts)
+        buf_set_keymap("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", map_opts)
         buf_set_keymap("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", map_opts)
-        -- buf_set_keymap("n", "<C-k>", "<cmd>Lspsaga signature_help<CR>", map_opts)
         buf_set_keymap("n", "<C-k>", "<cmd>lua vim.lsp.buf.signature_help()<CR>", map_opts)
         buf_set_keymap("n", "<leader>wa", "<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>", map_opts)
         buf_set_keymap("n", "<leader>wr", "<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>", map_opts)
         buf_set_keymap("n", "<leader>wl", "<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>",
           map_opts)
         buf_set_keymap("n", "<leader>D", "<cmd>lua vim.lsp.buf.type_definition()<CR>", map_opts)
-        buf_set_keymap("n", "<leader>ac", "<cmd>Lspsaga code_action<CR>", map_opts)
-        buf_set_keymap("n", "<leader>rn", "<cmd>Lspsaga rename<CR>", map_opts)
         -- buf_set_keymap("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", map_opts)
         buf_set_keymap("n", "<leader>f", "<cmd>lua vim.lsp.buf.format { async = true }<CR>", map_opts)
-        buf_set_keymap("n", "<leader>o", "<cmd>Lspsaga outline<CR>", map_opts)
       end
 
 
@@ -237,7 +225,7 @@ return {
           documentation = cmp.config.window.bordered(),
         },
         mapping = cmp.mapping.preset.insert({
-          ["<C-u>"] = cmp.mapping.scroll_docs(-4),
+          ["<C-u>"] = cmp.mapping.scroll_docs( -4),
           ["<C-d>"] = cmp.mapping.scroll_docs(4),
           -- ["<Space>"] = cmp.mapping.complete(),
           ["<C-e>"] = cmp.mapping.abort(),
@@ -371,7 +359,70 @@ return {
   { "williamboman/mason.nvim" },
   { "williamboman/mason-lspconfig.nvim" },
   { "folke/lsp-colors.nvim" },
-  { "glepnir/lspsaga.nvim" },
+  {
+    "glepnir/lspsaga.nvim",
+    event = "LspAttach",
+    dependencies = {
+      { "nvim-tree/nvim-web-devicons" },
+      --Please make sure you install markdown and markdown_inline parser
+      { "nvim-treesitter/nvim-treesitter" }
+    },
+    config = function()
+      require("lspsaga").setup({})
+      local lspsaga = require("lspsaga")
+      lspsaga.setup({})
+
+      local keymap = vim.keymap.set
+
+      -- Code action
+      keymap({ "n", "v" }, "<leader>ca", "<cmd>Lspsaga code_action<CR>")
+
+      -- Rename all occurrences of the hovered word for the selected files
+      keymap("n", "rn", "<cmd>Lspsaga rename ++project<CR>")
+
+      -- Peek definition
+      -- You can edit the file containing the definition in the floating window
+      -- It also supports open/vsplit/etc operations, do refer to "definition_action_keys"
+      -- It also supports tagstack
+      -- Use <C-t> to jump back
+      keymap("n", "gp", "<cmd>Lspsaga peek_definition<CR>")
+
+      -- Go to definition
+      keymap("n", "gd", "<cmd>Lspsaga goto_definition<CR>")
+
+      -- Peek type definition
+      -- You can edit the file containing the type definition in the floating window
+      -- It also supports open/vsplit/etc operations, do refer to "definition_action_keys"
+      -- It also supports tagstack
+      -- Use <C-t> to jump back
+      keymap("n", "gt", "<cmd>Lspsaga peek_type_definition<CR>")
+
+
+      keymap("n", "gj", "<cmd>Lspsaga diagnostic_jump_next<CR>")
+      keymap("n", "gk", "<cmd>Lspsaga diagnostic_jump_prev<CR>")
+
+      -- Show line diagnostics
+      -- You can pass argument ++unfocus to
+      -- unfocus the show_line_diagnostics floating window
+      keymap("n", "<leader>sl", "<cmd>Lspsaga show_line_diagnostics<CR>")
+
+      -- Show buffer diagnostics
+      keymap("n", "<leader>sb", "<cmd>Lspsaga show_buf_diagnostics<CR>")
+
+      -- Show workspace diagnostics
+      keymap("n", "<leader>sw", "<cmd>Lspsaga show_workspace_diagnostics<CR>")
+
+      -- Show cursor diagnostics
+      keymap("n", "<leader>sc", "<cmd>Lspsaga show_cursor_diagnostics<CR>")
+
+      -- If you want to keep the hover window in the top right hand corner,
+      -- you can pass the ++keep argument
+      -- Note that if you use hover with ++keep, pressing this key again will
+      -- close the hover window. If you want to jump to the hover window
+      -- you should use the wincmd command "<C-w>w"
+      -- keymap("n", "K", "<cmd>Lspsaga hover_doc ++keep<CR>")
+    end
+  },
   { "hrsh7th/nvim-cmp" },
   { "hrsh7th/cmp-nvim-lsp" },
   { "hrsh7th/cmp-nvim-lsp-signature-help" },
