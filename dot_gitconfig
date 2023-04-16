@@ -2,9 +2,6 @@
 name = nananaman
 email = foolawoola@gmail.com
 
-[credential]
-	helper = osxkeychain
-
 [core]
     pager = delta
 
