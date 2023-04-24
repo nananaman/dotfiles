@@ -32,21 +32,14 @@ return {
               name = "tests",
               icon = "",
               matcher = function(buf)
-                return buf.filename:match("_spec") or buf.filename:match("test")
-              end,
-            },
-            {
-              name = "view models",
-              highlight = { guisp = "#D27E99", gui = "underline" },
-              matcher = function(buf)
-                return buf.filename:match("view_model%.dart")
+                return buf.name:match("%_spec") or buf.name:match("%_test")
               end,
             },
             {
               highlight = { guisp = "#98BB6C", gui = "underline" },
               name = "docs",
               matcher = function(buf)
-                return buf.filename:match("%.md") or buf.filename:match("%.txt")
+                return buf.name:match("%.md") or buf.name:match("%.txt")
               end,
             },
           },

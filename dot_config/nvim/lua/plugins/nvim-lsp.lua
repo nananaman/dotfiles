@@ -1,5 +1,6 @@
 return {
-  { "neovim/nvim-lspconfig",
+  {
+    "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
       "mason.nvim",
@@ -31,6 +32,36 @@ return {
       local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
       local mason = require("mason")
 
+      -- Use LspAttach autocommand to only map the following keys
+      -- after the language server attaches to the current buffer
+      vim.api.nvim_create_autocmd("LspAttach", {
+        group = vim.api.nvim_create_augroup("UserLspConfig", {}),
+        callback = function(ev)
+          -- Enable completion triggered by <c-x><c-o>
+          vim.bo[ev.buf].omnifunc = "v:lua.vim.lsp.omnifunc"
+
+          -- Buffer local mappings.
+          -- See `:help vim.lsp.*` for documentation on any of the below functions
+          local opts = { buffer = ev.buf }
+          -- vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+          vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+          vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
+          vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, opts)
+          vim.keymap.set("n", "<space>wa", vim.lsp.buf.add_workspace_folder, opts)
+          vim.keymap.set("n", "<space>wr", vim.lsp.buf.remove_workspace_folder, opts)
+          vim.keymap.set("n", "<space>wl", function()
+            print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+          end, opts)
+          vim.keymap.set("n", "gD", vim.lsp.buf.type_definition, opts)
+          -- vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename, opts)
+          -- vim.keymap.set({ "n", "v" }, "<space>ca", vim.lsp.buf.code_action, opts)
+          -- vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
+          vim.keymap.set("n", "<space>f", function()
+            vim.lsp.buf.format({ async = true })
+          end, opts)
+        end,
+      })
+
       mason.setup({
         ui = {
           icons = {
@@ -46,165 +77,116 @@ return {
       vim.api.nvim_set_keymap("n", "<space>e", "<cmd>lua vim.diagnostic.open_float()<CR>", map_opts)
       vim.api.nvim_set_keymap("n", "<space>q", "<cmd>lua vim.diagnostic.setloclist()<CR>", map_opts)
 
-      local on_attach = function(client, bufnr)
-        local function buf_set_keymap(...)
-          vim.api.nvim_buf_set_keymap(bufnr, ...)
-        end
-
-        buf_set_keymap("n", "gD", "<cmd>lua vim.lsp.buf.type_definition()<CR>", map_opts)
-        -- buf_set_keymap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", map_opts)
-        buf_set_keymap("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", map_opts)
-        buf_set_keymap("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", map_opts)
-        buf_set_keymap("n", "<C-k>", "<cmd>lua vim.lsp.buf.signature_help()<CR>", map_opts)
-        buf_set_keymap("n", "<leader>wa", "<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>", map_opts)
-        buf_set_keymap("n", "<leader>wr", "<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>", map_opts)
-        buf_set_keymap("n", "<leader>wl", "<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>",
-          map_opts)
-        buf_set_keymap("n", "<leader>D", "<cmd>lua vim.lsp.buf.type_definition()<CR>", map_opts)
-        -- buf_set_keymap("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", map_opts)
-        buf_set_keymap("n", "<leader>f", "<cmd>lua vim.lsp.buf.format { async = true }<CR>", map_opts)
-      end
-
-
-      -- vim.keymap.set("n", "<leader>rn", function()
-      --   return ":IncRename " .. vim.fn.expand("<cword>")
-      -- end, { expr = true })
-
       local runtime_path = vim.split(package.path, ";")
       table.insert(runtime_path, "lua/?.lua")
       table.insert(runtime_path, "lua/?/init.lua")
 
       local is_node_proj = lspconfig.util.root_pattern("package.json")
-      local is_python_proj = lspconfig.util.root_pattern("pyproject.toml", "Pipfile")
-
-      local enhance_server_opts = {
-        ["sumneko_lua"] = function(opts)
-          opts.settings = {
-            Lua = {
-              runtime = {
-                version = "LuaJIT",
-                path = runtime_path,
-              },
-              diagnostics = {
-                globals = { "vim" },
-              },
-              workspace = {
-                library = vim.api.nvim_get_runtime_file("", true),
-              },
-              telemetry = {
-                enable = false,
-              },
-            },
-          }
-        end,
-        ["jsonls"] = function(opts)
-          opts.filetypes = { "json", "jsonc" }
-          opts.settings = {
-            json = {
-              -- Schemas https://www.schemastore.org
-              schemas = {
-                {
-                  fileMatch = { "package.json" },
-                  url = "https://json.schemastore.org/package.json",
-                },
-                {
-                  fileMatch = { "tsconfig*.json" },
-                  url = "https://json.schemastore.org/tsconfig.json",
-                },
-                {
-                  fileMatch = {
-                    ".prettierrc",
-                    ".prettierrc.json",
-                    "prettier.config.json",
-                  },
-                  url = "https://json.schemastore.org/prettierrc.json",
-                },
-                {
-                  fileMatch = { ".eslintrc", ".eslintrc.json" },
-                  url = "https://json.schemastore.org/eslintrc.json",
-                },
-                {
-                  fileMatch = { ".babelrc", ".babelrc.json", "babel.config.json" },
-                  url = "https://json.schemastore.org/babelrc.json",
-                },
-                {
-                  fileMatch = { "lerna.json" },
-                  url = "https://json.schemastore.org/lerna.json",
-                },
-                {
-                  fileMatch = { "now.json", "vercel.json" },
-                  url = "https://json.schemastore.org/now.json",
-                },
-                {
-                  fileMatch = {
-                    ".stylelintrc",
-                    ".stylelintrc.json",
-                    "stylelint.config.json",
-                  },
-                  url = "http://json.schemastore.org/stylelintrc.json",
-                },
-              },
-            },
-          }
-        end,
-        ["tsserver"] = function(opts)
-          opts.root_dir = lspconfig.util.root_pattern("package.json")
-          opts.init_options = { lint = true, unstable = true }
-          opts.on_attach = function(client, bufnr)
-            client.resolved_capabilities.document_formatting = false
-            on_attach(client, bufnr)
-          end
-        end,
-        ["eslint"] = function(opts)
-          opts.root_dir = lspconfig.util.root_pattern("package.json")
-          opts.init_options = { lint = true, unstable = true }
-          opts.on_attach = function(client, bufnr)
-            client.resolved_capabilities.document_formatting = false
-            on_attach(client, bufnr)
-          end
-        end,
-        ["denols"] = function(opts)
-          opts.root_dir = lspconfig.util.root_pattern("deno.json")
-          opts.init_options = {
-            lint = true,
-            unstable = true,
-            suggest = {
-              imports = {
-                hosts = {
-                  ["https://deno.land"] = true,
-                  ["https://cdn.nest.land"] = true,
-                  ["https://crux.land"] = true,
-                },
-              },
-            },
-          }
-        end,
-        ["pyright"] = function(opts)
-          opts.settings = {
-            python = {
-              venvPath = ".",
-              pythonPath = "./.venv/bin/python",
-              analysis = {
-                extraPaths = { "." }
-              }
-            }
-          }
-        end,
-      }
 
       local mason_lspconfig = require("mason-lspconfig")
       mason_lspconfig.setup_handlers({
         function(server_name)
           local opts = {
-            on_attach = on_attach,
+            -- on_attach = on_attach,
             capabilities = capabilities,
           }
 
-          if enhance_server_opts[server_name] then
-            enhance_server_opts[server_name](opts)
-          end
-
           lspconfig[server_name].setup(opts)
+        end,
+        ["lua_ls"] = function()
+          lspconfig.lua_ls.setup({
+            settings = {
+              Lua = {
+                runtime = { version = "LuaJIT", path = runtime_path },
+                diagnostics = { globals = { "vim" } },
+                workspace = { library = vim.api.nvim_get_runtime_file("", true) },
+                telemetry = { enable = false },
+              },
+            },
+          })
+        end,
+        ["jsonls"] = function()
+          lspconfig.jsonls.setup({
+            filetypes = { "json", "jsonc" },
+            settings = {
+              json = {
+                -- Schemas https://www.schemastore.org
+                schemas = {
+                  { fileMatch = { "package.json" }, url = "https://json.schemastore.org/package.json" },
+                  { fileMatch = { "tsconfig*.json" }, url = "https://json.schemastore.org/tsconfig.json" },
+                  {
+                    fileMatch = { ".prettierrc", ".prettierrc.json", "prettier.config.json" },
+                    url = "https://json.schemastore.org/prettierrc.json",
+                  },
+                  {
+                    fileMatch = { ".eslintrc", ".eslintrc.json" },
+                    url = "https://json.schemastore.org/eslintrc.json",
+                  },
+                  {
+                    fileMatch = { ".babelrc", ".babelrc.json", "babel.config.json" },
+                    url = "https://json.schemastore.org/babelrc.json",
+                  },
+                  { fileMatch = { "lerna.json" }, url = "https://json.schemastore.org/lerna.json" },
+                  { fileMatch = { "now.json", "vercel.json" }, url = "https://json.schemastore.org/now.json" },
+                  {
+                    fileMatch = { ".stylelintrc", ".stylelintrc.json", "stylelint.config.json" },
+                    url = "http://json.schemastore.org/stylelintrc.json",
+                  },
+                },
+              },
+            },
+          })
+        end,
+        ["tsserver"] = function()
+          lspconfig.tsserver.setup({
+            root_dir = lspconfig.util.root_pattern("package.json"),
+            init_options = { lint = true, unstable = true },
+            on_attach = function(client, bufnr)
+              client.resolved_capabilities.document_formatting = false
+              on_attach(client, bufnr)
+            end,
+          })
+        end,
+        ["eslint"] = function()
+          lspconfig.eslint.setup({
+            root_dir = lspconfig.util.root_pattern("package.json"),
+            init_options = { lint = true, unstable = true },
+            on_attach = function(client, bufnr)
+              client.resolved_capabilities.document_formatting = false
+              on_attach(client, bufnr)
+            end,
+          })
+        end,
+        ["denols"] = function()
+          lspconfig.denols.setup({
+            root_dir = lspconfig.util.root_pattern("deno.json"),
+            init_options = {
+              lint = true,
+              unstable = true,
+              suggest = {
+                imports = {
+                  hosts = {
+                    ["https://deno.land"] = true,
+                    ["https://cdn.nest.land"] = true,
+                    ["https://crux.land"] = true,
+                  },
+                },
+              },
+            },
+          })
+        end,
+        ["pyright"] = function()
+          lspconfig.pyright.setup({
+            settings = {
+              python = {
+                venvPath = ".",
+                pythonPath = "./.venv/bin/python",
+                analysis = {
+                  extraPaths = { "." },
+                },
+              },
+            },
+          })
         end,
       })
 
@@ -254,7 +236,7 @@ return {
           { name = "emoji" },
           { name = "calc" },
           { name = "treesitter" },
-          { name = "copilot" }
+          { name = "copilot" },
         }, {
           { name = "buffer" },
         }),
@@ -277,26 +259,26 @@ return {
       })
 
       -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
-      cmp.setup.cmdline({ '/', '?' }, {
+      cmp.setup.cmdline({ "/", "?" }, {
         mapping = cmp.mapping.preset.cmdline(),
         sources = {
-          { name = 'buffer' }
-        }
+          { name = "buffer" },
+        },
       })
 
       -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
-      cmp.setup.cmdline(':', {
+      cmp.setup.cmdline(":", {
         mapping = cmp.mapping.preset.cmdline(),
         sources = cmp.config.sources({
-          { name = 'path' }
+          { name = "path" },
         }, {
           {
-            name = 'cmdline',
+            name = "cmdline",
             option = {
-              ignore_cmds = { 'Man', '!' }
-            }
-          }
-        })
+              ignore_cmds = { "Man", "!" },
+            },
+          },
+        }),
       })
 
       local lspkind = require("lspkind")
@@ -334,19 +316,19 @@ return {
             return vim.fn.executable("cspell") > 0
           end,
           -- 起動時に設定ファイル読み込み
-          extra_args = { "--config", "~/.config/cspell/cspell.json" },
+          extra_args = { "--config", vim.fn.getenv("HOME") .. "/.config/cspell/cspell.json" },
         }),
+        null_ls.builtins.formatting.stylua,
+        null_ls.builtins.formatting.sql_formatter.with({
+          extra_args = { "--config", vim.fn.getenv("HOME") .. "/.config/sql-formatter/config.json" },
+        }),
+        null_ls.builtins.formatting.black,
+        null_ls.builtins.formatting.isort,
       }
 
       -- Prettier for Node.js
       if is_node_proj then
         table.insert(sources, null_ls.builtins.formatting.prettier)
-      end
-
-      -- Python
-      if is_python_proj then
-        table.insert(sources, null_ls.builtins.formatting.black)
-        table.insert(sources, null_ls.builtins.formatting.isort)
       end
 
       null_ls.setup({
@@ -371,7 +353,7 @@ return {
           capabilities = capabilities,
         },
       })
-    end
+    end,
   },
   { "williamboman/mason.nvim" },
   { "williamboman/mason-lspconfig.nvim" },
@@ -382,7 +364,7 @@ return {
     dependencies = {
       { "nvim-tree/nvim-web-devicons" },
       --Please make sure you install markdown and markdown_inline parser
-      { "nvim-treesitter/nvim-treesitter" }
+      { "nvim-treesitter/nvim-treesitter" },
     },
     config = function()
       require("lspsaga").setup({})
@@ -414,7 +396,6 @@ return {
       -- Use <C-t> to jump back
       keymap("n", "gt", "<cmd>Lspsaga peek_type_definition<CR>")
 
-
       keymap("n", "gj", "<cmd>Lspsaga diagnostic_jump_next<CR>")
       keymap("n", "gk", "<cmd>Lspsaga diagnostic_jump_prev<CR>")
 
@@ -438,7 +419,7 @@ return {
       -- close the hover window. If you want to jump to the hover window
       -- you should use the wincmd command "<C-w>w"
       -- keymap("n", "K", "<cmd>Lspsaga hover_doc ++keep<CR>")
-    end
+    end,
   },
   { "hrsh7th/nvim-cmp" },
   { "hrsh7th/cmp-nvim-lsp" },
@@ -456,4 +437,18 @@ return {
   { "rafamadriz/friendly-snippets" },
   { "onsails/lspkind-nvim" },
   { "jose-elias-alvarez/null-ls.nvim" },
+  {
+    "jay-babu/mason-null-ls.nvim",
+    event = { "BufReadPre", "BufNewFile" },
+    dependencies = {
+      "williamboman/mason.nvim",
+      "jose-elias-alvarez/null-ls.nvim",
+    },
+    config = function()
+      require("mason-null-ls").setup({
+        ensure_installed = nil,
+        automatic_installation = true,
+      })
+    end,
+  },
 }
