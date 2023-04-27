@@ -24,7 +24,7 @@ return {
     end
 
     local keymap = vim.keymap.set
-    keymap({ "n", "v" }, "<leader>pe", "<cmd>Partedit<CR>")
-    -- keymap({ "v" }, "<leader>pe", operator_partedit)
+    keymap({ "n", "v" }, "<space>pe", "<cmd>Partedit<CR>")
+    -- keymap({ "v" }, "<space>pe", operator_partedit)
   end
 }

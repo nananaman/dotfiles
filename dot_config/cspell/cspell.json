@@ -4,7 +4,8 @@
     "dotfiles",
     "lua",
     "user",
-    "vim"
+    "vim",
+    "golang"
   ],
   "dictionaryDefinitions": [
     {

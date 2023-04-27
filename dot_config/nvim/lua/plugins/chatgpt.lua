@@ -9,7 +9,7 @@ return {
   config = function()
     local opts = { noremap = true, silent = true }
 
-    vim.api.nvim_set_keymap("n", "<Leader>tk", ":ChatGPT<CR>", opts)
+    vim.api.nvim_set_keymap("n", "<space>c", ":ChatGPT<CR>", opts)
 
     require("chatgpt").setup({
       yank_register = "+",

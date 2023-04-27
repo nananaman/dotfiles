@@ -15,7 +15,7 @@ vim.opt.termguicolors = true
 vim.opt.number = true
 -- 現在の行を強調表示
 vim.opt.cursorline = true
--- ステータスラインを常に表示
+-- ステータスラインを常に表示. Noice.nvim でコマンドラインは中央に表示している
 vim.opt.laststatus = 2
 -- signcolumn を常に表示
 vim.o.signcolumn = "yes"

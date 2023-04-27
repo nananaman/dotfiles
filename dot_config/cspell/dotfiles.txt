@@ -1,1 +1,11 @@
 hogehoge
+rdbms
+RDBMS
+stretchr
+rdbmstest
+chouge
+gomock
+protobuf
+guregu
+sqlx
+jmoiron

@@ -11,16 +11,16 @@ return {
       local opts = { noremap = true, silent = true }
 
       for k, v in pairs({
-        ["<Leader>t"] = "<CMD>TestNearest<CR>",
-        ["<Leader>T"] = "<CMD>TestFile<CR>",
-        -- ["<Leader>a"] = "<CMD>TestSuite<CR>",
-        ["<Leader>tl"] = "<CMD>TestLast<CR>",
-        ["<Leader>g"] = "<CMD>TestVisit<CR><Esc>",
-        ["<Leader>b"] = "<CMD>lua require('dap').toggle_breakpoint()<CR>",
-        ["<Leader>l"] = ":lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>",
-        ["<Leader>td"] = ":lua require('dap-go').debug_test()<CR>",
+        ["<space>t"] = "<CMD>TestNearest<CR>",
+        ["<space>T"] = "<CMD>TestFile<CR>",
+        -- ["<space>a"] = "<CMD>TestSuite<CR>",
+        ["<space>tl"] = "<CMD>TestLast<CR>",
+        ["<space>g"] = "<CMD>TestVisit<CR><Esc>",
+        ["<space>b"] = "<CMD>lua require('dap').toggle_breakpoint()<CR>",
+        ["<space>l"] = ":lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>",
+        ["<space>td"] = ":lua require('dap-go').debug_test()<CR>",
         -- dap-ui key map
-        ["<Leader>d"] = ":lua require'dapui'.toggle()<CR>",
+        ["<space>d"] = ":lua require'dapui'.toggle()<CR>",
         ["<F5>"] = ":lua require'dap'.continue()<CR>"
       }) do
         vim.api.nvim_set_keymap("", k, v, opts)

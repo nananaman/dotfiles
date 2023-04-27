@@ -4,6 +4,6 @@ return {
     require('gitsigns').setup({ signcolumn = true, numhl = false, linehl = false, })
 
     local map_opts = { noremap = true, silent = true }
-    vim.api.nvim_set_keymap("n", "<leader>gb", "<cmd>Gitsigns blame_line<CR>", map_opts)
+    vim.api.nvim_set_keymap("n", "<space>gb", "<cmd>Gitsigns blame_line<CR>", map_opts)
   end
 }

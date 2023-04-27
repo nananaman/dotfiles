@@ -374,10 +374,10 @@ return {
       local keymap = vim.keymap.set
 
       -- Code action
-      keymap({ "n", "v" }, "<leader>ca", "<cmd>Lspsaga code_action<CR>")
+      keymap({ "n", "v" }, "<space>ca", "<cmd>Lspsaga code_action<CR>")
 
       -- Rename all occurrences of the hovered word for the selected files
-      keymap("n", "<Leader>rn", "<cmd>Lspsaga rename ++project<CR>")
+      keymap("n", "<space>rn", "<cmd>Lspsaga rename ++project<CR>")
 
       -- Peek definition
       -- You can edit the file containing the definition in the floating window
@@ -402,16 +402,16 @@ return {
       -- Show line diagnostics
       -- You can pass argument ++unfocus to
       -- unfocus the show_line_diagnostics floating window
-      keymap("n", "<leader>sl", "<cmd>Lspsaga show_line_diagnostics<CR>")
+      keymap("n", "<space>sl", "<cmd>Lspsaga show_line_diagnostics<CR>")
 
       -- Show buffer diagnostics
-      keymap("n", "<leader>sb", "<cmd>Lspsaga show_buf_diagnostics<CR>")
+      keymap("n", "<space>sb", "<cmd>Lspsaga show_buf_diagnostics<CR>")
 
       -- Show workspace diagnostics
-      keymap("n", "<leader>sw", "<cmd>Lspsaga show_workspace_diagnostics<CR>")
+      keymap("n", "<space>sw", "<cmd>Lspsaga show_workspace_diagnostics<CR>")
 
       -- Show cursor diagnostics
-      keymap("n", "<leader>sc", "<cmd>Lspsaga show_cursor_diagnostics<CR>")
+      keymap("n", "<space>sc", "<cmd>Lspsaga show_cursor_diagnostics<CR>")
 
       -- If you want to keep the hover window in the top right hand corner,
       -- you can pass the ++keep argument
