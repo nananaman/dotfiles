@@ -14,5 +14,6 @@ alias kn='kubens'
 {{-   if (.chezmoi.kernel.osrelease | lower | contains "microsoft") -}}
 alias win32yank='/mnt/c/Tools/win32yank/win32yank.exe'
 alias clip='win32yank -i'
+alias open=wslview
 {{-   end -}}
 {{- end}}
