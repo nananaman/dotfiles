@@ -17,7 +17,7 @@ return {
         ["<space>tl"] = "<CMD>TestLast<CR>",
         ["<space>g"] = "<CMD>TestVisit<CR><Esc>",
         ["<space>b"] = "<CMD>lua require('dap').toggle_breakpoint()<CR>",
-        ["<space>l"] = ":lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>",
+        -- ["<space>l"] = ":lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>",
         ["<space>td"] = ":lua require('dap-go').debug_test()<CR>",
         -- dap-ui key map
         ["<space>d"] = ":lua require'dapui'.toggle()<CR>",
