@@ -20,14 +20,30 @@ return {
   { "machakann/vim-sandwich" },
   { "terryma/vim-expand-region" },
   { "tpope/vim-repeat" },
-  { "rhysd/clever-f.vim" },
 
   -- 移動
   {
-    "yuki-yano/fuzzy-motion.vim",
-    config = function()
-      vim.api.nvim_set_keymap("n", "<Space><Space>", ":FuzzyMotion<CR>", opts)
-    end
+    "folke/flash.nvim",
+    event = "VeryLazy",
+    ---@type Flash.Config
+    opts = {},
+    keys = {
+      {
+        "s",
+        mode = { "n", "x", "o" },
+        function()
+          -- default options: exact mode, multi window, all directions, with a backdrop
+          require("flash").jump()
+        end,
+      },
+      {
+        "S",
+        mode = { "o", "x" },
+        function()
+          require("flash").treesitter()
+        end,
+      },
+    },
   },
 
   -- 見た目
@@ -51,15 +67,19 @@ return {
     cmd = "StartupTime",
   },
 
-  { "windwp/nvim-autopairs", config = function()
-    require("nvim-autopairs").setup {}
-  end },
+  {
+    "windwp/nvim-autopairs",
+    config = function()
+      require("nvim-autopairs").setup {}
+    end
+  },
 
   -- TypeScript
   { "windwp/nvim-ts-autotag" },
 
   -- Flutter
-  { "akinsho/flutter-tools.nvim",
+  {
+    "akinsho/flutter-tools.nvim",
     lazy = false,
     dependencies = {
       'nvim-lua/plenary.nvim',
@@ -69,3 +89,4 @@ return {
   -- Go
   { "golang/vscode-go" },
 }
+
