@@ -9,3 +9,5 @@ protobuf
 guregu
 sqlx
 jmoiron
+katohome
+nicolive
