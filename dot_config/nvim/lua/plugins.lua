@@ -16,8 +16,16 @@ return {
   { "rcarriga/nvim-notify" },
 
   -- 操作
-  { "andymass/vim-matchup" },
-  { "machakann/vim-sandwich" },
+  {
+    "kylechui/nvim-surround",
+    version = "*", -- Use for stability; omit to use `main` branch for the latest features
+    event = "VeryLazy",
+    config = function()
+      require("nvim-surround").setup({
+        -- Configuration here, or leave empty to use defaults
+      })
+    end,
+  },
   { "terryma/vim-expand-region" },
   { "tpope/vim-repeat" },
 
@@ -38,7 +46,7 @@ return {
       },
       {
         "S",
-        mode = { "o", "x" },
+        mode = { "n", "o", "x" },
         function()
           require("flash").treesitter()
         end,
@@ -51,14 +59,14 @@ return {
   {
     "folke/todo-comments.nvim",
     config = function()
-      require('todo-comments').setup()
-    end
+      require("todo-comments").setup()
+    end,
   },
   {
     "kevinhwang91/nvim-hlslens",
     config = function()
-      require('hlslens').setup()
-    end
+      require("hlslens").setup()
+    end,
   },
 
   {
@@ -70,8 +78,8 @@ return {
   {
     "windwp/nvim-autopairs",
     config = function()
-      require("nvim-autopairs").setup {}
-    end
+      require("nvim-autopairs").setup({})
+    end,
   },
 
   -- TypeScript
@@ -82,11 +90,10 @@ return {
     "akinsho/flutter-tools.nvim",
     lazy = false,
     dependencies = {
-      'nvim-lua/plenary.nvim',
+      "nvim-lua/plenary.nvim",
     },
   },
 
   -- Go
   { "golang/vscode-go" },
 }
-
