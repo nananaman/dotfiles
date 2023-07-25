@@ -1,5 +1,5 @@
 {
-  "language": "postgresql",
+  "language": "mysql",
   "tabWidth": 4,
   "keywordCase": "upper",
   "linesBetweenQueries": 2,

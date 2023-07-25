@@ -11,7 +11,7 @@ return {
       local opts = { noremap = true, silent = true }
 
       for k, v in pairs({
-        ["<space>t"] = "<CMD>TestNearest<CR>",
+        -- ["<space>t"] = "<CMD>TestNearest<CR>",
         ["<space>T"] = "<CMD>TestFile<CR>",
         -- ["<space>a"] = "<CMD>TestSuite<CR>",
         ["<space>tl"] = "<CMD>TestLast<CR>",
