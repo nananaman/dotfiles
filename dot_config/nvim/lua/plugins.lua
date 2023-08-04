@@ -1,8 +1,8 @@
 local opts = { noremap = true, silent = true }
 
 for k, v in pairs({
-  ["<C-w>|"] = "<CMD>vsplit<CR>",
-  ["<C-w>-"] = "<CMD>split<CR>",
+  ["|"] = "<CMD>vsplit<CR>",
+  ["-"] = "<CMD>split<CR>",
   ["<Esc><Esc>"] = "<CMD>nohlsearch<CR><Esc>",
 }) do
   vim.api.nvim_set_keymap("", k, v, opts)
