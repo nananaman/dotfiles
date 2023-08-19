@@ -31,8 +31,8 @@ elif [ "$(expr substr $(uname -s) 1 5)" == 'Linux' ]; then
   if !(type wget >/dev/null 2>&1); then
     sudo apt-get install wget
   fi
-  wget https://go.dev/dl/go1.17.4.linux-amd64.tar.gz
-  sudo tar -C /usr/local/ -xzf go1.17.4.linux-amd64.tar.gz
+  wget https://go.dev/dl/go1.21.0.linux-amd64.tar.gz
+  sudo tar -C /usr/local/ -xzf go1.21.0.linux-amd64.tar.gz
   export PATH=$PATH:/usr/local/go/bin
   cd -
 else
