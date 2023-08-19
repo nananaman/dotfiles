@@ -1,6 +1,7 @@
 return {
   {
-    'nvim-telescope/telescope.nvim', tag = '0.1.1',
+    'nvim-telescope/telescope.nvim',
+    tag = '0.1.1',
     dependencies = {
       'nvim-lua/plenary.nvim',
       "nvim-telescope/telescope-fzf-native.nvim"
@@ -16,6 +17,7 @@ return {
       })
       require('telescope').load_extension('fzf')
       require("telescope").load_extension("notify")
+      require("telescope").load_extension("ghq")
 
       local function map(mode, lhs, rhs, opts)
         local options = { noremap = true }
@@ -31,9 +33,11 @@ return {
       map("n", ",h", ":Telescope help_tags<CR>", { silent = true })
       map("n", ",n", ":Telescope notify<CR>", { silent = true })
       map("n", ",d", ":TodoTelescope<CR>", { silent = true, noremap = true })
+      map("n", ",q", ":Telescope ghq<CR>", { silent = true, noremap = true })
 
       -- map("n", "gr", ":Telescope lsp_references<CR>")
     end
   },
-  { "nvim-telescope/telescope-fzf-native.nvim", build = "make" }
+  { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+  { "nvim-telescope/telescope-ghq.nvim" },
 }
