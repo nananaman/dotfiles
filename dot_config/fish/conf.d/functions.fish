@@ -19,6 +19,46 @@ function fvd
   end
 end
 
+function fgcd
+  set -l repo ( ghq list | fzf +m --reverse )
+  if string length -q -- $repo
+    ghq get $repo
+    and cd (ghq root)/$repo
+  end
+end
+
+# 自分のリポジトリを検索してghq get
+function fgget
+  # gh cli の存在確認
+  if not type gh > /dev/null
+    echo "gh cli is not installed"
+    # gh cli のインストール
+    # OS別にインストールコマンドを変える
+    if type brew > /dev/null
+      brew install gh
+    else if type apt > /dev/null
+      sudo apt install gh
+    else
+      echo "gh cli install failed"
+      return 1
+    end
+  end
+
+  # gh cli の認証確認
+  if not gh auth status > /dev/null
+    echo "gh cli is not authenticated"
+    gh auth login
+  end
+
+  # リポジトリの検索
+  set -l sshUrl ( gh repo list --source --json sshUrl --jq '.[].sshUrl' | fzf +m --reverse )
+  if string length -q -- $sshUrl
+    set -l repo ( echo $sshUrl | sed 's#git@github\.com:#github\.com/#' | sed 's#\.git$##' )
+    ghq get $sshUrl
+    and cd (ghq root)/$repo
+  end
+end
+
 set -U fish_features qmark-noglob
 function github-copilot_helper
     set -l TMPFILE (mktemp)
