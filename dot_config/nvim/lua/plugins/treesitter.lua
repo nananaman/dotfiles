@@ -1,4 +1,5 @@
 return { "nvim-treesitter/nvim-treesitter",
+  build = ":TSUpdate"
   config = function()
     local parser_install_dir = vim.fn.stdpath "data" .. "/treesitter"
     vim.opt.runtimepath:append(parser_install_dir)
