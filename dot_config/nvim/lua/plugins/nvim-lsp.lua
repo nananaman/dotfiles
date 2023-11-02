@@ -23,7 +23,8 @@ return {
       "hrsh7th/vim-vsnip-integ",
       "rafamadriz/friendly-snippets",
       "onsails/lspkind-nvim",
-      "jose-elias-alvarez/null-ls.nvim",
+      -- "jose-elias-alvarez/null-ls.nvim",
+      "nvimtools/none-ls.nvim",
       "akinsho/flutter-tools.nvim",
     },
     config = function()
