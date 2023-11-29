@@ -18,7 +18,7 @@ local win_config = {
     { key = "T", mods = "CTRL|SHIFT", action = act.Hide },
     -- Paste from Clipboard
     { key = "v", mods = "CTRL", action = act.PasteFrom("Clipboard") },
-  }
+  },
 }
 
 local mac_config = {
@@ -28,7 +28,7 @@ local mac_config = {
     { key = "T", mods = "CTRL|SHIFT", action = act.HideApplication },
     -- Paste from Clipboard
     { key = "v", mods = "SUPER", action = act.PasteFrom("Clipboard") },
-  }
+  },
 }
 
 local apple_silicon_config = {
@@ -45,11 +45,11 @@ local apple_silicon_config = {
     { key = "T", mods = "CTRL|SHIFT", action = act.HideApplication },
     -- Paste from Clipboard
     { key = "v", mods = "SUPER", action = act.PasteFrom("Clipboard") },
-  }
+  },
 }
 
 local common_config = {
-  font = wezterm.font("HackGenNerd Console"),
+  font = wezterm.font_with_fallback({ "HackGenNerd Console" }),
   font_size = 14,
   adjust_window_size_when_changing_font_size = false,
   hide_tab_bar_if_only_one_tab = false,
@@ -164,7 +164,6 @@ local common_config = {
     { key = "DownArrow", mods = "SHIFT", action = act.ActivatePaneDirection("Down") },
     { key = "x", mods = "SHIFT|CTRL", action = act.CloseCurrentPane({ confirm = false }) },
     { key = "z", mods = "SHIFT|CTRL", action = act.TogglePaneZoomState },
-
     { key = "f", mods = "SHIFT|CTRL", action = act.EmitEvent("trigger-open-ghq-project") },
     { key = "v", mods = "SHIFT|CTRL", action = act.EmitEvent("trigget-nvim-with-scrollback") },
     { key = "n", mods = "SHIFT|CTRL", action = act.ToggleFullScreen },
