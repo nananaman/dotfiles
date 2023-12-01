@@ -2,6 +2,5 @@
   "language": "mysql",
   "tabWidth": 4,
   "keywordCase": "upper",
-  "linesBetweenQueries": 2,
-  "tabulateAlias": true
+  "linesBetweenQueries": 2
 }
