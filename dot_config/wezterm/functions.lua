@@ -25,16 +25,16 @@ function M.format_tab_title(tab, tabs, panes, config, hover, max_width)
   }
 end
 
-function M.update_right_status(window, pane)
+function M.update_status(window, pane)
   -- Each element holds the text for a cell in a "powerline" style << fade
   local cells = {}
   table.insert(cells, window:active_workspace())
 
-  local success, stdout, stderr = utils.run_child_process("kubectl config current-context")
-  if success then
-    local kube_ctx = string.gsub(stdout, "[\n\r]", "")
-    table.insert(cells, "⎈ " .. kube_ctx)
-  end
+  -- local success, stdout, stderr = utils.run_child_process("kubectl config current-context")
+  -- if success then
+  --   local kube_ctx = string.gsub(stdout, "[\n\r]", "")
+  --   table.insert(cells, "⎈ " .. kube_ctx)
+  -- end
 
   -- An entry for each battery (typically 0 or 1 battery)
   for _, b in ipairs(wezterm.battery_info()) do

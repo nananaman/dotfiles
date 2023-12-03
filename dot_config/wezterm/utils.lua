@@ -57,7 +57,8 @@ end
 -- OS に依るコマンドの差異を補正する
 function M.correct_command(command)
   if M.is_wsl() then
-    return { "wsl.exe", "--distribution", "Ubuntu-22.04", "fish", "-l", "-c", command }
+    -- return { "wsl.exe", "--distribution", "Ubuntu-22.04", "-e", "fish", "-l", "-c", command }
+    return { "fish", "-l", "-c", command }
   elseif M.is_apple_silicon() then
     return { "/opt/homebrew/bin/fish", "-l", "-c", command }
   else

@@ -7,12 +7,13 @@ local utils = require("utils")
 --- wezterm on
 ---------------------------------------------------------------
 wezterm.on("format-tab-title", functions.format_tab_title)
-wezterm.on("update-right-status", functions.update_right_status)
+wezterm.on("update-status", functions.update_status)
 wezterm.on("trigger-open-ghq-project", functions.trigger_open_ghq_project)
 wezterm.on("trigget-nvim-with-scrollback", functions.trigger_nvim_with_scrollback)
 
 local win_config = {
-  default_prog = { "wsl.exe", "~", "--distribution", "Ubuntu-22.04" },
+  default_prog = { "wsl.exe", "--distribution", "Ubuntu-22.04" },
+  default_domain = 'WSL:Ubuntu-22.04',
   keys = {
     -- Hide
     { key = "T", mods = "CTRL|SHIFT", action = act.Hide },
