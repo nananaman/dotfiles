@@ -106,7 +106,7 @@ function M.update_status(window, pane)
 end
 
 function M.trigger_open_ghq_project(window, pane)
-  local command = "cd (ghq root)/(ghq list | fzf +m --reverse --prompt='Project > ') && vim"
+  local command = "cd (ghq root)/(ghq list | fzf +m --reverse --prompt='Project > ') && fish"
   utils.spawn_command_in_new_tab(window, pane, command)
 end
 
