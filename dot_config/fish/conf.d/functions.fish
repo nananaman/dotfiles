@@ -11,14 +11,6 @@ function fbrm
   and git checkout ( echo $branch | sed 's/.* //' | sed 's#remotes/[^/]*/##'  )
 end
 
-function fvd
-  set -l tgt ( chezmoi managed | fzf +m --reverse )
-  if string length -q -- $tgt
-    chezmoi edit ~/$tgt --apply
-    and exec fish
-  end
-end
-
 function fgcd
   set -l repo ( ghq list | fzf +m --reverse )
   if string length -q -- $repo
