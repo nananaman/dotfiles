@@ -1,67 +1,18 @@
 command_timeout = 2000
 
 # k8s を最も右に表示する
-# format = "$all$kubernetes$line_break$character"
-
-# [directory]
-# style = "#FFEB3B"
-#
-# [git_branch]
-# symbol = " "
-# style = "#FFEB3B"
-#
-# [kubernetes]
-# format = 'on [⎈  $context \($namespace\)](dimmed green) '
-# disabled = false
-#
-# [gcloud]
-# disabled = true
-
-format = """
-[](#7E9CD8)\
-$username\
-[](bg:#957FB8 fg:#7E9CD8)\
-$directory\
-[](fg:#957FB8 bg:#6A9589)\
-$git_branch\
-$git_status\
-[](fg:#6A9589 bg:#C8C093)\
-$time\
-[ ](fg:#C8C093)\
-$status\
-\n\
-$character\
-"""
-
-[username]
-show_always = true
-style_user = "fg:#1F1F28 bg:#7E9CD8"
-style_root = "fg:#1F1F28 bg:#7E9CD8"
-format = '[$user ]($style)'
+format = "$all$kubernetes$line_break$character"
 
 [directory]
-style = "fg:#1F1F28 bg:#957FB8"
-format = "[ $path ]($style)"
-truncate_to_repo = false
-truncation_length = 3
-truncation_symbol = "…/"
+style = "#FFEB3B"
 
 [git_branch]
-symbol = ""
-style = "fg:#1F1F28 bg:#6A9589"
-format = '[ $symbol $branch ]($style)'
+symbol = " "
+style = "#FFEB3B"
 
-[git_status]
-style = "fg:#1F1F28 bg:#6A9589"
-format = '[$all_status$ahead_behind ]($style)'
-deleted = '󰅖'
-
-[status]
+[kubernetes]
+format = 'on [⎈  $context \($namespace\)](dimmed green) '
 disabled = false
-symbol = ' '
 
-[time]
-disabled = false
-time_format = "%T"
-style = "fg:#1F1F28 bg:#C8C093"
-format = '[ 󰅐 $time]($style)'
+[gcloud]
+disabled = true
