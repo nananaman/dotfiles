@@ -28,7 +28,7 @@ function fgcd
 end
 
 # 自分のリポジトリを検索してghq get
-function fgget
+function fghq
   # gh cli の存在確認
   if not type gh > /dev/null
     echo "gh cli is not installed"
