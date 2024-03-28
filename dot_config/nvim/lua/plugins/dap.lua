@@ -1,7 +1,7 @@
 return {
-  { "mfussenegger/nvim-dap",
+  {
+    "mfussenegger/nvim-dap",
     dependencies = {
-      { "rcarriga/nvim-dap-ui" },
       { "leoluz/nvim-dap-go" },
       { "theHamsta/nvim-dap-virtual-text" },
       { "vim-test/vim-test" },
@@ -21,26 +21,41 @@ return {
         ["<space>td"] = ":lua require('dap-go').debug_test()<CR>",
         -- dap-ui key map
         ["<space>d"] = ":lua require'dapui'.toggle()<CR>",
-        ["<F5>"] = ":lua require'dap'.continue()<CR>"
+        ["<F5>"] = ":lua require'dap'.continue()<CR>",
       }) do
         vim.api.nvim_set_keymap("", k, v, opts)
       end
+    end,
+  },
+  {
+    "rcarriga/nvim-dap-ui",
+    dependencies = {
+      { "mfussenegger/nvim-dap" },
+      { "nvim-neotest/nvim-nio" },
+      { "rcarriga/nvim-dap-ui" },
+    },
+    config = function()
+      require("dapui").setup()
 
-      require('dap').listeners.before['event_initialized']['custom'] = function(session, body)
-        require('dapui').open()
+      require("dap").listeners.before["event_initialized"]["custom"] = function(session, body)
+        require("dapui").open()
       end
 
       -- require('dap').listeners.before['event_terminated']['custom'] = function(session, body)
       --   require('dapui').close()
       -- end
-    end },
-  { "rcarriga/nvim-dap-ui", config = function()
-    require("dapui").setup()
-  end },
-  { "leoluz/nvim-dap-go", config = function()
-    require('dap-go').setup()
-  end },
-  { "theHamsta/nvim-dap-virtual-text", config = function()
-    require("nvim-dap-virtual-text").setup()
-  end },
+    end,
+  },
+  {
+    "leoluz/nvim-dap-go",
+    config = function()
+      require("dap-go").setup()
+    end,
+  },
+  {
+    "theHamsta/nvim-dap-virtual-text",
+    config = function()
+      require("nvim-dap-virtual-text").setup()
+    end,
+  },
 }

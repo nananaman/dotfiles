@@ -191,6 +191,19 @@ return {
         end,
       })
 
+      lspconfig.sourcekit.setup({
+        cmd = { "sourcekit-lsp" },
+        filetypes = { "swift", "c", "cpp", "objective-c", "objective-cpp" },
+        root_dir = lspconfig.util.root_pattern(
+          "buildServer.json",
+          "*.xcodeproj",
+          "*.xcworkspace",
+          ".git",
+          "compile_commands.json",
+          "Package.swift"
+        ),
+      })
+
       vim.opt.completeopt = "menu,menuone,noselect"
 
       -- Setup nvim-cmp.
