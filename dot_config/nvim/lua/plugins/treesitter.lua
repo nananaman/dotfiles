@@ -9,7 +9,7 @@ return {
       parser_install_dir = parser_install_dir,
       highlight = {
         enable = true,
-        disable = {},
+        disable = { "make", "env" },
       },
       autotag = {
         enable = true,
@@ -20,5 +20,5 @@ return {
       auto_install = true,
       -- ensure_installed = "all",
     })
-  end
+  end,
 }
