@@ -75,7 +75,7 @@ return {
 
       -- Mappings.
       local map_opts = { noremap = true, silent = true }
-      vim.api.nvim_set_keymap("n", "<space>e", "<cmd>lua vim.diagnostic.open_float()<CR>", map_opts)
+      -- vim.api.nvim_set_keymap("n", "<space>e", "<cmd>lua vim.diagnostic.open_float()<CR>", map_opts)
       vim.api.nvim_set_keymap("n", "<space>q", "<cmd>lua vim.diagnostic.setloclist()<CR>", map_opts)
 
       local runtime_path = vim.split(package.path, ";")
