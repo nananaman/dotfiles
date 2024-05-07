@@ -13,6 +13,8 @@ vim.opt.hidden = true
 vim.opt.termguicolors = true
 -- 行番号を表示
 vim.opt.number = true
+-- 相対行番号を表示
+vim.wo.relativenumber = true
 -- 現在の行を強調表示
 vim.opt.cursorline = true
 -- ステータスラインを常に表示. Noice.nvim でコマンドラインは中央に表示している
@@ -80,13 +82,13 @@ autocmd("BufWritePre", {
 -----------------------------------------------------------------------------//
 -- For Windows
 -----------------------------------------------------------------------------//
-local in_wsl = os.getenv('WSL_DISTRO_NAME') ~= nil
+local in_wsl = os.getenv("WSL_DISTRO_NAME") ~= nil
 
 if in_wsl then
   vim.g.clipboard = {
-    name = 'wsl clipboard',
+    name = "wsl clipboard",
     copy = { ["+"] = { "win32yank.exe", "-i" }, ["*"] = { "win32yank.exe", "-i" } },
     paste = { ["+"] = { "win32yank.exe", "-o", "--lf" }, ["*"] = { "win32yank.exe", "-o", "--lf" } },
-    cache_enabled = true
+    cache_enabled = true,
   }
 end
