@@ -4,12 +4,11 @@ return {
   dependencies = {
     "MunifTanjim/nui.nvim",
     "nvim-lua/plenary.nvim",
-    "nvim-telescope/telescope.nvim"
+    "folke/trouble.nvim",
+    "nvim-telescope/telescope.nvim",
   },
   config = function()
-    local opts = { noremap = true, silent = true }
-
-    vim.api.nvim_set_keymap("n", "<space>c", ":ChatGPT<CR>", opts)
+    vim.api.nvim_set_keymap("n", "<space>c", ":ChatGPT<CR>", { noremap = true, silent = true })
 
     require("chatgpt").setup({
       yank_register = "+",
@@ -102,16 +101,16 @@ return {
         },
       },
       openai_params = {
-        model = "gpt-3.5-turbo",
+        model = "gpt-4o",
         frequency_penalty = 0,
         presence_penalty = 0,
-        max_tokens = 300,
+        max_tokens = 3000,
         temperature = 0,
         top_p = 1,
         n = 1,
       },
       openai_edit_params = {
-        model = "code-davinci-edit-001",
+        model = "gpt-4o",
         temperature = 0,
         top_p = 1,
         n = 1,
