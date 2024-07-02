@@ -1,18 +1,37 @@
 return {
   "folke/trouble.nvim",
-  dependencies = {
-    "nvim-tree/nvim-web-devicons",
+  opts = {}, -- for default options, refer to the configuration section for custom setup.
+  cmd = "Trouble",
+  keys = {
+    {
+      "<leader>xx",
+      "<cmd>Trouble diagnostics toggle<cr>",
+      desc = "Diagnostics (Trouble)",
+    },
+    {
+      "<leader>xX",
+      "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
+      desc = "Buffer Diagnostics (Trouble)",
+    },
+    {
+      "<leader>cs",
+      "<cmd>Trouble symbols toggle focus=false<cr>",
+      desc = "Symbols (Trouble)",
+    },
+    {
+      "<leader>cl",
+      "<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
+      desc = "LSP Definitions / references / ... (Trouble)",
+    },
+    {
+      "<leader>xL",
+      "<cmd>Trouble loclist toggle<cr>",
+      desc = "Location List (Trouble)",
+    },
+    {
+      "<leader>xQ",
+      "<cmd>Trouble qflist toggle<cr>",
+      desc = "Quickfix List (Trouble)",
+    },
   },
-  config = function()
-    vim.api.nvim_set_keymap("n", "<space>xx", "<cmd>Trouble<cr>", { silent = true, noremap = true })
-    vim.api.nvim_set_keymap("n", "<space>xw", "<cmd>Trouble workspace_diagnostics<cr>",
-      { silent = true, noremap = true })
-    vim.api.nvim_set_keymap("n", "<space>xd", "<cmd>Trouble document_diagnostics<cr>", { silent = true, noremap = true })
-    vim.api.nvim_set_keymap("n", "<space>xl", "<cmd>Trouble loclist<cr>", { silent = true, noremap = true })
-    vim.api.nvim_set_keymap("n", "<space>xq", "<cmd>Trouble quickfix<cr>", { silent = true, noremap = true })
-    vim.api.nvim_set_keymap("n", "<space>xt", "<cmd>TodoTrouble<cr>", { silent = true, noremap = true })
-
-    vim.api.nvim_set_keymap("n", "gr", "<cmd>Trouble lsp_references<cr>", { silent = true, noremap = true })
-    -- vim.api.nvim_set_keymap("n", "gD", "<cmd>Trouble lsp_type_definitions<cr>", { silent = true, noremap = true })
-  end
 }

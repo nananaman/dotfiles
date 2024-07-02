@@ -1,10 +1,19 @@
 return {
-  'tkmpypy/chowcho.nvim',
+  "tkmpypy/chowcho.nvim",
   config = function()
     local chowcho = require("chowcho")
 
     chowcho.setup({
       icon_enabled = true,
+      exclude = function(buf, win)
+        -- exclude noice.nvim's cmdline_popup
+        local bt = vim.api.nvim_get_option_value("buftype", { buf = buf })
+        local ft = vim.api.nvim_get_option_value("filetype", { buf = buf })
+        if bt == "nofile" and (ft == "noice" or ft == "vim") then
+          return true
+        end
+        return false
+      end,
     })
 
     -- <C-w>xと<C-w><C-x>を同時に設定する
@@ -84,5 +93,5 @@ return {
         chowcho_buffer(0, selected_bufnr, selected_opts)
       end)
     end)
-  end
+  end,
 }

@@ -1,10 +1,10 @@
 return {
   {
-    'nvim-telescope/telescope.nvim',
-    tag = '0.1.4',
+    "nvim-telescope/telescope.nvim",
+    tag = "0.1.4",
     dependencies = {
-      'nvim-lua/plenary.nvim',
-      "nvim-telescope/telescope-fzf-native.nvim"
+      "nvim-lua/plenary.nvim",
+      "nvim-telescope/telescope-fzf-native.nvim",
     },
     config = function()
       require("telescope").setup({
@@ -15,9 +15,10 @@ return {
           file_ignore_patterns = { "node_modules" },
         },
       })
-      require('telescope').load_extension('fzf')
+      require("telescope").load_extension("fzf")
       require("telescope").load_extension("notify")
       require("telescope").load_extension("ghq")
+      require("telescope").load_extension("aerial")
 
       local function map(mode, lhs, rhs, opts)
         local options = { noremap = true }
@@ -32,11 +33,12 @@ return {
       map("n", ",g", ":Telescope live_grep<CR>", { silent = true })
       map("n", ",h", ":Telescope help_tags<CR>", { silent = true })
       map("n", ",n", ":Telescope notify<CR>", { silent = true })
+      map("n", ",a", ":Telescope aerial<CR>", { silent = true })
       map("n", ",d", ":TodoTelescope<CR>", { silent = true, noremap = true })
       map("n", ",q", ":Telescope ghq<CR>", { silent = true, noremap = true })
 
       -- map("n", "gr", ":Telescope lsp_references<CR>")
-    end
+    end,
   },
   { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
   { "nvim-telescope/telescope-ghq.nvim" },
