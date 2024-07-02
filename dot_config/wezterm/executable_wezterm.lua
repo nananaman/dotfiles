@@ -14,6 +14,7 @@ wezterm.on("trigget-nvim-with-scrollback", functions.trigger_nvim_with_scrollbac
 local win_config = {
   default_prog = { "wsl.exe", "--distribution", "Ubuntu-22.04" },
   default_domain = 'WSL:Ubuntu-22.04',
+  font_size = 12,
   keys = {
     -- Hide
     { key = "T", mods = "CTRL|SHIFT", action = act.Hide },
