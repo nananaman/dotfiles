@@ -12,7 +12,7 @@ end
 return {
   -- 依存
   { "nvim-lua/plenary.nvim" },
-  { "vim-denops/denops.vim" },
+  -- { "vim-denops/denops.vim" },
   { "MunifTanjim/nui.nvim" },
   { "rcarriga/nvim-notify" },
 

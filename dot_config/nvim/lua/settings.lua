@@ -76,17 +76,3 @@ autocmd("BufWritePre", {
   pattern = "*",
   command = ":%s/\\s\\+$//e",
 })
-
------------------------------------------------------------------------------//
--- For Windows
------------------------------------------------------------------------------//
-local in_wsl = os.getenv("WSL_DISTRO_NAME") ~= nil
-
-if in_wsl then
-  vim.g.clipboard = {
-    name = "wsl clipboard",
-    copy = { ["+"] = { "win32yank.exe", "-i" }, ["*"] = { "win32yank.exe", "-i" } },
-    paste = { ["+"] = { "win32yank.exe", "-o", "--lf" }, ["*"] = { "win32yank.exe", "-o", "--lf" } },
-    cache_enabled = true,
-  }
-end
