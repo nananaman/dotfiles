@@ -1,5 +1,5 @@
 return {
-  'akinsho/toggleterm.nvim',
+  "akinsho/toggleterm.nvim",
   version = "*",
   config = function()
     function _G.set_terminal_keymaps()
@@ -37,10 +37,12 @@ return {
 
     local Terminal = require("toggleterm.terminal").Terminal
 
+    -----------------------------------------------------------------------------------
+    -- lazygit
+    -----------------------------------------------------------------------------------
     local lazygit = Terminal:new({
       cmd = "lazygit -ucd ~/.config/lazygit",
       dir = "git_dir",
-      shade_terminals = true,
       direction = "float",
       float_opts = {
         border = "double",
@@ -57,5 +59,20 @@ return {
     end
 
     vim.api.nvim_set_keymap("n", "<space>lg", "<cmd>lua _lazygit_toggle()<CR>", { noremap = true, silent = true })
-  end
+
+    -----------------------------------------------------------------------------------
+    -- opencommit
+    -----------------------------------------------------------------------------------
+    local opencommit = Terminal:new({
+      cmd = "opencommit",
+      dir = "git_dir",
+      direction = "float",
+    })
+
+    function _opencommit_toggle()
+      opencommit:toggle()
+    end
+
+    vim.api.nvim_set_keymap("n", "<space>oc", "<cmd>lua _opencommit_toggle()<CR>", { noremap = true, silent = true })
+  end,
 }
