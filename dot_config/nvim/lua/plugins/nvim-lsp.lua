@@ -223,21 +223,21 @@ return {
           ["<C-d>"] = cmp.mapping.scroll_docs(4),
           -- ["<Space>"] = cmp.mapping.complete(),
           ["<C-e>"] = cmp.mapping.abort(),
-          ["<CR>"] = cmp.mapping.confirm({ select = false }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-          ["<Tab>"] = function(fallback)
-            if cmp.visible() then
-              cmp.select_next_item()
-            else
-              fallback()
-            end
-          end,
-          ["<S-Tab>"] = function(fallback)
-            if cmp.visible() then
-              cmp.select_prev_item()
-            else
-              fallback()
-            end
-          end,
+          ["<CR>"] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+          -- ["<Tab>"] = function(fallback)
+          --   if cmp.visible() then
+          --     cmp.select_next_item()
+          --   else
+          --     fallback()
+          --   end
+          -- end,
+          -- ["<S-Tab>"] = function(fallback)
+          --   if cmp.visible() then
+          --     cmp.select_prev_item()
+          --   else
+          --     fallback()
+          --   end
+          -- end,
         }),
         sources = cmp.config.sources({
           { name = "nvim_lsp" },
@@ -247,7 +247,8 @@ return {
           { name = "emoji" },
           { name = "calc" },
           { name = "treesitter" },
-          { name = "copilot" },
+          -- { name = "copilot" },
+          { name = "supermaven" },
         }, {
           { name = "buffer" },
         }),
@@ -293,6 +294,13 @@ return {
       })
 
       local lspkind = require("lspkind")
+      lspkind.init({
+        symbol_map = {
+          Supermaven = "",
+        },
+      })
+      vim.api.nvim_set_hl(0, "CmpItemKindSupermaven", { fg = "#6CC644" })
+
       cmp.setup({
         formatting = {
           format = lspkind.cmp_format({

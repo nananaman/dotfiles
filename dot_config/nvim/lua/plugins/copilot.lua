@@ -12,7 +12,7 @@ return {
           accept_word = "<C-e>",
           next = "<C-j>",
           prev = "<C-k>",
-        }
+        },
       },
       panel = { enabled = false },
       filetypes = {
