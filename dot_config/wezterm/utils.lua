@@ -35,7 +35,7 @@ function M.spawn_command_in_new_tab(window, pane, command)
   window:perform_action(
     wezterm.action({
       SpawnCommandInNewTab = {
-        args = M.correct_command(command)
+        args = M.correct_command(command),
       },
     }),
     pane
@@ -48,10 +48,6 @@ end
 
 function M.is_apple_silicon()
   return wezterm.target_triple == "aarch64-apple-darwin"
-end
-
-function M.is_intel_mac()
-  return wezterm.target_triple == "x86_64-apple-darwin"
 end
 
 -- OS に依るコマンドの差異を補正する
