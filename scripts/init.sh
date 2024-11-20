@@ -8,8 +8,11 @@ bash install_tools.sh
 echo "[Info] Install vim8..."
 bash install_nvim.sh
 
-echo "[Info] Install fish..."
-bash install_fish.sh
+# echo "[Info] Install fish..."
+# bash install_fish.sh
+
+echo "[Info] Install nushell..."
+bash install_nushell.sh
 
 echo "[Info] Install fonts..."
 bash install_fonts.sh

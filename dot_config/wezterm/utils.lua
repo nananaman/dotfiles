@@ -3,7 +3,7 @@ local wezterm = require("wezterm")
 local M = {}
 
 function M.get_basename(s)
-  return string.gsub(s, "(.*[/\\])(.*)", "%2")
+  return string.gsub(tostring(s), "(.*[/\\])(.*)", "%2")
 end
 
 function M.convert_home_dir(path)
@@ -26,16 +26,11 @@ function M.merge_tables(t1, t2)
   return t1
 end
 
-function M.run_child_process(command)
-  local success, stdout, stderr = wezterm.run_child_process(M.correct_command(command))
-  return success, stdout, stderr
-end
-
 function M.spawn_command_in_new_tab(window, pane, command)
   window:perform_action(
     wezterm.action({
       SpawnCommandInNewTab = {
-        args = M.correct_command(command),
+        args = command,
       },
     }),
     pane
@@ -48,18 +43,6 @@ end
 
 function M.is_apple_silicon()
   return wezterm.target_triple == "aarch64-apple-darwin"
-end
-
--- OS に依るコマンドの差異を補正する
-function M.correct_command(command)
-  if M.is_wsl() then
-    -- return { "wsl.exe", "--distribution", "Ubuntu-22.04", "-e", "fish", "-l", "-c", command }
-    return { "fish", "-l", "-c", command }
-  elseif M.is_apple_silicon() then
-    return { "/opt/homebrew/bin/fish", "-l", "-c", command }
-  else
-    return { "/usr/local/bin/fish", "-l", "-c", command }
-  end
 end
 
 return M

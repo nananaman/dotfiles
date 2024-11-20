@@ -2,7 +2,8 @@
 {{-   if (.chezmoi.kernel.osrelease | lower | contains "microsoft") -}}
 #!/bin/bash
 
-WEZTERM_DIR=$(dirname $(which wezterm.exe))
+# WEZTERM_DIR=$(dirname $(which wezterm.exe))
+WEZTERM_DIR=/mnt/c/Users/foola/.config/wezterm
 rm $WEZTERM_DIR/*.lua
 cp ~/.config/wezterm/* $WEZTERM_DIR/
 {{-   end -}}
