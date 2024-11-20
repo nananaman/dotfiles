@@ -136,8 +136,8 @@ return {
             },
           })
         end,
-        ["tsserver"] = function()
-          lspconfig.tsserver.setup({
+        ["ts_ls"] = function()
+          lspconfig.ts_ls.setup({
             root_dir = lspconfig.util.root_pattern("package.json"),
             init_options = { lint = true, unstable = true },
             on_attach = function(client, bufnr)
@@ -189,6 +189,10 @@ return {
         end,
       })
 
+      lspconfig.nushell.setup({
+        cmd = { "nu", "--lsp" },
+        filetypes = { "nu" },
+      })
       lspconfig.sourcekit.setup({
         cmd = { "sourcekit-lsp" },
         filetypes = { "swift", "c", "cpp", "objective-c", "objective-cpp" },

@@ -17,7 +17,10 @@ return {
         enable = true, -- mandatory, false will disable the whole extension
       },
       auto_install = true,
-      -- ensure_installed = "all",
+      ensure_installed = { "nu" },
     })
   end,
+  dependencies = {
+    { "nushell/tree-sitter-nu", build = ":TSUpdate nu" },
+  },
 }
