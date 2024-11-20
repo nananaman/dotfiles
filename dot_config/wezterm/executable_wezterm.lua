@@ -24,7 +24,7 @@ local wsl_config = {
 }
 
 local apple_silicon_config = {
-  default_prog = { "/opt/homebrew/bin/fish", "-l" },
+  default_prog = { "/bin/bash" },
   window_padding = {
     left = 0,
     right = 0,

@@ -102,6 +102,12 @@ $env.NU_PLUGIN_DIRS = [
 
 $env.GOPATH = $env.HOME + '/go'
 
+$env.VOLTA_HOME = $env.HOME + '/.volta'
+$env.PATH = (
+  $env.PATH
+  | prepend ($env.VOLTA_HOME + '/bin')
+)
+
 $env.PATH = (
   $env.PATH
   | prepend ($env.HOME + '/bin')
@@ -132,12 +138,6 @@ if (sys host | get kernel_version | str contains microsoft) {
   $env.PATH = (
     $env.PATH
     | prepend ($env.FLUTTER_ROOT + '/bin')
-  )
-
-  $env.VOLTA_HOME = $env.HOME + '/.volta'
-  $env.PATH = (
-    $env.PATH
-    | prepend ($env.VOLTA_HOME + '/bin')
   )
 
   $env.BROWSER = 'wslview'

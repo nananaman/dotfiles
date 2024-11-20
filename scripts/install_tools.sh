@@ -87,3 +87,4 @@ fi
 # starship
 curl -fsSL https://starship.rs/install.sh > /tmp/install_starship.sh
 sh /tmp/install_starship.sh -y
+starship init nu > ~/.cache/starship/init.nu

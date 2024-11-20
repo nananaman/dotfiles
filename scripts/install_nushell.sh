@@ -2,6 +2,8 @@
 
 cargo install --locked nu
 
+touch ~/.config/nushell/local.nu
+
 cat << 'EOF' >> ~/.bashrc
 
 if [[ $- == *i* ]]; then
