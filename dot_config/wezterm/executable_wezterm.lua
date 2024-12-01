@@ -8,8 +8,6 @@ local utils = require("utils")
 ---------------------------------------------------------------
 wezterm.on("format-tab-title", functions.format_tab_title)
 wezterm.on("update-status", functions.update_status)
-wezterm.on("trigger-open-ghq-project", functions.trigger_open_ghq_project)
-wezterm.on("trigget-nvim-with-scrollback", functions.trigger_nvim_with_scrollback)
 
 local wsl_config = {
   default_cwd = "$HOME",
@@ -156,8 +154,6 @@ local common_config = {
     { key = "DownArrow", mods = "SHIFT", action = act.ActivatePaneDirection("Down") },
     { key = "x", mods = "SHIFT|CTRL", action = act.CloseCurrentPane({ confirm = false }) },
     { key = "z", mods = "SHIFT|CTRL", action = act.TogglePaneZoomState },
-    { key = "f", mods = "SHIFT|CTRL", action = act.EmitEvent("trigger-open-ghq-project") },
-    { key = "v", mods = "SHIFT|CTRL", action = act.EmitEvent("trigget-nvim-with-scrollback") },
     { key = "n", mods = "SHIFT|CTRL", action = act.ToggleFullScreen },
 
     -- Debug

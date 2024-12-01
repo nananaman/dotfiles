@@ -894,10 +894,22 @@ $env.config = {
             mode: emacs
             event: { edit: selectall }
         }
+        {
+          name: open_ghq_project
+          modifier: control
+          keycode: char_f
+          mode: emacs
+          event: {
+            send: executehostcommand,
+            cmd: "openGhqProject"
+          }
+        }
     ]
 }
 
 source conf.d/index.nu
 source local.nu
+
+use functions/ *
 
 use ~/.cache/starship/init.nu

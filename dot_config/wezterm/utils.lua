@@ -26,17 +26,6 @@ function M.merge_tables(t1, t2)
   return t1
 end
 
-function M.spawn_command_in_new_tab(window, pane, command)
-  window:perform_action(
-    wezterm.action({
-      SpawnCommandInNewTab = {
-        args = command,
-      },
-    }),
-    pane
-  )
-end
-
 function M.is_wsl()
   return wezterm.target_triple == "x86_64-pc-windows-msvc"
 end

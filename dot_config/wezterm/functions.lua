@@ -99,29 +99,4 @@ function M.update_status(window, pane)
   window:set_right_status(wezterm.format(elements))
 end
 
-function M.trigger_open_ghq_project(window, pane)
-  local command = "cd (ghq root)/(ghq list | fzf +m --reverse --prompt='Project > ') && nu"
-  utils.spawn_command_in_new_tab(window, pane, command)
-end
-
-function M.trigger_nvim_with_scrollback(window, pane)
-  local scrollback = pane:get_lines_as_text()
-  local name = os.tmpname()
-  local f = io.open(name, "w+")
-  if f ~= nil then
-    f:write(string.match(scrollback, "^%s*(.-)%s*$"))
-    f:flush()
-    f:close()
-
-    if utils.is_wsl() then
-      name = string.gsub(string.gsub(name, "\\", "/"), "C:", "/mnt/c")
-    end
-    local command = "nvim " .. name .. " -c 'setfiletype bash'"
-    utils.spawn_command_in_new_tab(window, pane, command)
-    -- nvim で開いたら消す
-    wezterm.sleep_ms(1000)
-    os.remove(name)
-  end
-end
-
 return M
