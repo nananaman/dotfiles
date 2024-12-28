@@ -1,0 +1,3 @@
+font-family = "HackGenNerd Console"
+background-opacity = 0.85
+keybind = "global:ctrl+cmd+`=toggle_quick_terminal"
