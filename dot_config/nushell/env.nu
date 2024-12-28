@@ -113,6 +113,8 @@ $env.PATH = (
   | prepend ($env.HOME + '/bin')
   | prepend "/opt/homebrew/bin"
   | prepend "/usr/local/go/bin"
+  | prepend ($env.HOME + '/.cargo/bin')
+  | prepend ($env.HOME + '/.local/bin')
   | prepend ($env.GOPATH + '/bin')
 )
 
