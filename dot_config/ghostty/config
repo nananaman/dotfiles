@@ -1,3 +1,4 @@
+theme = "Kanagawa Wave"
 font-family = "HackGenNerd Console"
-background-opacity = 0.85
+background-opacity = 0.9
 keybind = "global:ctrl+cmd+`=toggle_quick_terminal"
