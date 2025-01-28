@@ -1,0 +1,39 @@
+# PATH
+export PATH="/usr/local/bin:$PATH"
+export PATH="$HOME/bin:$PATH"
+export PATH="/opt/homebrew/bin:$PATH"
+export PATH="/usr/local/go/bin:$PATH"
+export PATH="$HOME/.cargo/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="$GOPATH/bin:$PATH"
+
+eval "$(sheldon source)"
+eval "$(starship init zsh)"
+
+# alias
+alias vi="nvim"
+alias vim="nvim"
+
+alias ls="lsd"
+alias la="ls -a"
+alias ll="ls -al"
+
+alias cat="bat"
+
+alias k="kubectl"
+alias kc="kubectx"
+alias kn="kubens"
+
+# abbr
+abbr import-aliases -S --quieter
+
+# functions
+function cd-ghq-project {
+  local selected_project=$(ghq list | fzf +m --reverse --prompt="Project > ")
+
+  if [ -n "$selected_project" ]; then
+    cd $(ghq root)/$selected_project
+  fi
+}
+
+bindkey -s "^f" "cd-ghq-project\n"

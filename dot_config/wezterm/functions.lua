@@ -99,4 +99,9 @@ function M.update_status(window, pane)
   window:set_right_status(wezterm.format(elements))
 end
 
+function M.trigger_open_ghq_project(window, pane)
+  local command = "cd $(ghq root)/$(ghq list | fzf +m --reverse --prompt='Project > ') && zsh"
+  window:perform_action(wezterm.action({ SpawnCommandInNewTab = { args = { command } } }), pane)
+end
+
 return M

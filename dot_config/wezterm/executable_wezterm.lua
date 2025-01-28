@@ -17,12 +17,12 @@ local wsl_config = {
     -- Hide
     { key = "T", mods = "CTRL|SHIFT", action = act.Hide },
     -- Paste from Clipboard
-    { key = "v", mods = "CTRL", action = act.PasteFrom("Clipboard") },
+    { key = "v", mods = "CTRL",       action = act.PasteFrom("Clipboard") },
   },
 }
 
 local apple_silicon_config = {
-  default_prog = { "/bin/bash" },
+  default_prog = { "/bin/zsh" },
   window_padding = {
     left = 0,
     right = 0,
@@ -34,7 +34,7 @@ local apple_silicon_config = {
     -- Hide
     { key = "T", mods = "CTRL|SHIFT", action = act.HideApplication },
     -- Paste from Clipboard
-    { key = "v", mods = "SUPER", action = act.PasteFrom("Clipboard") },
+    { key = "v", mods = "SUPER",      action = act.PasteFrom("Clipboard") },
   },
 }
 
@@ -102,15 +102,15 @@ local common_config = {
   leader = { key = "g", mods = "CTRL", timeout_milliseconds = 1000 },
   keys = {
     -- Font Size
-    { key = "=", mods = "ALT", action = act.ResetFontSize },
-    { key = "+", mods = "ALT|SHIFT", action = act.IncreaseFontSize },
-    { key = "-", mods = "ALT", action = act.DecreaseFontSize },
+    { key = "=", mods = "ALT",          action = act.ResetFontSize },
+    { key = "+", mods = "ALT|SHIFT",    action = act.IncreaseFontSize },
+    { key = "-", mods = "ALT",          action = act.DecreaseFontSize },
 
     -- Copy Mode
-    { key = " ", mods = "LEADER", action = act.ActivateCopyMode },
+    { key = " ", mods = "LEADER",       action = act.ActivateCopyMode },
 
     -- Quick Select
-    { key = "Q", mods = "CTRL|SHIFT", action = act.QuickSelect },
+    { key = "Q", mods = "CTRL|SHIFT",   action = act.QuickSelect },
 
     -- Workspace
     -- Switch to the default workspace
@@ -133,31 +133,31 @@ local common_config = {
       mods = "LEADER|CTRL",
       action = act.ShowLauncherArgs({ flags = "FUZZY|WORKSPACES" }),
     },
-    { key = "j", mods = "SHIFT|CTRL", action = act.SwitchWorkspaceRelative(-1) },
-    { key = "k", mods = "SHIFT|CTRL", action = act.SwitchWorkspaceRelative(1) },
+    { key = "j",          mods = "SHIFT|CTRL",   action = act.SwitchWorkspaceRelative(-1) },
+    { key = "k",          mods = "SHIFT|CTRL",   action = act.SwitchWorkspaceRelative(1) },
 
     -- Tab
-    { key = "w", mods = "SHIFT|CTRL", action = act.SpawnTab("CurrentPaneDomain") },
-    { key = "h", mods = "SHIFT|CTRL", action = act.ActivateTabRelative(-1) },
-    { key = "l", mods = "SHIFT|CTRL", action = act.ActivateTabRelative(1) },
+    { key = "w",          mods = "SHIFT|CTRL",   action = act.SpawnTab("CurrentPaneDomain") },
+    { key = "h",          mods = "SHIFT|CTRL",   action = act.ActivateTabRelative(-1) },
+    { key = "l",          mods = "SHIFT|CTRL",   action = act.ActivateTabRelative(1) },
 
     -- Pane
-    { key = "|", mods = "LEADER|SHIFT", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
-    { key = "-", mods = "LEADER", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
-    { key = "LeftArrow", mods = "SHIFT|CTRL", action = act.AdjustPaneSize({ "Left", 1 }) },
-    { key = "RightArrow", mods = "SHIFT|CTRL", action = act.AdjustPaneSize({ "Right", 1 }) },
-    { key = "UpArrow", mods = "SHIFT|CTRL", action = act.AdjustPaneSize({ "Up", 1 }) },
-    { key = "DownArrow", mods = "SHIFT|CTRL", action = act.AdjustPaneSize({ "Down", 1 }) },
-    { key = "LeftArrow", mods = "SHIFT", action = act.ActivatePaneDirection("Left") },
-    { key = "RightArrow", mods = "SHIFT", action = act.ActivatePaneDirection("Right") },
-    { key = "UpArrow", mods = "SHIFT", action = act.ActivatePaneDirection("Up") },
-    { key = "DownArrow", mods = "SHIFT", action = act.ActivatePaneDirection("Down") },
-    { key = "x", mods = "SHIFT|CTRL", action = act.CloseCurrentPane({ confirm = false }) },
-    { key = "z", mods = "SHIFT|CTRL", action = act.TogglePaneZoomState },
-    { key = "n", mods = "SHIFT|CTRL", action = act.ToggleFullScreen },
+    { key = "|",          mods = "LEADER|SHIFT", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
+    { key = "-",          mods = "LEADER",       action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
+    { key = "LeftArrow",  mods = "SHIFT|CTRL",   action = act.AdjustPaneSize({ "Left", 1 }) },
+    { key = "RightArrow", mods = "SHIFT|CTRL",   action = act.AdjustPaneSize({ "Right", 1 }) },
+    { key = "UpArrow",    mods = "SHIFT|CTRL",   action = act.AdjustPaneSize({ "Up", 1 }) },
+    { key = "DownArrow",  mods = "SHIFT|CTRL",   action = act.AdjustPaneSize({ "Down", 1 }) },
+    { key = "LeftArrow",  mods = "SHIFT",        action = act.ActivatePaneDirection("Left") },
+    { key = "RightArrow", mods = "SHIFT",        action = act.ActivatePaneDirection("Right") },
+    { key = "UpArrow",    mods = "SHIFT",        action = act.ActivatePaneDirection("Up") },
+    { key = "DownArrow",  mods = "SHIFT",        action = act.ActivatePaneDirection("Down") },
+    { key = "x",          mods = "SHIFT|CTRL",   action = act.CloseCurrentPane({ confirm = false }) },
+    { key = "z",          mods = "SHIFT|CTRL",   action = act.TogglePaneZoomState },
+    { key = "n",          mods = "SHIFT|CTRL",   action = act.ToggleFullScreen },
 
     -- Debug
-    { key = "d", mods = "SHIFT|CTRL", action = act.ShowDebugOverlay },
+    { key = "d",          mods = "SHIFT|CTRL",   action = act.ShowDebugOverlay },
   },
 }
 

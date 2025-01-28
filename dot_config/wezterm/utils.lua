@@ -6,11 +6,13 @@ function M.get_basename(s)
   return string.gsub(tostring(s), "(.*[/\\])(.*)", "%2")
 end
 
+---@param path string
+---@return string
 function M.convert_home_dir(path)
   local cwd = path
   local home = os.getenv("HOME")
   if home ~= nil then
-    cwd = cwd:gsub("^" .. home .. "/", "~/")
+    cwd = string.gsub(tostring(cwd), "^" .. home .. "/", "~/")
   end
   return cwd
 end
