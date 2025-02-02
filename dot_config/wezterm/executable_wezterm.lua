@@ -10,6 +10,7 @@ wezterm.on("format-tab-title", functions.format_tab_title)
 wezterm.on("update-status", functions.update_status)
 
 local wsl_config = {
+  default_prog = { "/usr/bin/zsh" },
   default_cwd = "$HOME",
   default_domain = "WSL:Ubuntu-22.04",
   font_size = 12,
