@@ -1,11 +1,17 @@
 # PATH
 export PATH="/usr/local/bin:$PATH"
 export PATH="$HOME/bin:$PATH"
+export PATH="$HOME/go/bin:$PATH"
 export PATH="/opt/homebrew/bin:$PATH"
 export PATH="/usr/local/go/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$GOPATH/bin:$PATH"
+
+if ! command -v sheldon &> /dev/null; then
+  echo "Installing sheldon..."
+  cargo install sheldon
+fi
 
 eval "$(sheldon source)"
 eval "$(starship init zsh)"
