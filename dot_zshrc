@@ -7,6 +7,8 @@ export PATH="/usr/local/go/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$GOPATH/bin:$PATH"
+export PATH="$HOME/.rd/bin:$PATH" # Rancher Desktop
+export PATH="$HOME/.rye/shims:$PATH" # Rye
 
 if ! command -v sheldon &> /dev/null; then
   echo "Installing sheldon..."
@@ -41,5 +43,20 @@ function cd-ghq-project {
     cd $(ghq root)/$selected_project
   fi
 }
+zle -N cd-ghq-project
+bindkey "^f" cd-ghq-project
 
-bindkey -s "^f" "cd-ghq-project\n"
+# fzf history
+function fzf-select-history() {
+    BUFFER=$(history -n -r 1 | fzf --query "$LBUFFER" --reverse)
+    CURSOR=$#BUFFER
+    zle reset-prompt
+}
+
+zle -N fzf-select-history
+bindkey "^r" fzf-select-history
+
+bindkey "^[[F" end-of-line
+bindkey "^[[H" beginning-of-line
+
+eval "$(mise activate zsh)"

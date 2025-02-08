@@ -140,20 +140,20 @@ return {
           lspconfig.ts_ls.setup({
             root_dir = lspconfig.util.root_pattern("package.json"),
             init_options = { lint = true, unstable = true },
-            on_attach = function(client, bufnr)
-              client.resolved_capabilities.document_formatting = false
-              on_attach(client, bufnr)
-            end,
+            -- on_attach = function(client, bufnr)
+            --   client.resolved_capabilities.document_formatting = false
+            --   on_attach(client, bufnr)
+            -- end,
           })
         end,
         ["eslint"] = function()
           lspconfig.eslint.setup({
             root_dir = lspconfig.util.root_pattern("package.json"),
             init_options = { lint = true, unstable = true },
-            on_attach = function(client, bufnr)
-              client.resolved_capabilities.document_formatting = false
-              on_attach(client, bufnr)
-            end,
+            -- on_attach = function(client, bufnr)
+            --   client.resolved_capabilities.document_formatting = false
+            --   on_attach(client, bufnr)
+            -- end,
           })
         end,
         ["denols"] = function()
