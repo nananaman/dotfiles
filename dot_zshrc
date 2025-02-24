@@ -18,6 +18,14 @@ fi
 eval "$(sheldon source)"
 eval "$(starship init zsh)"
 
+# load config files
+ZSH_CONFIG_DIR="$HOME/.config/zsh"
+if [ -d "$ZSH_CONFIG_DIR" ]; then
+  for file in $ZSH_CONFIG_DIR/**/*.zsh; do
+    source $file
+  done
+fi
+
 # alias
 alias vi="nvim"
 alias vim="nvim"
@@ -36,13 +44,6 @@ alias kn="kubens"
 abbr import-aliases -S --quieter
 
 # functions
-function cd-ghq-project {
-  local selected_project=$(ghq list | fzf +m --reverse --prompt="Project > ")
-
-  if [ -n "$selected_project" ]; then
-    cd $(ghq root)/$selected_project
-  fi
-}
 zle -N cd-ghq-project
 bindkey "^f" cd-ghq-project
 

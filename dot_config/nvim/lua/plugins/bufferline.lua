@@ -32,7 +32,7 @@ return {
               name = "tests",
               icon = "",
               matcher = function(buf)
-                return buf.name:match("%_spec") or buf.name:match("%_test") or buf.name:match("%Tests")
+                return buf.name:match("%_spec") or buf.name:match("%_test") or buf.name:match("test%_") or buf.name:match("%Tests")
               end,
             },
             {
