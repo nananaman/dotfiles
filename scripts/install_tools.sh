@@ -1,89 +1,224 @@
 #!/bin/sh
 
-# brew
-if [ "$(uname)" == 'Darwin' ]; then
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+#-------------------------------------------------------
+# Tools installer script
+# Installs various CLI tools and utilities
+#-------------------------------------------------------
+
+# Source utilities
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$SCRIPT_DIR/utils.sh"
+
+log_info "Installing development tools..."
+
+#-------------------------------------------------------
+# Basic package manager and utilities
+#-------------------------------------------------------
+
+# Ensure package manager is installed
+ensure_package_manager
+
+# Install essential tools
+if is_macos; then
+  log_info "Installing essential macOS tools..."
   brew install wget
 fi
 
-# fzf
-git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-yes | ~/.fzf/install
+#-------------------------------------------------------
+# FZF - Fuzzy Finder
+#-------------------------------------------------------
 
-# ripgrrep
-if [ "$(uname)" == 'Darwin' ]; then
-  brew install ripgrep
-elif [ "$(expr substr $(uname -s) 1 5)" == 'Linux' ]; then
-  sudo apt-get install ripgrep
+if ! command_exists fzf; then
+  log_info "Installing fzf (fuzzy finder)..."
+  
+  # Clone fzf repository
+  git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+  
+  # Run the install script (yes to all prompts)
+  yes | ~/.fzf/install
+  
+  log_success "fzf installed"
 else
-  echo "Your platform ($(uname -a)) is not supported."
-  exit 1
+  log_info "fzf is already installed"
 fi
 
-# if use bash
-# echo '[ -f ~/.fzf.bash ] && source ~/.fzf.bash' >> ~/.bashrc
+#-------------------------------------------------------
+# Ripgrep - Fast grep alternative
+#-------------------------------------------------------
 
-# install go
-if [ "$(uname)" == 'Darwin' ]; then
-  brew install go
-elif [ "$(expr substr $(uname -s) 1 5)" == 'Linux' ]; then
-  cd /tmp
-  if !(type wget >/dev/null 2>&1); then
-    sudo apt-get install wget
+if ! command_exists rg; then
+  log_info "Installing ripgrep..."
+  
+  if is_macos; then
+    brew install ripgrep
+  elif is_linux; then
+    sudo apt-get install -y ripgrep
   fi
-  wget https://go.dev/dl/go1.21.0.linux-amd64.tar.gz
-  sudo tar -C /usr/local/ -xzf go1.21.0.linux-amd64.tar.gz
-  export PATH=$PATH:/usr/local/go/bin
-  cd -
+  
+  log_success "ripgrep installed"
 else
-  echo "Your platform ($(uname -a)) is not supported."
-  exit 1
+  log_info "ripgrep is already installed"
 fi
 
-# ghq
-go install github.com/x-motemen/ghq@latest
+#-------------------------------------------------------
+# Go language and tools
+#-------------------------------------------------------
 
-# memo
-go install github.com/mattn/memo@latest
-
-# lazygit
-go install github.com/jesseduffield/lazygit@latest
-
-# deno
-curl -fsSL https://deno.land/x/install/install.sh | sh
-# dex
-deno install --allow-read --allow-write --allow-run --reload --force --name dex https://pax.deno.dev/kawarimidoll/deno-dex/main.ts
-
-# install rust
-curl https://sh.rustup.rs -sSf > /tmp/install_rust.sh
-sh /tmp/install_rust.sh -y
-source $HOME/.cargo/env
-
-if [ "$(expr substr $(uname -s) 1 5)" == 'Linux' ]; then
-  sudo apt-get install gcc -y
+if ! command_exists go; then
+  log_info "Installing Go programming language..."
+  
+  if is_macos; then
+    brew install go
+  elif is_linux; then
+    # Install wget if not available
+    if ! command_exists wget; then
+      sudo apt-get install -y wget
+    fi
+    
+    GO_VERSION="1.21.0"
+    cd /tmp
+    download_file "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz" "go${GO_VERSION}.linux-amd64.tar.gz"
+    sudo tar -C /usr/local/ -xzf "go${GO_VERSION}.linux-amd64.tar.gz"
+    
+    # Add Go to PATH (temporarily for this script)
+    export PATH=$PATH:/usr/local/go/bin
+    
+    # Add Go to path permanently if not already added
+    add_line_to_file 'export PATH=$PATH:/usr/local/go/bin' "$HOME/.profile"
+    
+    cd - > /dev/null
+  fi
+  
+  log_success "Go installed"
+else
+  log_info "Go is already installed"
 fi
 
-# lsd
-cargo install lsd
+# Install Go tools
+for go_pkg in "github.com/x-motemen/ghq@latest" "github.com/mattn/memo@latest" "github.com/jesseduffield/lazygit@latest"; do
+  pkg_name=$(echo "$go_pkg" | cut -d'/' -f3 | cut -d'@' -f1)
+  
+  if ! command_exists "$pkg_name"; then
+    log_info "Installing $pkg_name..."
+    go install "$go_pkg"
+    log_success "$pkg_name installed"
+  else
+    log_info "$pkg_name is already installed"
+  fi
+done
 
-# bat
-if [ "$(uname)" == 'Darwin' ]; then
-  sudo apt-get install bat fd-find
-  sudo ln -s /usr/bin/batcat /usr/local/bin/bat
-elif [ "$(expr substr $(uname -s) 1 5)" == 'Linux' ]; then
-  brew install bat
+#-------------------------------------------------------
+# Deno - JavaScript/TypeScript runtime
+#-------------------------------------------------------
+
+if ! command_exists deno; then
+  log_info "Installing Deno..."
+  run_installer "https://deno.land/x/install/install.sh"
+  
+  # Add Deno to PATH for the rest of this script
+  export PATH="$HOME/.deno/bin:$PATH"
+  
+  log_success "Deno installed"
+else
+  log_info "Deno is already installed"
 fi
 
-# delta
-cargo install git-delta
-
-# silicon
-if [ "$(uname)" == 'Darwin' ]; then
-  cargo install silicon
-elif [ "$(expr substr $(uname -s) 1 5)" == 'Linux' ]; then
-  brew install silicon
+# Install dex with Deno
+if ! command_exists dex; then
+  log_info "Installing dex..."
+  deno install --allow-read --allow-write --allow-run --reload --force --name dex https://pax.deno.dev/kawarimidoll/deno-dex/main.ts
+  log_success "dex installed"
+else
+  log_info "dex is already installed"
 fi
 
-# starship
-curl -fsSL https://starship.rs/install.sh > /tmp/install_starship.sh
-sh /tmp/install_starship.sh -y
+#-------------------------------------------------------
+# Rust language and tools
+#-------------------------------------------------------
+
+if ! command_exists cargo; then
+  log_info "Installing Rust and cargo..."
+  download_file "https://sh.rustup.rs" "/tmp/install_rust.sh"
+  sh /tmp/install_rust.sh -y
+  # Source cargo environment
+  . "$HOME/.cargo/env"
+  
+  log_success "Rust installed"
+else
+  log_info "Rust is already installed"
+fi
+
+# Install compiler tools for Linux
+if is_linux; then
+  if ! command_exists gcc; then
+    log_info "Installing GCC..."
+    sudo apt-get install -y gcc
+  fi
+fi
+
+# Install Rust tools
+for cargo_pkg in "lsd" "git-delta"; do
+  if ! command_exists "$cargo_pkg"; then
+    log_info "Installing $cargo_pkg..."
+    install_cargo_package "$cargo_pkg"
+    log_success "$cargo_pkg installed"
+  else
+    log_info "$cargo_pkg is already installed"
+  fi
+done
+
+#-------------------------------------------------------
+# Bat - Better cat alternative
+#-------------------------------------------------------
+
+if ! command_exists bat; then
+  log_info "Installing bat..."
+  
+  if is_macos; then
+    brew install bat
+  elif is_linux; then
+    sudo apt-get install -y bat
+    
+    # On some Linux systems, bat is installed as batcat
+    if ! command_exists bat && command_exists batcat; then
+      log_info "Creating symlink from batcat to bat..."
+      sudo ln -s /usr/bin/batcat /usr/local/bin/bat
+    fi
+  fi
+  
+  log_success "bat installed"
+else
+  log_info "bat is already installed"
+fi
+
+#-------------------------------------------------------
+# Silicon - Code screenshot tool
+#-------------------------------------------------------
+
+if ! command_exists silicon; then
+  log_info "Installing silicon..."
+  
+  if is_macos; then
+    install_cargo_package "silicon"
+  elif is_linux; then
+    brew install silicon
+  fi
+  
+  log_success "silicon installed"
+else
+  log_info "silicon is already installed"
+fi
+
+#-------------------------------------------------------
+# Starship - Cross-shell prompt
+#-------------------------------------------------------
+
+if ! command_exists starship; then
+  log_info "Installing starship..."
+  run_installer "https://starship.rs/install.sh"
+  log_success "starship installed"
+else
+  log_info "starship is already installed"
+fi
+
+log_success "All tools installed successfully!"
