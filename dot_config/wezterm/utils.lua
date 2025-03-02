@@ -3,7 +3,7 @@ local wezterm = require("wezterm")
 local M = {}
 
 function M.get_basename(s)
-  return string.gsub(tostring(s), "(.*[/\\])(.*)", "%2")
+  return tostring(s):match("^.+/(.+)$") or s
 end
 
 ---@param path string
@@ -12,7 +12,7 @@ function M.convert_home_dir(path)
   local cwd = path
   local home = os.getenv("HOME")
   if home ~= nil then
-    cwd = string.gsub(tostring(cwd), "^" .. home .. "/", "~/")
+    cwd = tostring(cwd):gsub("file://", ""):gsub("^" .. home .. "/", "~/")
   end
   return cwd
 end
