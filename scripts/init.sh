@@ -1,29 +1,71 @@
 #!/bin/sh
 
-echo "[Info] start setup..."
+#-------------------------------------------------------
+# Dotfiles initialization script
+# Main entry point for setting up the development environment
+#-------------------------------------------------------
 
-echo "[Info] Install tools..."
-bash install_tools.sh
+# Source utilities
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$SCRIPT_DIR/utils.sh"
 
-echo "[Info] Install vim8..."
-bash install_nvim.sh
+# Print welcome message
+cat << EOF
 
-# echo "[Info] Install fish..."
-# bash install_fish.sh
+#-------------------------------------------------------
+# Dotfiles Installation
+# Starting setup process...
+#-------------------------------------------------------
 
-echo "[Info] Install nushell..."
-bash install_nushell.sh
+EOF
 
-echo "[Info] Install fonts..."
-bash install_fonts.sh
+# Run each installation script in sequence
+run_script() {
+  script_name="$1"
+  log_info "Running $script_name..."
+  
+  if [ -f "$SCRIPT_DIR/$script_name" ]; then
+    bash "$SCRIPT_DIR/$script_name"
+    
+    if [ $? -eq 0 ]; then
+      log_success "$script_name completed successfully"
+    else
+      log_error "$script_name failed with exit code $?"
+      exit 1
+    fi
+  else
+    log_error "Script $script_name not found"
+    exit 1
+  fi
+  
+  echo # Add newline for better readability
+}
 
-echo "[Info] Install wezterm..."
-bash install_wezterm.sh
+# Install tools first
+run_script "install_tools.sh"
 
-cat << END
+# Install Neovim
+run_script "install_nvim.sh"
 
-**************************
-**    SETUP FINISHED!   **
-**************************
+# Install Zsh
+run_script "install_zsh.sh"
 
-END
+# Install fonts
+run_script "install_fonts.sh"
+
+# Install WezTerm
+run_script "install_wezterm.sh"
+
+# Print completion message
+cat << EOF
+
+#-------------------------------------------------------
+#                SETUP FINISHED!
+#       Your dotfiles have been installed.
+#-------------------------------------------------------
+
+What's next:
+1. Apply changes: chezmoi apply
+2. Restart your terminal
+
+EOF
