@@ -5,7 +5,7 @@ return {
       { "leoluz/nvim-dap-go" },
       { "theHamsta/nvim-dap-virtual-text" },
       { "vim-test/vim-test" },
-      { "mfussenegger/nvim-dap-python" },
+      -- { "mfussenegger/nvim-dap-python" },
     },
     config = function()
       -- keymaps

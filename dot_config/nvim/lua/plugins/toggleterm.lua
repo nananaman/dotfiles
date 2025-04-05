@@ -34,45 +34,5 @@ return {
         end
       end,
     })
-
-    local Terminal = require("toggleterm.terminal").Terminal
-
-    -----------------------------------------------------------------------------------
-    -- lazygit
-    -----------------------------------------------------------------------------------
-    local lazygit = Terminal:new({
-      cmd = "lazygit -ucd ~/.config/lazygit",
-      dir = "git_dir",
-      direction = "float",
-      float_opts = {
-        border = "double",
-      },
-      -- function to run on opening the terminal
-      on_open = function(term)
-        float_handler(term)
-        -- vim.api.nvim_buf_set_keymap(term.bufnr, "n", "q", "<cmd>close<CR>", {noremap = true, silent = true})
-      end,
-    })
-
-    function _lazygit_toggle()
-      lazygit:toggle()
-    end
-
-    vim.api.nvim_set_keymap("n", "<space>lg", "<cmd>lua _lazygit_toggle()<CR>", { noremap = true, silent = true })
-
-    -----------------------------------------------------------------------------------
-    -- opencommit
-    -----------------------------------------------------------------------------------
-    local opencommit = Terminal:new({
-      cmd = "opencommit",
-      dir = "git_dir",
-      direction = "float",
-    })
-
-    function _opencommit_toggle()
-      opencommit:toggle()
-    end
-
-    vim.api.nvim_set_keymap("n", "<space>oc", "<cmd>lua _opencommit_toggle()<CR>", { noremap = true, silent = true })
   end,
 }
