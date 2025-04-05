@@ -1,3 +1,5 @@
+export EDITOR=nvim
+
 # PATH
 export PATH="/usr/local/bin:$PATH"
 export PATH="$HOME/bin:$PATH"
@@ -9,6 +11,7 @@ export PATH="$HOME/.local/bin:$PATH"
 export PATH="$GOPATH/bin:$PATH"
 export PATH="$HOME/.rd/bin:$PATH" # Rancher Desktop
 export PATH="$HOME/.rye/shims:$PATH" # Rye
+export PATH="$HOME/.codeium/windsurf//bin:$PATH" # Windsurf
 
 if ! command -v sheldon &> /dev/null; then
   echo "Installing sheldon..."
