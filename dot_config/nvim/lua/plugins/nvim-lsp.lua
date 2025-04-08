@@ -248,7 +248,7 @@ return {
           extra_args = { "--config", vim.fn.getenv("HOME") .. "/.config/cspell/cspell.json" },
         })
       )
-      table.insert(opts.sources, cspell.code_actions)
+      table.insert(sources, cspell.code_actions)
 
       -- Prettier for Node.js
       if is_node_proj then

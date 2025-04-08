@@ -18,9 +18,6 @@ return {
             },
           },
         },
-        lualine_z = {
-          { require("plugins.codecompanion-components.lualine-component") },
-        },
       },
     })
   end,
