@@ -74,6 +74,6 @@ vim.opt.hlsearch = true
 
 -- Remove whitespace on save
 autocmd("BufWritePre", {
-  pattern = "*",
+  pattern = "^(?!.*md$).+$",
   command = ":%s/\\s\\+$//e",
 })
