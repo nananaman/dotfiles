@@ -2,6 +2,7 @@ return {
   {
     "zbirenbaum/copilot.lua",
     cmd = "Copilot",
+    event = "InsertEnter",
     build = ":Copilot auth",
     opts = {
       suggestion = {
@@ -18,6 +19,7 @@ return {
       filetypes = {
         yaml = true,
       },
+      copilot_model = "gpt-4o-copilot"
     },
   },
 }
