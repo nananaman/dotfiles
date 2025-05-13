@@ -42,6 +42,7 @@ alias cat="bat"
 alias k="kubectl"
 alias kc="kubectx"
 alias kn="kubens"
+alias cwt="claude-worktree"
 
 # abbr
 abbr import-aliases -S --quieter
