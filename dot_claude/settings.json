@@ -7,6 +7,7 @@
       "Bash(rg:*)",
       "Bash(grep:*)",
       "Bash(ls:*)",
+      "Bash(make:*)",
       "Bash(mise run:*)",
       "Read(**)"
     ],
