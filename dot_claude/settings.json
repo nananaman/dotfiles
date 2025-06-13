@@ -3,6 +3,11 @@
     "allow": [
       "Bash(afplay:*)",
       "Bash(git:*)",
+      "Bash(find:*)",
+      "Bash(rg:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(mise run:*)",
       "Read(**)"
     ],
     "deny": []
