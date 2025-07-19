@@ -296,8 +296,6 @@ return {
           enable = false
         }
       })
-      local lspsaga = require("lspsaga")
-      lspsaga.setup({})
 
       local keymap = vim.keymap.set
 
