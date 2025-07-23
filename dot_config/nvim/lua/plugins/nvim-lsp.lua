@@ -212,7 +212,6 @@ return {
           extra_args = { "--config", vim.fn.getenv("HOME") .. "/.config/sql-formatter/config.json" },
         }),
         null_ls.builtins.formatting.black,
-        null_ls.builtins.formatting.isort,
         null_ls.builtins.formatting.golines.with({
           extra_args = { "-max-len", "120" },
         }),
