@@ -11,7 +11,10 @@
       "Bash(mise run:*)",
       "Read(**)"
     ],
-    "deny": []
+    "deny": [],
+    "additionalDirectories": [
+      "~/obsidian"
+    ]
   },
   "includeCoAuthoredBy": false,
   "hooks": {
