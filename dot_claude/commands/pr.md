@@ -4,6 +4,7 @@
 1. 現在の差分を踏まえて新しい branch を作成する
 2. 差分を add して commit する
 3. push して draft で PR を作成する
+4. PR の作成が完了したら `gh pr view --web` を使ってブラウザで表示する
 
 ## PR テンプレート
 ```
