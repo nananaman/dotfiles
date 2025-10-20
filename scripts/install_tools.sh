@@ -157,7 +157,7 @@ if is_linux; then
 fi
 
 # Install Rust tools
-for cargo_pkg in "lsd" "git-delta"; do
+for cargo_pkg in "lsd" "git-delta" "atuin"; do
   if ! command_exists "$cargo_pkg"; then
     log_info "Installing $cargo_pkg..."
     install_cargo_package "$cargo_pkg"

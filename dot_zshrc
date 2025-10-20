@@ -64,4 +64,8 @@ bindkey "^r" fzf-select-history
 bindkey "^[[F" end-of-line
 bindkey "^[[H" beginning-of-line
 
+# atuin
+export PATH="$HOME/.atuin/bin:$PATH"
+eval "$(atuin init zsh)"
+
 eval "$(mise activate zsh)"
