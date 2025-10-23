@@ -18,14 +18,14 @@ return {
       -- null-ls
       local sources = {
         null_ls.builtins.completion.spell,
-        null_ls.builtins.formatting.stylua,
-        null_ls.builtins.formatting.sql_formatter.with({
-          extra_args = { "--config", vim.fn.getenv("HOME") .. "/.config/sql-formatter/config.json" },
-        }),
-        null_ls.builtins.formatting.black,
-        null_ls.builtins.formatting.golines.with({
-          extra_args = { "-max-len", "120" },
-        }),
+        -- null_ls.builtins.formatting.stylua,
+        -- null_ls.builtins.formatting.sql_formatter.with({
+        --   extra_args = { "--config", vim.fn.getenv("HOME") .. "/.config/sql-formatter/config.json" },
+        -- }),
+        -- null_ls.builtins.formatting.black,
+        -- null_ls.builtins.formatting.golines.with({
+        --   extra_args = { "-max-len", "120" },
+        -- }),
       }
 
       local cspell = require("cspell")
@@ -86,8 +86,8 @@ return {
     config = function()
       require("lspsaga").setup({
         lightbulb = {
-          enable = false
-        }
+          enable = false,
+        },
       })
 
       local keymap = vim.keymap.set
