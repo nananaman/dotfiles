@@ -13,7 +13,7 @@ log_info "Installing Neovim..."
 
 if is_linux; then
   log_info "Downloading Neovim AppImage..."
-  download_file "https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage" "/tmp/nvim.appimage"
+  download_file "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage" "/tmp/nvim.appimage"
   chmod u+x /tmp/nvim.appimage
   
   ensure_dir "/usr/local/bin"
