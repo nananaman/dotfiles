@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
     "allow": [
       "Bash(afplay:*)",
@@ -9,14 +10,37 @@
       "Bash(ls:*)",
       "Bash(make:*)",
       "Bash(mise run:*)",
+      "Bash(mkdir:*)",
+      "Bash(cat:*)",
+      "Bash(cd:*)",
+      "Bash(find:*)",
+      "Bash(sed:*)",
+      "Bash(jq:*)",
+      "Bash(touch:*)",
+      "Bash(python:*)",
+      "Bash(gh pr create:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)",
+      "Bash(git add:*)",
+      "Bash(git checkout:*)",
+      "Bash(git cherry-pick:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git restore:*)",
+      "mcp__serena__*",
+      "mcp__github__*",
+      "WebSearch",
       "Read(**)"
     ],
-    "deny": [],
+    "deny": [
+      "Edit(/etc/**)",
+      "Edit(~/.ssh/**)"
+    ],
     "additionalDirectories": [
       "~/obsidian"
     ]
   },
-  "includeCoAuthoredBy": false,
   "hooks": {
     "Stop": [
       {
@@ -29,5 +53,9 @@
         ]
       }
     ]
-  }
+  },
+  "enabledPlugins": {
+    "frontend-design@claude-plugins-official": true
+  },
+  "alwaysThinkingEnabled": true
 }
