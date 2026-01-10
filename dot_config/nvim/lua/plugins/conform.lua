@@ -13,6 +13,7 @@ return {
       sql = { "sql_formatter" },
       go = { "golines", "gofmt" },
       toml = { "taplo" },
+      json = { "deno_fmt" },
       -- You can customize some of the format options for the filetype (:help conform.format)
       -- rust = { "rustfmt", lsp_format = "fallback" },
       -- Conform will run the first available formatter
