@@ -21,4 +21,4 @@ keybind = shift+ctrl+z=toggle_split_zoom
 # Other
 keybind = shift+ctrl+r=reload_config
 keybind = shift+ctrl+p=toggle_command_palette
-keybind = ctrl+t=toggle_visibility
+# keybind = ctrl+t=toggle_visibility

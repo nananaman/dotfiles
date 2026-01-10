@@ -2,7 +2,7 @@ return {
   name = "chezmoi apply",
   builder = function()
     return {
-      cmd = { "chezmoi", "apply" },
+      cmd = { "zsh", "-c", "chezmoi apply && aerospace reload-config" },
       components = { "default" },
     }
   end,
