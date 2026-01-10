@@ -53,8 +53,8 @@ run_script "install_zsh.sh"
 # Install fonts
 run_script "install_fonts.sh"
 
-# Install WezTerm
-run_script "install_wezterm.sh"
+# Install macOS applications
+run_script "install_apps.sh"
 
 # Print completion message
 cat << EOF
