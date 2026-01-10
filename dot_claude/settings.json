@@ -59,7 +59,7 @@
     "deslop@kuu-marketplace": true,
     "dig@kuu-marketplace": true,
     "fix-ci@kuu-marketplace": true,
-    "chouge@salmon-ml-marketplace": true
+    "chouge@salmon-ml-marketplace": false
   },
   "alwaysThinkingEnabled": true
 }
