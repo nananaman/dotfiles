@@ -55,10 +55,12 @@
     ]
   },
   "enabledPlugins": {
+    "code-simplifier@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
+    "hookify@claude-plugins-official": true,
     "deslop@kuu-marketplace": true,
-    "fix-ci@kuu-marketplace": true,
-    "chouge@salmon-ml-marketplace": false
+    "fix-ci@kuu-marketplace": true
   },
   "alwaysThinkingEnabled": true
 }
