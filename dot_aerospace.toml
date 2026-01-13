@@ -232,4 +232,4 @@ run = ["move-node-to-workspace X"]
 # ワークスペースC: 1Password
 [[on-window-detected]]
 if.app-id = "com.1password.1password"
-run = ["move-node-to-workspace C"]
+run = ["move-node-to-workspace C", "layout floating"]
