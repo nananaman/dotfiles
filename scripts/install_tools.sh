@@ -97,7 +97,7 @@ fi
 # Install Go tools
 for go_pkg in "github.com/x-motemen/ghq@latest" "github.com/mattn/memo@latest" "github.com/jesseduffield/lazygit@latest"; do
   pkg_name=$(echo "$go_pkg" | cut -d'/' -f3 | cut -d'@' -f1)
-  
+
   if ! command_exists "$pkg_name"; then
     log_info "Installing $pkg_name..."
     go install "$go_pkg"
@@ -106,6 +106,15 @@ for go_pkg in "github.com/x-motemen/ghq@latest" "github.com/mattn/memo@latest" "
     log_info "$pkg_name is already installed"
   fi
 done
+
+# Install gwq (worktree manager)
+if ! command_exists gwq; then
+  log_info "Installing gwq..."
+  go install github.com/d-kuro/gwq/cmd/gwq@latest
+  log_success "gwq installed"
+else
+  log_info "gwq is already installed"
+fi
 
 #-------------------------------------------------------
 # Deno - JavaScript/TypeScript runtime

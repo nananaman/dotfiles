@@ -73,5 +73,6 @@
     "deslop@kuu-marketplace": true,
     "fix-ci@kuu-marketplace": true
   },
-  "alwaysThinkingEnabled": true
+  "alwaysThinkingEnabled": true,
+  "language": "Japanese"
 }
