@@ -4,6 +4,26 @@
 
 ## 基本構文
 
+### 簡易検索（推奨）
+
+最もシンプルな検索方法。ファイル名とフォルダ名の両方から部分一致で検索します。
+
+```bash
+gog drive search "keyword"
+gog drive search "katohome"
+gog drive search "report"
+```
+
+**特徴**:
+- フィールド指定が不要で簡単
+- ファイル名とフォルダ名の両方を検索
+- 部分一致で検索
+- 最も頻繁に使われる検索方法
+
+### 詳細検索
+
+フィールドと演算子を指定した詳細な検索。
+
 ```
 gog drive search "<field> <operator> <value>"
 ```
@@ -191,6 +211,22 @@ gog drive search "fullText contains '\"hello world\"'"
 ```
 
 ## 実践例
+
+### よく使う検索
+
+```bash
+# 簡易検索（ファイル名・フォルダ名から検索）
+gog drive search "report"
+gog drive search "katohome"
+gog drive search "2026"
+
+# ファイル形式を指定
+gog drive search "mimeType = 'application/pdf'"
+gog drive search "mimeType = 'application/vnd.google-apps.folder'"
+
+# 最近更新されたファイル
+gog drive search "modifiedTime > '2026-01-01'"
+```
 
 ### ファイル管理
 
