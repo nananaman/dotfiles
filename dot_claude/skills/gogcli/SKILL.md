@@ -95,8 +95,7 @@ gog drive permissions list <fileId>
 #### 検索クエリ（よく使うパターン）
 ```bash
 # 簡易検索（ファイル名・フォルダ名から検索）
-gog drive search "katohome"
-gog drive search "report"
+gog drive search "keyword"
 
 # ファイル名で詳細検索
 gog drive search "name contains 'report'"

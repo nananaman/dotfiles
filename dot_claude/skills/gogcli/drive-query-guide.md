@@ -10,8 +10,6 @@
 
 ```bash
 gog drive search "keyword"
-gog drive search "katohome"
-gog drive search "report"
 ```
 
 **特徴**:
