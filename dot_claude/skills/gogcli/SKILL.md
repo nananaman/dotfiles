@@ -131,7 +131,7 @@ gog drive search "trashed = false and name contains 'report'"
 #### クエリ構文リファレンス
 
 **主要フィールド**:
-- `name` - ファイル名
+- `name` - ファイル名（フォルダ名は含まない）
 - `mimeType` - ファイル形式
 - `fullText` - ファイル内容全体
 - `modifiedTime` / `createdTime` - 更新/作成日時
@@ -149,6 +149,7 @@ gog drive search "trashed = false and name contains 'report'"
 - `and` / `or` / `not` - 論理演算
 
 **注意点**:
+- **フォルダ名で検索する場合は簡易検索を使用**（`name`はファイル名のみ）
 - 文字列は必ずシングルクォートで囲む: `name = 'file.txt'`
 - アポストロフィやバックスラッシュはエスケープ: `name = 'file\\'s name'`
 - 日時はRFC3339形式: `'2026-01-30T12:00:00'`

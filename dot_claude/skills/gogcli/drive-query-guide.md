@@ -14,9 +14,11 @@ gog drive search "keyword"
 
 **特徴**:
 - フィールド指定が不要で簡単
-- ファイル名とフォルダ名の両方を検索
+- **ファイル名とフォルダ名の両方を検索**（`name`フィールドはファイル名のみ）
 - 部分一致で検索
 - 最も頻繁に使われる検索方法
+
+**重要**: フォルダ名で検索したい場合は、`name contains`ではなく簡易検索を使用してください
 
 ### 詳細検索
 
@@ -36,7 +38,7 @@ gog drive search "<field> <operator> <value>"
 
 | フィールド | 説明 | 例 |
 |----------|------|-----|
-| `name` | ファイル名 | `name = 'report.pdf'` |
+| `name` | ファイル名（フォルダ名は含まない） | `name = 'report.pdf'` |
 | `fullText` | ファイル内容全体 | `fullText contains 'keyword'` |
 | `mimeType` | MIMEタイプ | `mimeType = 'application/pdf'` |
 | `modifiedTime` | 最終更新日時 | `modifiedTime > '2026-01-01T00:00:00'` |
