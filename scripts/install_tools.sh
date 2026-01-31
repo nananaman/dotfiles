@@ -107,13 +107,13 @@ for go_pkg in "github.com/x-motemen/ghq@latest" "github.com/mattn/memo@latest" "
   fi
 done
 
-# Install gwq (worktree manager)
-if ! command_exists gwq; then
-  log_info "Installing gwq..."
-  go install github.com/d-kuro/gwq/cmd/gwq@latest
-  log_success "gwq installed"
+# Install git-wt (worktree manager)
+if ! command_exists git-wt; then
+  log_info "Installing git-wt..."
+  go install github.com/k1LoW/git-wt@latest
+  log_success "git-wt installed"
 else
-  log_info "gwq is already installed"
+  log_info "git-wt is already installed"
 fi
 
 #-------------------------------------------------------

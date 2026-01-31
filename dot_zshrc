@@ -20,6 +20,7 @@ fi
 
 eval "$(sheldon source)"
 eval "$(starship init zsh)"
+eval "$(git-wt --init zsh)"
 
 # load config files
 ZSH_CONFIG_DIR="$HOME/.config/zsh"

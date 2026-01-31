@@ -6,6 +6,7 @@
 - 異常系のテストは正常系とは別の関数に分ける
 
 ## Worktree
-- Create worktree: `gwq add -b <branch>` or `gwq add <existing-branch>`
-- List worktrees: `gwq list`
-- Remove worktree: `gwq remove <pattern>`
+- List worktrees: `git wt`
+- Create/switch to worktree: `git wt <branch>` (creates if needed)
+- Delete worktree: `git wt -d <branch>`
+- Worktrees are created in `.wt/` directory

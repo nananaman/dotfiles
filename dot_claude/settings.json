@@ -38,6 +38,7 @@
       "Bash(gog tasks list:*)",
       "Bash(gog drive search:*)",
       "Bash(gog drive ls:*)",
+      "WebFetch(**)",
       "WebSearch",
       "Read(**)"
     ],
