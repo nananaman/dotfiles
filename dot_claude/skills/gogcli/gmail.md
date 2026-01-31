@@ -13,6 +13,29 @@ gog gmail labels add <messageId> <labelName>
 gog gmail labels remove <messageId> <labelName>
 ```
 
+## スレッド操作
+
+```bash
+# スレッドのラベルを変更
+gog gmail thread modify <threadId> --add <labelName>
+gog gmail thread modify <threadId> --remove <labelName>
+
+# スレッドの詳細を取得
+gog gmail thread get <threadId> --json
+
+# 未読メールを全て既読にする
+gog gmail search 'is:unread' --json | jq -r '.threads[].id' | \
+  while read thread_id; do
+    gog gmail thread modify "$thread_id" --remove UNREAD
+  done
+
+# 特定の条件のメールにラベルを追加
+gog gmail search 'from:notifications@service.com' --json | jq -r '.threads[].id' | \
+  while read thread_id; do
+    gog gmail thread modify "$thread_id" --add "Notifications"
+  done
+```
+
 ## メール検索
 
 ```bash
