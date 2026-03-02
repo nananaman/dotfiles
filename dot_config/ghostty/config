@@ -2,6 +2,8 @@ theme = "Kanagawa Wave"
 font-family = "HackGenNerd Console"
 background-opacity = 0.9
 keybind = "global:ctrl+cmd+`=toggle_quick_terminal"
+unfocused-split-opacity = 0.8
+unfocused-split-fill = #000000
 
 # Tab
 keybind = shift+ctrl+w=new_tab
