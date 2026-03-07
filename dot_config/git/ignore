@@ -1,2 +1,3 @@
 # Global gitignore for worktrees
 .wt
+**/.claude/settings.local.json
