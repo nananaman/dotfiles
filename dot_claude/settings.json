@@ -80,9 +80,11 @@
     "feature-dev@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
     "hookify@claude-plugins-official": true,
+    "gopls-lsp@claude-plugins-official": true,
     "deslop@kuu-marketplace": true,
     "fix-ci@kuu-marketplace": true
   },
+  "language": "Japanese",
   "alwaysThinkingEnabled": true,
-  "language": "Japanese"
+  "skipDangerousModePermissionPrompt": true
 }
