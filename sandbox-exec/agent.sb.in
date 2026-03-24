@@ -655,13 +655,11 @@
 )
 
 ;; ---------------------------------------------------------------------------
-;; Integration: chezmoi
-;; Dotfile manager config, cache, and target directory access.
+;; ~/.config — git config, app settings, etc.
 ;; ---------------------------------------------------------------------------
 
 (allow file-read* file-write*
-    (home-subpath "/.config")                                  ;; chezmoi config + managed targets under ~/.config.
-    (home-subpath "/.cache/chezmoi")                           ;; chezmoi cache.
+    (home-subpath "/.config")
 )
 
 ;; ---------------------------------------------------------------------------

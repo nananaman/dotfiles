@@ -18,6 +18,7 @@
     # VCS
     git
     git-lfs
+    gh
     ghq
     lazygit
     delta

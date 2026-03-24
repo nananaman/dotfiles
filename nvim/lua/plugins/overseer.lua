@@ -5,7 +5,6 @@ return {
     require("overseer").setup({
       templates = {
         "builtin",
-        "user.chezmoi_apply",
       },
     })
 
