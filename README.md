@@ -42,5 +42,8 @@ zsh/                       # Zsh configuration
 ghostty/                   # Ghostty terminal configuration
 aerospace/                 # AeroSpace window manager
 lazygit/                   # Lazygit configuration
+git/                       # Git config & ignore
 claude/                    # Claude Code settings & skills
+codex/                     # Codex CLI instructions
+sandbox-exec/              # macOS sandbox profiles
 ```
