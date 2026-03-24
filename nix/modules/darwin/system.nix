@@ -7,10 +7,8 @@
 {
   nixpkgs.config.allowUnfree = true;
 
-  # Determinate Nix を使用しているため無効化
-  nix.enable = false;
+  nix.enable = false; # Determinate Nix が管理
 
-  # Touch ID で sudo 認証
   security.pam.services.sudo_local.touchIdAuth = true;
   security.pam.services.sudo_local.reattach = true;
 

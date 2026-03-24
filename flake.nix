@@ -89,53 +89,55 @@
           };
         };
 
-      flake = {
-        darwinConfigurations.${username} = nix-darwin.lib.darwinSystem {
-          system = "aarch64-darwin";
+      flake =
+        let
+          darwinSystem = "aarch64-darwin";
+          darwinPkgs = mkPkgs darwinSystem;
+        in
+        {
+          darwinConfigurations.${username} = nix-darwin.lib.darwinSystem {
+            system = darwinSystem;
 
-          modules = [
-            (import ./nix/modules/darwin/system.nix {
-              pkgs = mkPkgs "aarch64-darwin";
-              inherit (nixpkgs) lib;
-              inherit username homedir;
-            })
+            modules = [
+              (import ./nix/modules/darwin/system.nix {
+                pkgs = darwinPkgs;
+                inherit (darwinPkgs) lib;
+                inherit username homedir;
+              })
 
-            home-manager.darwinModules.home-manager
-            {
-              home-manager = {
-                useGlobalPkgs = false;
-                useUserPackages = true;
-                backupFileExtension = "hm-backup";
-                extraSpecialArgs = {
-                  pkgs = mkPkgs "aarch64-darwin";
+              home-manager.darwinModules.home-manager
+              {
+                home-manager = {
+                  useGlobalPkgs = true;
+                  useUserPackages = true;
+                  backupFileExtension = "hm-backup";
+                  users.${username} =
+                    {
+                      pkgs,
+                      config,
+                      lib,
+                      ...
+                    }:
+                    let
+                      helpers = import ./nix/modules/lib/helpers { inherit lib; };
+                    in
+                    {
+                      imports = [
+                        (import ./nix/modules/home {
+                          inherit
+                            pkgs
+                            config
+                            lib
+                            helpers
+                            dotfilesDir
+                            ;
+                        })
+                      ];
+                    };
                 };
-                users.${username} =
-                  {
-                    pkgs,
-                    config,
-                    lib,
-                    ...
-                  }:
-                  let
-                    helpers = import ./nix/modules/lib/helpers { inherit lib; };
-                  in
-                  {
-                    imports = [
-                      (import ./nix/modules/home {
-                        inherit
-                          pkgs
-                          config
-                          lib
-                          helpers
-                          dotfilesDir
-                          ;
-                      })
-                    ];
-                  };
-              };
-            }
-          ];
+              }
+            ];
+          };
         };
-      };
     };
 }
