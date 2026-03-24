@@ -6,7 +6,7 @@
 ;; Source: 00-base.sb
 ;; ---------------------------------------------------------------------------
 
-(define HOME_DIR "{{ .chezmoi.homeDir }}")
+(define HOME_DIR "@HOME@")
 
 (define (home-subpath rel) (subpath (string-append HOME_DIR rel)))
 (define (home-literal rel) (literal (string-append HOME_DIR rel)))
@@ -34,7 +34,14 @@
     (literal "/var")                                                  ;; Compatibility symlink to /private/var.
     (literal "/tmp")                                                  ;; Compatibility symlink to /private/tmp.
     (literal "/home")                                                 ;; Probed during path resolution by some runtimes.
-    (subpath "/Applications/Xcode.app/Contents/Developer")            ;; xcrun shim targets used by /usr/bin/git, clang, etc.
+    (subpath "/Applications/Xcode.app")                               ;; Xcode toolchain, frameworks, and simulator support.
+    (subpath "/Applications/Google Chrome.app")                      ;; Chrome binary and resources for Flutter web / browser automation.
+)
+
+;; Simulator runtimes are mounted disk images; dylib loading requires file-map-executable.
+(allow file-map-executable
+    (subpath "/Library/Developer/CoreSimulator")
+    (subpath "/Applications/Xcode.app")
 )
 
 (allow file-read-metadata
@@ -125,6 +132,17 @@
     (global-name "com.apple.audio.coreaudiod")
     (global-name "com.apple.audio.audiohald")
     (global-name "com.apple.audio.AudioComponentRegistrar")
+    (global-name-regex #"^com\.apple\.CoreSimulator\.")
+    (global-name "com.apple.usbmuxd")
+    (global-name "com.apple.usbmuxd.xpc")
+    (global-name "com.apple.mobile.lockdown")
+    (global-name "com.apple.instruments.remoteserver")
+    (global-name "com.apple.windowserver.active")
+    (global-name "com.apple.gpumemd.source")
+    (global-name "com.apple.SecurityServer")
+    (global-name "com.apple.tccd")
+    (global-name "com.apple.tccd.system")
+    (global-name "com.apple.pasteboard.1")
 )
 
 (allow iokit-open)                                                      ;; Required for audio hardware device access (afplay, etc.).
@@ -290,6 +308,11 @@
     (home-subpath "/Library/Caches/Cypress")
     (home-subpath "/.cache/puppeteer")
 
+    ;; Google Chrome
+    (home-subpath "/Library/Application Support/Google/Chrome")
+    (home-subpath "/Library/Caches/Google/Chrome")
+    (home-subpath "/Library/Google")
+
     ;; Node ecosystem caches
     (home-subpath "/Library/Caches/typescript")
     (home-subpath "/Library/Caches/prisma-nodejs")
@@ -381,6 +404,31 @@
     (home-subpath "/.cache/sccache")
     (home-subpath "/Library/Caches/sccache")
     (home-subpath "/Library/Application Support/Mozilla.sccache")
+)
+
+;; ---------------------------------------------------------------------------
+;; Toolchain: Dart / Flutter
+;; Dart SDK tool config, pub cache, and Flutter SDK paths.
+;; Source: 30-toolchains/dart-flutter.sb
+;; ---------------------------------------------------------------------------
+
+(allow file-read* file-write*
+    (home-subpath "/.dart-tool")
+    (home-subpath "/.dart")
+    (home-subpath "/.dartServer")
+    (home-subpath "/.pub-cache")
+    (home-subpath "/.config/dart")
+    (home-subpath "/flutter")
+    (home-subpath "/fvm")
+    (home-subpath "/.config/flutter")
+    (home-subpath "/Library/Android")
+    (home-subpath "/.android")
+    (home-subpath "/.cocoapods")
+    (home-subpath "/Library/Developer/CoreSimulator")
+    (home-subpath "/Library/Developer/Xcode")
+    (home-subpath "/Library/Developer/XCTestProducts")
+    (home-subpath "/Library/Logs/CoreSimulator")
+    (home-subpath "/Library/Caches/CocoaPods")
 )
 
 ;; ---------------------------------------------------------------------------
@@ -623,12 +671,12 @@
 
 ;; Ancestor literals for ~/ghq (required for readdir() on parent directories).
 (allow file-read*
-    (literal "{{ .chezmoi.homeDir }}")
-    (literal "{{ .chezmoi.homeDir }}/ghq")
+    (literal "@HOME@")
+    (literal "@HOME@/ghq")
 )
 
 (allow file-read* file-write*
-    (subpath "{{ .chezmoi.homeDir }}/ghq")
+    (subpath "@HOME@/ghq")
 )
 
 ;; ---------------------------------------------------------------------------

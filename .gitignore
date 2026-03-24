@@ -2,3 +2,13 @@
 local.fish
 local.nu
 local.zsh
+
+# Nix
+result
+.direnv
+
+# Secrets
+zsh/conf.d/local.zsh
+
+# Claude Code
+.claude/settings.local.json

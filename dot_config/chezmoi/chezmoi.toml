@@ -1,5 +1,0 @@
-[diff]
-  exclude = ['scripts']
-
-[edit]
-    command = "nvim"

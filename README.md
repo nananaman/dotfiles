@@ -1,47 +1,46 @@
 # dotfiles
 
-My dotfiles managed by chezmoi
+My dotfiles managed by Nix Flakes + home-manager + nix-darwin.
 
-## Installation
+## Prerequisites
 
-```
-$ sh -c "$(curl -fsLS chezmoi.io/get)" -- init --apply nananaman
-```
-
-## Install Tools
+Install [Nix](https://nixos.org/) via [Determinate Systems installer](https://determinate.systems/nix-installer/):
 
 ```
-$ chezmoi cd && bash ./scripts/init.sh
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
 ```
 
-This will install and configure:
-- Neovim
-- Fish shell
-- Nushell
-- Wezterm
-- Zsh
-- Additional tools and fonts
+## Usage
 
-## Configuration Structure
+```bash
+# Build (dry run)
+nix run .#build
 
-```
-dot_config/
-  ├── chezmoi/        # chezmoi configuration
-  ├── cspell/         # spell checking configuration
-  ├── fish/           # fish shell configuration
-  ├── ghostty/        # ghostty terminal configuration
-  ├── lazygit/        # lazygit configuration
-  ├── nushell/        # nushell configuration
-  ├── nvim/           # neovim configuration
-  ├── sheldon/        # shell plugin manager
-  ├── sql-formatter/  # SQL formatter configuration
-  └── wezterm/        # wezterm terminal configuration
+# Build and apply
+nix run .#switch
+
+# Update dependencies
+nix run .#update
 ```
 
-## Managing Dotfiles
+## Structure
 
 ```
-$ chezmoi diff    # See pending changes
-$ chezmoi apply   # Apply changes
-$ chezmoi cd      # Navigate to the repository
+flake.nix                  # Entry point
+nix/
+  modules/
+    home/                  # Cross-platform (home-manager)
+      packages.nix         # CLI tools (fzf, ripgrep, bat, etc.)
+      dotfiles.nix         # Symlink management
+      programs/            # App configs (git, starship, etc.)
+    darwin/                # macOS settings (nix-darwin)
+      system.nix           # Dock, Finder, keyboard, Homebrew casks
+    lib/helpers/           # Shared utilities
+  overlays/                # Custom packages
+nvim/                      # Neovim configuration
+zsh/                       # Zsh configuration
+ghostty/                   # Ghostty terminal configuration
+aerospace/                 # AeroSpace window manager
+lazygit/                   # Lazygit configuration
+claude/                    # Claude Code settings & skills
 ```
