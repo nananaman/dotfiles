@@ -1,53 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
-    "allow": [
-      "Bash(afplay:*)",
-      "Bash(git:*)",
-      "Bash(find:*)",
-      "Bash(rg:*)",
-      "Bash(grep:*)",
-      "Bash(ls:*)",
-      "Bash(make:*)",
-      "Bash(mise run:*)",
-      "Bash(mkdir:*)",
-      "Bash(cat:*)",
-      "Bash(cd:*)",
-      "Bash(find:*)",
-      "Bash(sed:*)",
-      "Bash(jq:*)",
-      "Bash(touch:*)",
-      "Bash(python:*)",
-      "Bash(gh pr create:*)",
-      "Bash(gh pr view:*)",
-      "Bash(gh run list:*)",
-      "Bash(gh run view:*)",
-      "Bash(git add:*)",
-      "Bash(git checkout:*)",
-      "Bash(git cherry-pick:*)",
-      "Bash(git commit:*)",
-      "Bash(git push:*)",
-      "Bash(git restore:*)",
-      "mcp__serena__*",
-      "mcp__github__*",
-      "Bash(gog gmail search:*)",
-      "Bash(gog calendar calendars:*)",
-      "Bash(gog calendar events:*)",
-      "Bash(gog tasks lists:*)",
-      "Bash(gog tasks list:*)",
-      "Bash(gog drive search:*)",
-      "Bash(gog drive ls:*)",
-      "WebFetch(domain:**)",
-      "WebSearch",
-      "Read(**)"
-    ],
-    "deny": [
-      "Edit(/etc/**)",
-      "Edit(~/.ssh/**)"
-    ],
-    "additionalDirectories": [
-      "~/obsidian"
-    ]
+    "defaultMode": "auto"
   },
   "hooks": {
     "PreToolUse": [
@@ -56,7 +10,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "afplay /System/Library/Sounds/Blow.aiff"
+            "command": "afplay /System/Library/Sounds/Blow.aiff",
+            "async": true
           }
         ]
       }
@@ -67,7 +22,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "afplay /System/Library/Sounds/Glass.aiff"
+            "command": "afplay /System/Library/Sounds/Glass.aiff",
+            "async": true
           }
         ]
       }
@@ -79,11 +35,9 @@
     "feature-dev@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
     "hookify@claude-plugins-official": true,
-    "gopls-lsp@claude-plugins-official": true,
-    "deslop@kuu-marketplace": true,
-    "fix-ci@kuu-marketplace": true
+    "gopls-lsp@claude-plugins-official": true
   },
   "language": "Japanese",
   "alwaysThinkingEnabled": true,
-  "skipDangerousModePermissionPrompt": true
+  "skipAutoPermissionPrompt": true
 }

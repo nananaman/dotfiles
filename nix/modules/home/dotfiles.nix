@@ -30,11 +30,5 @@ in
 
     $DRY_RUN_CMD mkdir -p "${configHome}/git"
     link_force "${dotfilesDir}/git/ignore" "${configHome}/git/ignore"
-
-    # sandbox-exec (substitute @HOME@ at activation time)
-    $DRY_RUN_CMD mkdir -p "${configHome}/sandbox-exec"
-    $DRY_RUN_CMD sed "s|@HOME@|${homeDirectory}|g" \
-      "${dotfilesDir}/sandbox-exec/agent.sb.in" \
-      > "${configHome}/sandbox-exec/agent.sb"
   '';
 }
