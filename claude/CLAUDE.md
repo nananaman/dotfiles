@@ -1,12 +1,19 @@
-## コーディング
-- コメントは必要な箇所にのみ付け、自明なことは書かない
+# 開発スタイル
+TDD で開発する（探索 → Red → Green → Refactoring）
+KPI やカバレッジ目標が与えられたら、達成するまで試行する
+不明瞭な指示は質問して明確にする
+
+## コード設計
+- 関心の分離を保つ
+- 状態とロジックを分離する
+- 可読性と保守性を重視する
+- コントラクト層（API/型）を厳密に定義し、実装層は再生成可能に保つ
+- 静的検査可能なルールはプロンプトではなく、その環境の linter で記述する
 
 ## テスト
 - Arrage, Act, Assert のコメントを入れて読みやすくする
 - 異常系のテストは正常系とは別の関数に分ける
 
-## Worktree
-- List worktrees: `git wt`
-- Create/switch to worktree: `git wt <branch>` (creates if needed)
-- Delete worktree: `git wt -d <branch>`
-- Worktrees are created in `.wt/` directory
+## 環境
+- GitHub: {{ .github_username }}
+- リポジトリ: ghq 管理（`~/ghq/github.com/owner/repo`）
