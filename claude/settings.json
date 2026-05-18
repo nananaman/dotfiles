@@ -1,7 +1,10 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
-    "defaultMode": "auto"
+    "defaultMode": "auto",
+    "allow": [
+      "Bash(bq *)"
+    ]
   },
   "hooks": {
     "PreToolUse": [
@@ -49,5 +52,9 @@
   },
   "language": "Japanese",
   "alwaysThinkingEnabled": true,
-  "skipAutoPermissionPrompt": true
+  "skipAutoPermissionPrompt": true,
+  "preferredNotifChannel": "terminal_bell",
+  "remoteControlAtStartup": true,
+  "agentPushNotifEnabled": true,
+  "useAutoModeDuringPlan": true
 }

@@ -62,3 +62,8 @@ eval "$(mise activate zsh)"
 
 # Vite+ bin (https://viteplus.dev)
 [ -f "$HOME/.vite-plus/env" ] && . "$HOME/.vite-plus/env"
+
+export PATH=/Users/juntawatanabe/.ticloud/bin:$PATH
+
+# Added by cua-driver installer — see https://github.com/trycua/cua
+export PATH="$HOME/.local/bin:$PATH"

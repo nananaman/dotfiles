@@ -28,6 +28,9 @@
     deno
     neovim
 
+    # Cloud
+    google-cloud-sdk
+
     # Other
     silicon
     mise
