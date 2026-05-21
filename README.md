@@ -26,6 +26,8 @@ nix run .#update
 ## Structure
 
 ```
+AGENTS.md                  # Coding agent instructions for this repository
+CLAUDE.md                  # Symlink to AGENTS.md for Claude Code compatibility
 flake.nix                  # Entry point
 nix/
   modules/
