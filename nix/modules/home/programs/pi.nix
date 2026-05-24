@@ -1,5 +1,5 @@
 { config, dotfilesDir, ... }:
 {
-  xdg.configFile."codex/instructions.md".source =
+  home.file.".pi/agent/AGENTS.md".source =
     config.lib.file.mkOutOfStoreSymlink "${dotfilesDir}/agents/AGENTS.md";
 }
