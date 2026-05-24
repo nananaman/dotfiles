@@ -107,8 +107,10 @@ in
     # Development
     go
     deno
+    nixfmt
     neovim
     apm-cli
+    zellij
 
     # Cloud
     google-cloud-sdk

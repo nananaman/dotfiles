@@ -26,9 +26,13 @@
       ...
     }:
     let
-      username = "juntawatanabe";
-      homedir = "/Users/${username}";
-      dotfilesDir = "${homedir}/ghq/github.com/chouge/dotfiles";
+      darwinUsername = "juntawatanabe";
+      darwinHomedir = "/Users/${darwinUsername}";
+      darwinDotfilesDir = "${darwinHomedir}/ghq/github.com/chouge/dotfiles";
+
+      wslUsername = "chouge";
+      wslHomedir = "/home/${wslUsername}";
+      wslDotfilesDir = "${wslHomedir}/ghq/github.com/nananaman/dotfiles";
 
       mkPkgs =
         system:
@@ -41,23 +45,35 @@
         };
     in
     flake-parts.lib.mkFlake { inherit inputs; } {
-      systems = [ "aarch64-darwin" ];
+      systems = [
+        "aarch64-darwin"
+        "x86_64-linux"
+      ];
 
       perSystem =
         { system, ... }:
         let
           pkgs = mkPkgs system;
-          hostname = username;
+          isDarwin = system == "aarch64-darwin";
+          configName = if isDarwin then darwinUsername else wslUsername;
+          buildTarget =
+            if isDarwin then
+              "darwinConfigurations.${configName}.system"
+            else
+              "homeConfigurations.${configName}.activationPackage";
+          homeManager = home-manager.packages.${system}.home-manager;
         in
         {
+          formatter = pkgs.nixfmt;
+
           apps = {
             build = {
               type = "app";
               program = toString (
-                pkgs.writeShellScript "darwin-build" ''
+                pkgs.writeShellScript "nix-build-config" ''
                   set -e
-                  echo "Building darwin configuration..."
-                  nix build .#darwinConfigurations.${hostname}.system
+                  echo "Building ${buildTarget}..."
+                  nix build .#${buildTarget}
                   echo "Build successful! Run 'nix run .#switch' to apply."
                 ''
               );
@@ -66,12 +82,22 @@
             switch = {
               type = "app";
               program = toString (
-                pkgs.writeShellScript "darwin-switch" ''
-                  set -eo pipefail
-                  echo "Building and switching to darwin configuration..."
-                  sudo nix run nix-darwin -- switch --flake .#${hostname}
-                  echo "Done!"
-                ''
+                pkgs.writeShellScript "nix-switch-config" (
+                  if isDarwin then
+                    ''
+                      set -eo pipefail
+                      echo "Building and switching to darwin configuration..."
+                      sudo nix run nix-darwin -- switch --flake .#${configName}
+                      echo "Done!"
+                    ''
+                  else
+                    ''
+                      set -eo pipefail
+                      echo "Building and switching to home-manager configuration..."
+                      ${homeManager}/bin/home-manager switch --flake .#${configName}
+                      echo "Done!"
+                    ''
+                )
               );
             };
 
@@ -95,14 +121,15 @@
           darwinPkgs = mkPkgs darwinSystem;
         in
         {
-          darwinConfigurations.${username} = nix-darwin.lib.darwinSystem {
+          darwinConfigurations.${darwinUsername} = nix-darwin.lib.darwinSystem {
             system = darwinSystem;
 
             modules = [
               (import ./nix/modules/darwin/system.nix {
                 pkgs = darwinPkgs;
                 inherit (darwinPkgs) lib;
-                inherit username homedir;
+                username = darwinUsername;
+                homedir = darwinHomedir;
               })
 
               home-manager.darwinModules.home-manager
@@ -111,7 +138,7 @@
                   useGlobalPkgs = true;
                   useUserPackages = true;
                   backupFileExtension = "hm-backup";
-                  users.${username} =
+                  users.${darwinUsername} =
                     {
                       pkgs,
                       config,
@@ -120,6 +147,7 @@
                     }:
                     let
                       helpers = import ./nix/modules/lib/helpers { inherit lib; };
+                      dotfilesDir = darwinDotfilesDir;
                     in
                     {
                       imports = [
@@ -136,6 +164,41 @@
                     };
                 };
               }
+            ];
+          };
+
+          homeConfigurations.${wslUsername} = home-manager.lib.homeManagerConfiguration {
+            pkgs = mkPkgs "x86_64-linux";
+            modules = [
+              (
+                {
+                  pkgs,
+                  config,
+                  lib,
+                  ...
+                }:
+                let
+                  helpers = import ./nix/modules/lib/helpers { inherit lib; };
+                  dotfilesDir = wslDotfilesDir;
+                in
+                {
+                  imports = [
+                    (import ./nix/modules/home {
+                      inherit
+                        pkgs
+                        config
+                        lib
+                        helpers
+                        dotfilesDir
+                        ;
+                    })
+                  ];
+
+                  home.username = wslUsername;
+                  home.homeDirectory = wslHomedir;
+                  targets.genericLinux.enable = true;
+                }
+              )
             ];
           };
         };

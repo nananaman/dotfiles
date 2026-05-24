@@ -22,6 +22,7 @@
 
     (import ./dotfiles.nix {
       inherit
+        pkgs
         lib
         config
         dotfilesDir
