@@ -28,6 +28,8 @@ in
     link_force "${dotfilesDir}/sql-formatter" "${configHome}/sql-formatter"
     link_force "${dotfilesDir}/stylua.toml" "${configHome}/stylua.toml"
 
+    link_force "${dotfilesDir}/.apm" "${homeDirectory}/.apm"
+
     $DRY_RUN_CMD mkdir -p "${configHome}/git"
     link_force "${dotfilesDir}/git/ignore" "${configHome}/git/ignore"
   '';

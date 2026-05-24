@@ -1,0 +1,8 @@
+name: chouge-agent-context
+version: 0.1.0
+target: claude,agent-skills
+
+dependencies:
+  apm:
+    - openclaw/agent-skills/skills/autoreview#834ce50c9ad39ae4a841a5c6375becc69c93fa76
+    - mizchi/skills/retrospective-codify#f74212c0e3c2e1cf420d27c6418af1a10f697f4b
