@@ -17,6 +17,9 @@ nix run .#switch
 
 # flake.lock 更新
 nix run .#update
+
+# APM user-scope agent skills を展開
+apm install -g
 ```
 
 ## Architecture
@@ -27,7 +30,7 @@ nix run .#update
 
 - `nix/modules/darwin/system.nix` — macOS システム設定（Dock, Finder, キーボード）、Homebrew casks
 - `nix/modules/home/` — home-manager モジュール群
-  - `packages.nix` — CLI ツール一覧（zsh, fzf, ripgrep, neovim 等）
+  - `packages.nix` — CLI ツール一覧（zsh, fzf, ripgrep, neovim, apm-cli 等）
   - `dotfiles.nix` — `home.activation` でシンボリックリンクを作成（nvim, zsh, ghostty 等をこのリポジトリから直接リンク）
   - `programs/` — home-manager の `programs.*` を使うアプリ設定（git, starship, Codex, codex）
 - `nix/modules/lib/helpers/` — activation 用のユーティリティ関数
@@ -36,6 +39,10 @@ nix run .#update
 ### dotfiles の管理方式
 
 設定ファイルは Nix で生成するのではなく、このリポジトリに直接置いて `dotfiles.nix` の `link_force` でシンボリックリンクしている。Nix が管理するのはパッケージインストールとリンク作成のみ。
+
+### Agent Skills
+
+グローバル agent skills は `.apm/apm.yml` で管理する。`dotfiles.nix` が `.apm/` を `~/.apm` にリンクし、`apm install -g` が `target: claude,agent-skills` に従って `~/.claude/skills` と `~/.agents/skills` に展開する。`apm.lock.yaml` と `apm_modules/` は `.apm/.gitignore` で除外するため、外部 dependency は full SHA で pin する。
 
 ### Nix フォーマット
 
