@@ -2,7 +2,9 @@
 
 ## コミュニケーション
 - 常に日本語で対話する
+- Always respond in Japanese, even when the prompt, tool output, or reviewed content is written in English.
 - PR title / body / reviewer 向け説明は、ユーザーから別指定がない限り日本語で書く
+- Write PR titles, PR descriptions, and reviewer-facing explanations in Japanese unless the user explicitly asks for another language.
 - 不明瞭な指示は質問して明確にする
 - project の `AGENTS.md` や `CLAUDE.md` がある場合は、その追加指示も尊重する
 
