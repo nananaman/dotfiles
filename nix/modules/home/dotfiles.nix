@@ -35,7 +35,7 @@ in
     link_force "${dotfilesDir}/sql-formatter" "${configHome}/sql-formatter"
     link_force "${dotfilesDir}/stylua.toml" "${configHome}/stylua.toml"
 
-    link_force "${dotfilesDir}/.apm" "${homeDirectory}/.apm"
+    link_force "${dotfilesDir}/apm" "${homeDirectory}/.apm"
 
     ${lib.optionalString pkgs.stdenv.isLinux ''
       cmd_exe="/mnt/c/Windows/System32/cmd.exe"

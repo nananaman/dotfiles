@@ -40,9 +40,13 @@ apm install -g
 
 設定ファイルは Nix で生成するのではなく、このリポジトリに直接置いて `dotfiles.nix` の `link_force` でシンボリックリンクしている。Nix が管理するのはパッケージインストールとリンク作成のみ。
 
+### Global Agent Instructions
+
+グローバル agent 指示は `agents/AGENTS.md` を唯一の source of truth として管理する。home-manager が同じファイルを `~/.claude/CLAUDE.md`, `~/.config/codex/instructions.md`, `~/.pi/agent/AGENTS.md` にリンクする。
+
 ### Agent Skills
 
-グローバル agent skills は `.apm/apm.yml` で管理する。`dotfiles.nix` が `.apm/` を `~/.apm` にリンクし、`apm install -g` が `target: claude,agent-skills` に従って `~/.claude/skills` と `~/.agents/skills` に展開する。`apm.lock.yaml` と `apm_modules/` は `.apm/.gitignore` で除外するため、外部 dependency は full SHA で pin する。
+グローバル agent skills は `apm/apm.yml` で管理する。`dotfiles.nix` が `apm/` を `~/.apm` にリンクし、`apm install -g` が `target: claude,agent-skills` に従って `~/.claude/skills` と `~/.agents/skills` に展開する。`apm.lock.yaml` と `apm_modules/` は `apm/.gitignore` で除外するため、外部 dependency は full SHA で pin する。
 
 ### Nix フォーマット
 
