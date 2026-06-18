@@ -15,8 +15,8 @@ eval "$(starship init zsh)"
 # load config files
 ZSH_CONFIG_DIR="$HOME/.config/zsh"
 if [ -d "$ZSH_CONFIG_DIR" ]; then
-  for file in $ZSH_CONFIG_DIR/**/*.zsh; do
-    source $file
+  for file in "$ZSH_CONFIG_DIR"/functions/*.zsh(N); do
+    source "$file"
   done
 fi
 
@@ -39,8 +39,8 @@ alias cwt="claude-worktree"
 abbr import-aliases -S --quieter
 
 # functions
-zle -N cd-ghq-project
-bindkey "^f" cd-ghq-project
+zle -N ghq-project-widget
+bindkey "^f" ghq-project-widget
 
 # fzf history
 function fzf-select-history() {

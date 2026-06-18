@@ -17,6 +17,8 @@ in
     link_force "${dotfilesDir}/nvim" "${configHome}/nvim"
 
     link_force "${dotfilesDir}/zsh/zshrc" "${homeDirectory}/.zshrc"
+    $DRY_RUN_CMD mkdir -p "${configHome}/zsh"
+    link_force "${dotfilesDir}/zsh/functions" "${configHome}/zsh/functions"
     link_force "${dotfilesDir}/zsh/sheldon" "${configHome}/sheldon"
 
     link_force "${dotfilesDir}/ghostty" "${configHome}/ghostty"
@@ -25,7 +27,10 @@ in
       link_force "${dotfilesDir}/ghostty/config" "${homeDirectory}/Library/Application Support/com.mitchellh.ghostty/config"
     ''}
 
-    link_force "${dotfilesDir}/zellij" "${configHome}/zellij"
+    if [ "$(readlink "${configHome}/zellij" 2>/dev/null || true)" = "${dotfilesDir}/zellij" ]; then
+      $DRY_RUN_CMD rm -f "${configHome}/zellij"
+    fi
+    link_force "${dotfilesDir}/tmux" "${configHome}/tmux"
 
     ${lib.optionalString pkgs.stdenv.isDarwin ''
       link_force "${dotfilesDir}/aerospace/aerospace.toml" "${homeDirectory}/.aerospace.toml"

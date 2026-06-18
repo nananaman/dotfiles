@@ -110,7 +110,7 @@ in
     nixfmt
     neovim
     apm-cli
-    zellij
+    tmux
 
     # Cloud
     google-cloud-sdk
