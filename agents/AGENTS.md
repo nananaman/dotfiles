@@ -32,8 +32,8 @@
 新規 skill の配置先は次の指針で決める:
 
 - **project 固有**（`<repo>/.claude/skills/`）: 特定 repo のドメイン知識・規約・ファイルレイアウトに依存し、他 repo で使う見込みがない
-- **グローバル**: APM user scope で管理する。外部由来の skill は `apm/apm.yml` に full SHA で pin し、`apm install -g` で `~/.claude/skills/` と `~/.agents/skills/` に展開する
-- **ローカル汎用 skill**: 外部 upstream がない場合のみ `apm/skills/<name>/` を source-of-truth として追加する
+- **グローバル**: APM user scope で管理する。外部由来・自作汎用 skill は `apm/apm.yml` に full SHA で pin し、`apm install -g` で `~/.claude/skills/` と `~/.agents/skills/` に展開する
+- **自作汎用 skill**: `nananaman/skills` を source-of-truth として追加し、dotfiles の `apm/apm.yml` から `nananaman/skills/<path>#<full-sha>` で参照する
 - **判断不能なとき**: 「project 固有かグローバルか」を質問してから作成
 
 現在のグローバル skill は `apm/apm.yml` を唯一の source of truth として管理する。APM 0.14.2 の user scope では `targets:` ではなく `target: claude,agent-skills` を使う。`apm.lock.yaml` と `apm_modules/` は `apm/.gitignore` で除外する。`gogcli` は未使用のため廃止済み。

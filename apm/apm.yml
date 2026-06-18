@@ -6,6 +6,6 @@ dependencies:
   apm:
     - openclaw/agent-skills/skills/autoreview#834ce50c9ad39ae4a841a5c6375becc69c93fa76
     - mizchi/skills/retrospective-codify#f74212c0e3c2e1cf420d27c6418af1a10f697f4b
-    - cursor/plugins/cursor-team-kit/skills/thermo-nuclear-code-quality-review#b8f2564c2e8da66b331c1dd63c2a2925d6739961
     - cursor/plugins/cursor-team-kit/skills/make-pr-easy-to-review#b8f2564c2e8da66b331c1dd63c2a2925d6739961
-    - path: ./skills/code-review
+    - nananaman/skills/meta/apm-usage#833dcbf68aba3cce811cb87a5e74717557da77d6
+    - nananaman/skills/meta/code-review#833dcbf68aba3cce811cb87a5e74717557da77d6

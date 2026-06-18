@@ -46,7 +46,7 @@ apm install -g
 
 ### Agent Skills
 
-グローバル agent skills は `apm/apm.yml` で管理する。`dotfiles.nix` が `apm/` を `~/.apm` にリンクし、`apm install -g` が `target: claude,agent-skills` に従って `~/.claude/skills` と `~/.agents/skills` に展開する。`apm.lock.yaml` と `apm_modules/` は `apm/.gitignore` で除外するため、外部 dependency は full SHA で pin する。
+グローバル agent skills のインストール一覧は `apm/apm.yml` で管理する。自作汎用 skill 本体は `nananaman/skills` を source-of-truth にし、dotfiles 側から full SHA で pin して参照する。`dotfiles.nix` が `apm/` を `~/.apm` にリンクし、`apm install -g` が `target: claude,agent-skills` に従って `~/.claude/skills` と `~/.agents/skills` に展開する。`apm.lock.yaml` と `apm_modules/` は `apm/.gitignore` で除外するため、外部 dependency は full SHA で pin する。
 
 ### Nix フォーマット
 
