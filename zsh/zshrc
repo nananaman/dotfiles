@@ -67,3 +67,18 @@ export PATH=/Users/juntawatanabe/.ticloud/bin:$PATH
 
 # Added by cua-driver installer — see https://github.com/trycua/cua
 export PATH="$HOME/.local/bin:$PATH"
+
+# pnpm
+export PNPM_HOME="/home/chouge/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME/bin:"*) ;;
+  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
+esac
+# pnpm end
+
+# bun completions
+[ -s "/home/chouge/.bun/_bun" ] && source "/home/chouge/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
