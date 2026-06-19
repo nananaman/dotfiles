@@ -81,6 +81,10 @@ let
   };
 in
 {
+  home.sessionVariables = {
+    RTK_TELEMETRY_DISABLED = "1";
+  };
+
   home.packages = with pkgs; [
     # Shell
     zsh
@@ -111,6 +115,7 @@ in
     neovim
     apm-cli
     tmux
+    rtk
 
     # Cloud
     google-cloud-sdk

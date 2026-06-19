@@ -8,5 +8,7 @@ in
       config.lib.file.mkOutOfStoreSymlink "${dotfilesDir}/agents/AGENTS.md";
     ".pi/agent/settings.json".source =
       config.lib.file.mkOutOfStoreSymlink "${piAgentDir}/settings.json";
+    ".pi/agent/extensions/rtk.ts".source =
+      config.lib.file.mkOutOfStoreSymlink "${piAgentDir}/extensions/rtk.ts";
   };
 }
