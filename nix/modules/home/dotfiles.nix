@@ -44,10 +44,41 @@ in
 
     ${lib.optionalString pkgs.stdenv.isLinux ''
       cmd_exe="/mnt/c/Windows/System32/cmd.exe"
+      powershell_exe="/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
       wslpath_exe="/usr/bin/wslpath"
       if [ -x "$cmd_exe" ] && [ -x "$wslpath_exe" ]; then
         win_profile="$(${pkgs.coreutils}/bin/timeout 2s "$cmd_exe" /c 'echo %USERPROFILE%' 2>/dev/null | ${pkgs.coreutils}/bin/tr -d '\r' || true)"
         if [ -n "$win_profile" ] && win_profile="$($wslpath_exe "$win_profile" 2>/dev/null)"; then
+          win_fonts_dir="$win_profile/AppData/Local/Microsoft/Windows/Fonts"
+          $DRY_RUN_CMD mkdir -p "$win_fonts_dir"
+          $DRY_RUN_CMD cp -f ${pkgs.hackgen-nf-font}/share/fonts/hackgen-nf/HackGenConsoleNF-Regular.ttf "$win_fonts_dir/"
+          $DRY_RUN_CMD cp -f ${pkgs.hackgen-nf-font}/share/fonts/hackgen-nf/HackGenConsoleNF-Bold.ttf "$win_fonts_dir/"
+          $DRY_RUN_CMD cp -f ${pkgs.hackgen-nf-font}/share/fonts/hackgen-nf/HackGen35ConsoleNF-Regular.ttf "$win_fonts_dir/"
+          $DRY_RUN_CMD cp -f ${pkgs.hackgen-nf-font}/share/fonts/hackgen-nf/HackGen35ConsoleNF-Bold.ttf "$win_fonts_dir/"
+
+          if [ -x "$powershell_exe" ] && [ -z "''${DRY_RUN_CMD:-}" ]; then
+            "$powershell_exe" -NoProfile -ExecutionPolicy Bypass -Command '
+              $ErrorActionPreference = "Stop"
+              $fontsDir = Join-Path $env:LOCALAPPDATA "Microsoft\Windows\Fonts"
+              New-Item -ItemType Directory -Force -Path $fontsDir | Out-Null
+              $fontsKey = "HKCU:\Software\Microsoft\Windows NT\CurrentVersion\Fonts"
+              New-Item -Force -Path $fontsKey | Out-Null
+
+              $entries = @(
+                @{ File = "HackGenConsoleNF-Regular.ttf"; Name = "HackGen Console NF (TrueType)" },
+                @{ File = "HackGenConsoleNF-Bold.ttf"; Name = "HackGen Console NF Bold (TrueType)" },
+                @{ File = "HackGen35ConsoleNF-Regular.ttf"; Name = "HackGen35 Console NF (TrueType)" },
+                @{ File = "HackGen35ConsoleNF-Bold.ttf"; Name = "HackGen35 Console NF Bold (TrueType)" }
+              )
+              foreach ($entry in $entries) {
+                $fontPath = Join-Path $fontsDir $entry.File
+                if (Test-Path $fontPath) {
+                  New-ItemProperty -Path $fontsKey -Name $entry.Name -PropertyType String -Value $fontPath -Force | Out-Null
+                }
+              }
+            '
+          fi
+
           for wt_package in Microsoft.WindowsTerminal_8wekyb3d8bbwe Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe; do
             wt_dir="$win_profile/AppData/Local/Packages/$wt_package/LocalState"
             if [ -d "$wt_dir" ]; then
