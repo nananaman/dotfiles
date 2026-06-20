@@ -71,6 +71,7 @@
       ".",
       "~/ghq/github.com/nananaman/dotfiles",
       "~/ghq/github.com/nananaman/skills",
+      "~/.pi/agent",
       "/tmp",
       "/private/tmp"
     ],
