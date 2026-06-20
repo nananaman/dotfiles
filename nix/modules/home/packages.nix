@@ -116,6 +116,7 @@ in
     apm-cli
     tmux
     rtk
+    sandbox-runtime
 
     # Cloud
     google-cloud-sdk

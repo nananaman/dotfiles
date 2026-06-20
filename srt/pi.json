@@ -1,0 +1,131 @@
+{
+  "network": {
+    "allowedDomains": [
+      "chatgpt.com",
+      "*.chatgpt.com",
+      "openai.com",
+      "*.openai.com",
+      "api.openai.com",
+      "opencode.ai",
+      "*.opencode.ai",
+      "anthropic.com",
+      "*.anthropic.com",
+      "api.anthropic.com",
+      "github.com",
+      "*.github.com",
+      "githubusercontent.com",
+      "*.githubusercontent.com",
+      "ghcr.io",
+      "*.ghcr.io",
+      "registry.npmjs.org",
+      "npmjs.com",
+      "*.npmjs.com",
+      "npmjs.org",
+      "*.npmjs.org",
+      "nodejs.org",
+      "*.nodejs.org",
+      "pypi.org",
+      "files.pythonhosted.org",
+      "pythonhosted.org",
+      "crates.io",
+      "static.crates.io",
+      "index.crates.io",
+      "proxy.golang.org",
+      "sum.golang.org",
+      "go.dev",
+      "golang.org",
+      "cache.nixos.org",
+      "channels.nixos.org",
+      "releases.nixos.org",
+      "jina.ai",
+      "*.jina.ai",
+      "api.exa.ai",
+      "exa.ai",
+      "*.exa.ai",
+      "perplexity.ai",
+      "*.perplexity.ai",
+      "generativelanguage.googleapis.com",
+      "*.googleapis.com"
+    ],
+    "deniedDomains": [],
+    "strictAllowlist": true,
+    "allowLocalBinding": false
+  },
+  "filesystem": {
+    "denyRead": [
+      "~/.ssh",
+      "~/.gnupg",
+      "/Users/juntawatanabe/.aws",
+      "/mnt/c/Users/foola/.aws",
+      "~/.config/gcloud",
+      "~/.kube",
+      "~/.docker/config.json",
+      "~/.netrc",
+      "~/.npmrc",
+      "~/.pypirc",
+      "~/.gem/credentials",
+      "~/.local/share/chezmoi/shell/env-secrets.sh"
+    ],
+    "allowRead": [],
+    "allowWrite": [
+      ".",
+      "~/ghq/github.com/nananaman/dotfiles",
+      "~/ghq/github.com/nananaman/skills",
+      "/tmp",
+      "/private/tmp"
+    ],
+    "denyWrite": [
+      ".env",
+      ".env.*",
+      "secrets/",
+      ".git/hooks/"
+    ]
+  },
+  "credentials": {
+    "envVars": [
+      {
+        "name": "AWS_ACCESS_KEY_ID",
+        "mode": "deny"
+      },
+      {
+        "name": "AWS_SECRET_ACCESS_KEY",
+        "mode": "deny"
+      },
+      {
+        "name": "AWS_SESSION_TOKEN",
+        "mode": "deny"
+      },
+      {
+        "name": "GOOGLE_APPLICATION_CREDENTIALS",
+        "mode": "deny"
+      },
+      {
+        "name": "GITHUB_TOKEN",
+        "mode": "deny"
+      },
+      {
+        "name": "GH_TOKEN",
+        "mode": "deny"
+      },
+      {
+        "name": "NPM_TOKEN",
+        "mode": "deny"
+      }
+    ]
+  },
+  "ignoreViolations": {
+    "*": [
+      "/usr/bin",
+      "/System"
+    ],
+    "git push": [
+      "/usr/bin/nc"
+    ],
+    "npm": [
+      "/private/tmp"
+    ]
+  },
+  "enableWeakerNestedSandbox": false,
+  "enableWeakerNetworkIsolation": false,
+  "allowAppleEvents": false
+}
