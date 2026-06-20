@@ -13,6 +13,9 @@ zsh/conf.d/local.zsh
 # Claude Code
 .claude/settings.local.json
 
+# Agent skills are installed by APM, not vendored in dotfiles
+.agents/skills/
+.claude/skills/
 
 # APM dependencies
 apm_modules/
