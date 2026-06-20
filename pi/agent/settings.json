@@ -3,7 +3,8 @@
   "defaultModel": "gpt-5.5",
   "defaultThinkingLevel": "medium",
   "packages": [
-    "npm:pi-web-access"
+    "npm:pi-web-access",
+    "npm:@tintinweb/pi-subagents@0.10.3"
   ],
   "lastChangelogVersion": "0.79.8",
   "theme": "dark"
