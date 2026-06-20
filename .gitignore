@@ -12,3 +12,7 @@ zsh/conf.d/local.zsh
 
 # Claude Code
 .claude/settings.local.json
+
+
+# APM dependencies
+apm_modules/

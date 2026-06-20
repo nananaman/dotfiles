@@ -1,0 +1,10 @@
+name: dotfiles
+version: 1.0.0
+description: APM project for dotfiles
+author: chouge
+dependencies:
+  apm:
+  - anthropics/skills/skills/skill-creator#57546260929473d4e0d1c1bb75297be2fdfa1949
+  mcp: []
+includes: auto
+scripts: {}

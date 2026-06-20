@@ -1,0 +1,15 @@
+lockfile_version: '1'
+generated_at: '2026-06-19T11:50:29.130067+00:00'
+apm_version: 0.14.2
+dependencies:
+- repo_url: anthropics/skills
+  host: github.com
+  resolved_commit: 57546260929473d4e0d1c1bb75297be2fdfa1949
+  resolved_ref: 57546260929473d4e0d1c1bb75297be2fdfa1949
+  virtual_path: skills/skill-creator
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/skill-creator
+  - .claude/skills/skill-creator
+  content_hash: sha256:b2bfe91d69ca99994c0566baede889e7d2b9bb8791c6b6106c5d387392f717f6
