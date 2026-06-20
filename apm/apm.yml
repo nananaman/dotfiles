@@ -9,4 +9,6 @@ dependencies:
     - cursor/plugins/cursor-team-kit/skills/make-pr-easy-to-review#b8f2564c2e8da66b331c1dd63c2a2925d6739961
     - nananaman/skills/meta/apm-usage#833dcbf68aba3cce811cb87a5e74717557da77d6
     - nananaman/skills/meta/code-review#833dcbf68aba3cce811cb87a5e74717557da77d6
+    - nananaman/skills/meta/skill-creator#5c1c1c71396b990542421930a025ce7dcf104ece
     - nananaman/skills/writing/japanese-tech-writing#020883d61164cab6f68d53cb3c0529232784d15d
+    - nananaman/skills/productivity/grill-me#5c1c1c71396b990542421930a025ce7dcf104ece
