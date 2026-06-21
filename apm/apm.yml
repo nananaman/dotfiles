@@ -7,7 +7,7 @@ dependencies:
     - mizchi/skills/retrospective-codify#f74212c0e3c2e1cf420d27c6418af1a10f697f4b
     - nananaman/skills/engineering/create-pr#a477e09b3d6595bb27addfde15289813047466c7
     - nananaman/skills/meta/apm-usage#833dcbf68aba3cce811cb87a5e74717557da77d6
-    - nananaman/skills/engineering/review-code-diff#e4ebfddf96d49613ec57b16b9a5005eb00d88a52
+    - nananaman/skills/engineering/review-diff-code#28908dc652a085a01fe3055cc7d91c4d7ac8a424
     - nananaman/skills/personal/chouge-git#0f419b091e798550d66d568a83d869691f75dddc
     - nananaman/skills/personal/chouge-changelog#9ecd9cbf2fdfaf2b00ae9b5a934919bef3ff5123
     - nananaman/skills/meta/skill-creator#5c1c1c71396b990542421930a025ce7dcf104ece
