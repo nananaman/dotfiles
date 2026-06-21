@@ -2,6 +2,6 @@
   "private": true,
   "devDependencies": {
     "@secretlint/secretlint-rule-preset-recommend": "^9.1.0",
-    "secretlint": "^9.1.0"
+    "secretlint": "^13.0.2"
   }
 }
