@@ -2,18 +2,34 @@
 set -euo pipefail
 
 # Global pre-push hook managed by dotfiles.
-# secretlint is opt-in per repository: add .secretlintrc* to enable it.
+# Repositories may override the default secretlint config by adding .secretlintrc*.
 # If a repository already has .git/hooks/pre-push, run it after this global gate.
 
 readonly zero_sha="0000000000000000000000000000000000000000"
 
-has_secretlint_config() {
-  [ -f .secretlintrc ] || \
-    [ -f .secretlintrc.json ] || \
-    [ -f .secretlintrc.yaml ] || \
-    [ -f .secretlintrc.yml ] || \
-    [ -f .secretlintrc.js ] || \
-    [ -f secretlint.config.js ]
+find_secretlint_config() {
+  local config
+  for config in \
+    .secretlintrc \
+    .secretlintrc.json \
+    .secretlintrc.yaml \
+    .secretlintrc.yml \
+    .secretlintrc.js \
+    secretlint.config.js; do
+    if [ -f "$config" ]; then
+      printf '%s\n' "$config"
+      return 0
+    fi
+  done
+
+  local config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
+  config="$config_home/secretlint/.secretlintrc.json"
+  if [ -f "$config" ]; then
+    printf '%s\n' "$config"
+    return 0
+  fi
+
+  return 1
 }
 
 resolve_secretlint() {
@@ -64,13 +80,16 @@ append_changed_files() {
 run_secretlint() {
   local refs_file="$1"
 
-  if ! has_secretlint_config; then
-    return 0
+  local secretlintrc=""
+  if ! secretlintrc=$(find_secretlint_config); then
+    echo "pre-push: secretlint config was not found." >&2
+    echo "pre-push: run nix run .#switch in dotfiles, or add .secretlintrc* to this repository." >&2
+    return 1
   fi
 
   local secretlint_cmd=""
   if ! secretlint_cmd=$(resolve_secretlint); then
-    echo "pre-push: .secretlintrc exists, but secretlint was not found." >&2
+    echo "pre-push: secretlint was not found." >&2
     echo "pre-push: run nix run .#switch in dotfiles, or install secretlint on PATH." >&2
     return 1
   fi
@@ -88,7 +107,7 @@ run_secretlint() {
     return 0
   fi
 
-  if ! sort -zu "$files_file" | xargs -0 $secretlint_cmd --; then
+  if ! sort -zu "$files_file" | xargs -0 $secretlint_cmd --secretlintrc "$secretlintrc" --; then
     rm -f "$files_file"
     echo "pre-push: secretlint failed. To bypass in an emergency, use git push --no-verify." >&2
     return 1

@@ -37,6 +37,8 @@ in
     ''}
     link_force "${dotfilesDir}/lazygit" "${configHome}/lazygit"
     link_force "${dotfilesDir}/cspell" "${configHome}/cspell"
+    $DRY_RUN_CMD mkdir -p "${configHome}/secretlint"
+    link_force "${dotfilesDir}/.secretlintrc.json" "${configHome}/secretlint/.secretlintrc.json"
     link_force "${dotfilesDir}/sql-formatter" "${configHome}/sql-formatter"
     link_force "${dotfilesDir}/stylua.toml" "${configHome}/stylua.toml"
     link_force "${dotfilesDir}/srt" "${configHome}/srt"

@@ -25,9 +25,11 @@ nix run .#update
 
 ## Pre-push secretlint
 
-Home Manager installs a global `secretlint` command and configures Git's global
+Home Manager installs a global `secretlint` command, links the default config to
+`~/.config/secretlint/.secretlintrc.json`, and configures Git's global
 `core.hooksPath` to `~/.config/git/hooks`. The managed `pre-push` hook runs
-`secretlint` only for repositories that opt in with `.secretlintrc*`.
+`secretlint` in every repository and uses a repository-local `.secretlintrc*`
+when present.
 
 The hook checks files in the ref range being pushed. For a new branch with no
 upstream, it scans all tracked files. Emergency bypass: `git push --no-verify`.
