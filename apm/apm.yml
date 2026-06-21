@@ -10,6 +10,8 @@ dependencies:
     - nananaman/skills/meta/apm-usage#833dcbf68aba3cce811cb87a5e74717557da77d6
     - nananaman/skills/engineering/code-review#a45c6bfedc058d8e33b46829029186e12d55d27c
     - nananaman/skills/personal/chouge-git#0f419b091e798550d66d568a83d869691f75dddc
+    - nananaman/skills/personal/chouge-changelog#9ecd9cbf2fdfaf2b00ae9b5a934919bef3ff5123
     - nananaman/skills/meta/skill-creator#5c1c1c71396b990542421930a025ce7dcf104ece
     - nananaman/skills/writing/japanese-tech-writing#020883d61164cab6f68d53cb3c0529232784d15d
     - nananaman/skills/productivity/grill-me#5c1c1c71396b990542421930a025ce7dcf104ece
+    - nananaman/skills/productivity/handoff#1415bd1dbac806ae0f9968add3d152d8439a05e5

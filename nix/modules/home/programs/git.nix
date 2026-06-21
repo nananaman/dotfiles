@@ -16,8 +16,13 @@
     settings = {
       user = {
         name = "chouge";
-        email = "foolawoola@gmail.com";
+        email = "36331803+nananaman@users.noreply.github.com";
       };
+      credential.helper = "!gh auth git-credential";
+      url."https://github.com/".insteadOf = [
+        "git@github.com:"
+        "ssh://git@github.com/"
+      ];
       core.hooksPath = "~/.config/git/hooks";
       merge.conflictstyle = "diff3";
       diff.colorMoved = "default";
