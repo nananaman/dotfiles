@@ -46,6 +46,23 @@ let
     pythonImportsCheck = [ "llm_github_models" ];
   };
 
+  secretlint = pkgs.buildNpmPackage {
+    pname = "dotfiles-secretlint";
+    version = "0.0.0";
+    src = ../../..;
+    npmDepsHash = "sha256-iHOgHl1G8JzG2OWvDiYUpL1GNIGdzNRqc2wPCQtYBYM=";
+    dontNpmBuild = true;
+    installPhase = ''
+      runHook preInstall
+
+      mkdir -p $out/bin $out/lib/dotfiles-secretlint
+      cp -R node_modules package.json package-lock.json $out/lib/dotfiles-secretlint/
+      ln -s $out/lib/dotfiles-secretlint/node_modules/.bin/secretlint $out/bin/secretlint
+
+      runHook postInstall
+    '';
+  };
+
   apm-cli = python.buildPythonApplication rec {
     pname = "apm-cli";
     version = "0.14.2";
@@ -113,6 +130,7 @@ in
     deno
     nixfmt
     neovim
+    secretlint
     apm-cli
     tmux
     rtk

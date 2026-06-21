@@ -18,6 +18,7 @@
         name = "chouge";
         email = "foolawoola@gmail.com";
       };
+      core.hooksPath = "~/.config/git/hooks";
       merge.conflictstyle = "diff3";
       diff.colorMoved = "default";
     };

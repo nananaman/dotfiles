@@ -92,5 +92,6 @@ in
 
     $DRY_RUN_CMD mkdir -p "${configHome}/git"
     link_force "${dotfilesDir}/git/ignore" "${configHome}/git/ignore"
+    link_force "${dotfilesDir}/git/hooks" "${configHome}/git/hooks"
   '';
 }

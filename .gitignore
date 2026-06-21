@@ -7,6 +7,9 @@ local.zsh
 result
 .direnv
 
+# Node.js
+node_modules/
+
 # Secrets
 zsh/conf.d/local.zsh
 

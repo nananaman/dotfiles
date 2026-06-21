@@ -1,0 +1,134 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Global pre-push hook managed by dotfiles.
+# secretlint is opt-in per repository: add .secretlintrc* to enable it.
+# If a repository already has .git/hooks/pre-push, run it after this global gate.
+
+readonly zero_sha="0000000000000000000000000000000000000000"
+
+has_secretlint_config() {
+  [ -f .secretlintrc ] || \
+    [ -f .secretlintrc.json ] || \
+    [ -f .secretlintrc.yaml ] || \
+    [ -f .secretlintrc.yml ] || \
+    [ -f .secretlintrc.js ] || \
+    [ -f secretlint.config.js ]
+}
+
+resolve_secretlint() {
+  if [ -x ./node_modules/.bin/secretlint ]; then
+    printf '%s\n' "./node_modules/.bin/secretlint"
+    return 0
+  fi
+
+  if command -v secretlint >/dev/null 2>&1; then
+    command -v secretlint
+    return 0
+  fi
+
+  if command -v npx >/dev/null 2>&1 && [ -f package.json ] && npx --no-install secretlint --version >/dev/null 2>&1; then
+    printf '%s\n' "npx --no-install secretlint"
+    return 0
+  fi
+
+  return 1
+}
+
+append_changed_files() {
+  local local_ref="$1"
+  local local_sha="$2"
+  local remote_sha="$4"
+  local upstream=""
+
+  # Branch/tag deletion push; nothing local is leaving the machine.
+  if [ "$local_sha" = "$zero_sha" ]; then
+    return 0
+  fi
+
+  if [ "$remote_sha" != "$zero_sha" ]; then
+    git diff --name-only --diff-filter=ACMR -z "${remote_sha}..${local_sha}"
+    return 0
+  fi
+
+  # New remote ref. Prefer the local ref's upstream when it exists; otherwise
+  # scan every tracked file, which is over-cautious but safe.
+  upstream=$(git rev-parse --verify --quiet "${local_ref}@{upstream}" 2>/dev/null || true)
+  if [ -n "$upstream" ]; then
+    git diff --name-only --diff-filter=ACMR -z "${upstream}..${local_sha}"
+  else
+    git ls-files -z
+  fi
+}
+
+run_secretlint() {
+  local refs_file="$1"
+
+  if ! has_secretlint_config; then
+    return 0
+  fi
+
+  local secretlint_cmd=""
+  if ! secretlint_cmd=$(resolve_secretlint); then
+    echo "pre-push: .secretlintrc exists, but secretlint was not found." >&2
+    echo "pre-push: run nix run .#switch in dotfiles, or install secretlint on PATH." >&2
+    return 1
+  fi
+
+  local files_file
+  files_file=$(mktemp)
+
+  local local_ref local_sha remote_ref remote_sha
+  while read -r local_ref local_sha remote_ref remote_sha; do
+    append_changed_files "$local_ref" "$local_sha" "$remote_ref" "$remote_sha" >>"$files_file"
+  done <"$refs_file"
+
+  if [ ! -s "$files_file" ]; then
+    rm -f "$files_file"
+    return 0
+  fi
+
+  if ! sort -zu "$files_file" | xargs -0 $secretlint_cmd --; then
+    rm -f "$files_file"
+    echo "pre-push: secretlint failed. To bypass in an emergency, use git push --no-verify." >&2
+    return 1
+  fi
+
+  rm -f "$files_file"
+}
+
+run_repo_local_pre_push() {
+  local refs_file="$1"
+  shift
+
+  local git_dir local_hook script_path local_hook_path
+  git_dir=$(git rev-parse --git-dir 2>/dev/null || true)
+  if [ -z "$git_dir" ]; then
+    return 0
+  fi
+
+  local_hook="$git_dir/hooks/pre-push"
+  if [ ! -x "$local_hook" ]; then
+    return 0
+  fi
+
+  script_path=$(cd "$(dirname "$0")" && pwd -P)/$(basename "$0")
+  local_hook_path=$(cd "$(dirname "$local_hook")" && pwd -P)/$(basename "$local_hook")
+  if [ "$script_path" = "$local_hook_path" ]; then
+    return 0
+  fi
+
+  "$local_hook" "$@" <"$refs_file"
+}
+
+main() {
+  local refs_file
+  refs_file=$(mktemp)
+  trap "rm -f '$refs_file'" EXIT
+  cat >"$refs_file"
+
+  run_secretlint "$refs_file"
+  run_repo_local_pre_push "$refs_file" "$@"
+}
+
+main "$@"
