@@ -42,6 +42,10 @@ in
     link_force "${dotfilesDir}/srt" "${configHome}/srt"
 
     link_force "${dotfilesDir}/apm" "${homeDirectory}/.apm"
+    $DRY_RUN_CMD mkdir -p "${homeDirectory}/.claude" "${homeDirectory}/.agents"
+    $DRY_RUN_CMD mkdir -p "${dotfilesDir}/apm/claude-skills" "${dotfilesDir}/apm/agent-skills"
+    link_force "${dotfilesDir}/apm/claude-skills" "${homeDirectory}/.claude/skills"
+    link_force "${dotfilesDir}/apm/agent-skills" "${homeDirectory}/.agents/skills"
 
     ${lib.optionalString pkgs.stdenv.isLinux ''
       cmd_exe="/mnt/c/Windows/System32/cmd.exe"
