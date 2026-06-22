@@ -16,6 +16,9 @@ zsh/conf.d/local.zsh
 # Claude Code
 .claude/settings.local.json
 
+# Pi worktrees
+.pi/worktrees/
+
 # Agent skills are installed by APM, not vendored in dotfiles
 .agents/skills/
 .claude/skills/
