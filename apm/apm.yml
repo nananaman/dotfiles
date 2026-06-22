@@ -9,6 +9,7 @@ dependencies:
     - nananaman/skills/engineering/create-pr#a477e09b3d6595bb27addfde15289813047466c7
     - nananaman/skills/meta/apm-usage#5622e07c1bc2bd5872b5a174880a06a0b231251d
     - nananaman/skills/engineering/review-diff-code#df8a88be0371d20eaf572142ebdb6a8158c7c67a
+    - nananaman/skills/engineering/sandbox-runtime#5e85fe6e71c5907f784741a851ccdd77d80c9466
     - nananaman/skills/personal/chouge-git#0f419b091e798550d66d568a83d869691f75dddc
     - nananaman/skills/personal/chouge-changelog#9ecd9cbf2fdfaf2b00ae9b5a934919bef3ff5123
     - nananaman/skills/meta/create-skill#5622e07c1bc2bd5872b5a174880a06a0b231251d
