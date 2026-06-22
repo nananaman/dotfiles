@@ -55,7 +55,9 @@ tmux/                      # tmux configuration
 aerospace/                 # AeroSpace window manager
 lazygit/                   # Lazygit configuration
 git/                       # Git config & ignore
-claude/                    # Claude Code settings & skills
+apm/                       # Global agent skills managed by APM
+agents/                    # Global agent instructions
+claude/                    # Claude Code settings
 codex/                     # Codex CLI instructions
 sandbox-exec/              # macOS sandbox profiles
 ```
