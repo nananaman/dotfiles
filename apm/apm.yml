@@ -5,7 +5,7 @@ target: claude,agent-skills
 dependencies:
   apm:
     - mizchi/skills/retrospective-codify#f74212c0e3c2e1cf420d27c6418af1a10f697f4b
-    - nananaman/skills/engineering/create-pr#a477e09b3d6595bb27addfde15289813047466c7
+    - nananaman/skills/engineering/create-pr#57fccf10a292978e3564a2e8087013a3b333e6d3
     - nananaman/skills/meta/apm-usage#5622e07c1bc2bd5872b5a174880a06a0b231251d
     - nananaman/skills/engineering/review-diff-code#df8a88be0371d20eaf572142ebdb6a8158c7c67a
     - nananaman/skills/engineering/test-writing-style#3288f12ad7ce58521fdc5f247ebcf946e53325d1
