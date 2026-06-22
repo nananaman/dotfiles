@@ -29,7 +29,8 @@ function spiw() {
     return 1
   fi
 
-  local name="spi-$(date +%Y%m%d-%H%M%S)-$$"
+  local name
+  name="$(mktemp -u "spi-$(date +%Y%m%d-%H%M%S)-XXXXXX")"
   local worktree_dir="$repo_root/.pi/worktrees/$name"
   local branch="spi/$name"
 
