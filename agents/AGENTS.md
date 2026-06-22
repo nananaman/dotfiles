@@ -21,8 +21,7 @@
 - コメントは必要な箇所にのみ付け、自明なことは書かない
 
 ## テスト
-- Arrange, Act, Assert のコメントを入れて読みやすくする
-- 異常系のテストは正常系とは別の関数に分ける
+- テストを新規追加・修正・レビューするときは `test-writing-style` skill を使う
 
 ## 環境
 - GitHub: {{ .github_username }}
