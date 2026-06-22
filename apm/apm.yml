@@ -12,10 +12,10 @@ dependencies:
     - nananaman/skills/engineering/sandbox-runtime#5e85fe6e71c5907f784741a851ccdd77d80c9466
     - nananaman/skills/personal/chouge-git#0f419b091e798550d66d568a83d869691f75dddc
     - nananaman/skills/personal/chouge-changelog#9ecd9cbf2fdfaf2b00ae9b5a934919bef3ff5123
-    - nananaman/skills/meta/create-skill#5622e07c1bc2bd5872b5a174880a06a0b231251d
-    - nananaman/skills/meta/reviewing-skills#5622e07c1bc2bd5872b5a174880a06a0b231251d
-    - nananaman/skills/meta/review-diff-skill#5622e07c1bc2bd5872b5a174880a06a0b231251d
-    - nananaman/skills/meta/review-skill#5622e07c1bc2bd5872b5a174880a06a0b231251d
+    - nananaman/skills/meta/create-skill#36fc5290c9ab9278fcb7415f408b7016baac1f88
+    - nananaman/skills/meta/reviewing-skills#36fc5290c9ab9278fcb7415f408b7016baac1f88
+    - nananaman/skills/meta/review-diff-skill#36fc5290c9ab9278fcb7415f408b7016baac1f88
+    - nananaman/skills/meta/review-skill#36fc5290c9ab9278fcb7415f408b7016baac1f88
     - nananaman/skills/writing/japanese-tech-writing#020883d61164cab6f68d53cb3c0529232784d15d
     - nananaman/skills/productivity/grill-me#5c1c1c71396b990542421930a025ce7dcf104ece
     - nananaman/skills/productivity/teach#d331688c0006ff84aa2cab16169229d5d7cbb8f2
