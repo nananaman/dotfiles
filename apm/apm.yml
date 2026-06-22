@@ -8,7 +8,8 @@ dependencies:
     - nananaman/skills/engineering/create-pr#57fccf10a292978e3564a2e8087013a3b333e6d3
     - nananaman/skills/meta/apm-usage#5622e07c1bc2bd5872b5a174880a06a0b231251d
     - nananaman/skills/engineering/review-diff-code#df8a88be0371d20eaf572142ebdb6a8158c7c67a
-    - nananaman/skills/engineering/test-writing-style#3288f12ad7ce58521fdc5f247ebcf946e53325d1
+    - nananaman/skills/engineering/tdd#2b8f0ca6d149939950277402b60c3ccc0c038ff0
+    - nananaman/skills/engineering/test-writing-style#2b8f0ca6d149939950277402b60c3ccc0c038ff0
     - nananaman/skills/engineering/sandbox-runtime#5e85fe6e71c5907f784741a851ccdd77d80c9466
     - nananaman/skills/personal/chouge-git#0f419b091e798550d66d568a83d869691f75dddc
     - nananaman/skills/personal/chouge-changelog#9ecd9cbf2fdfaf2b00ae9b5a934919bef3ff5123
