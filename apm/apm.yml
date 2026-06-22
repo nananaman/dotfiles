@@ -16,6 +16,6 @@ dependencies:
     - nananaman/skills/meta/review-diff-skill#70caff47c46e18c6f3b9d495fcc3b2279934d46e
     - nananaman/skills/meta/review-skill#70caff47c46e18c6f3b9d495fcc3b2279934d46e
     - nananaman/skills/writing/japanese-tech-writing#020883d61164cab6f68d53cb3c0529232784d15d
-    - nananaman/skills/productivity/grill-me#5c1c1c71396b990542421930a025ce7dcf104ece
+    - nananaman/skills/productivity/grill-me#a6c73fcad01636cb6ce719e8c2f498544e826daa
     - nananaman/skills/productivity/teach#d331688c0006ff84aa2cab16169229d5d7cbb8f2
     - nananaman/skills/productivity/handoff#1415bd1dbac806ae0f9968add3d152d8439a05e5
