@@ -56,6 +56,18 @@ return {
       -- end
 
       -- flutter-tools
+      if vim.lsp.document_color then
+        vim.api.nvim_create_autocmd("LspAttach", {
+          group = vim.api.nvim_create_augroup("flutter-document-color", { clear = true }),
+          callback = function(event)
+            local client = vim.lsp.get_client_by_id(event.data.client_id)
+            if client and client.name == "dartls" then
+              vim.lsp.document_color.enable(true, { bufnr = event.buf })
+            end
+          end,
+        })
+      end
+
       require("flutter-tools").setup({
         ui = {
           notification_style = "plugin",
@@ -64,11 +76,6 @@ return {
           enabled = true,
         },
         lsp = {
-          color = {
-            enabled = true,
-            background = true,
-            virtual_text = false,
-          },
           on_attach = on_attach,
           -- capabilities = capabilities,
         },

@@ -50,7 +50,7 @@ let
     pname = "dotfiles-secretlint";
     version = "0.0.0";
     src = ../../..;
-    npmDepsHash = "sha256-iHOgHl1G8JzG2OWvDiYUpL1GNIGdzNRqc2wPCQtYBYM=";
+    npmDepsHash = "sha256-1sVrc0S6G0p+ZWhFXFechDAMGy259J6Ziy8I427Hgks=";
     dontNpmBuild = true;
     installPhase = ''
       runHook preInstall
@@ -128,8 +128,10 @@ in
     # Development
     go
     deno
+    clang
     nixfmt
     neovim
+    tree-sitter
     secretlint
     apm-cli
     tmux
