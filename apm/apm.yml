@@ -6,6 +6,13 @@ dependencies:
   apm:
     - mizchi/skills/retrospective-codify#f74212c0e3c2e1cf420d27c6418af1a10f697f4b
     - nananaman/skills/engineering/create-pr#12e17fdedf84b1810af5e274fe36713839ca6ebc
+    - nananaman/skills/engineering/setup-engineering-flow#187035b02c56027cdddb6edf82d54095e17a5f3a
+    - nananaman/skills/engineering/draft-prd#187035b02c56027cdddb6edf82d54095e17a5f3a
+    - nananaman/skills/engineering/polish-prd#187035b02c56027cdddb6edf82d54095e17a5f3a
+    - nananaman/skills/engineering/draft-design-doc#187035b02c56027cdddb6edf82d54095e17a5f3a
+    - nananaman/skills/engineering/polish-design-doc#187035b02c56027cdddb6edf82d54095e17a5f3a
+    - nananaman/skills/engineering/draft-issue#187035b02c56027cdddb6edf82d54095e17a5f3a
+    - nananaman/skills/engineering/polish-issue#187035b02c56027cdddb6edf82d54095e17a5f3a
     - nananaman/skills/meta/apm-usage#12e17fdedf84b1810af5e274fe36713839ca6ebc
     - nananaman/skills/engineering/review-diff-code#d0913ca06392e1d330502f01c6d80257e717610f
     - nananaman/skills/engineering/tdd#2b8f0ca6d149939950277402b60c3ccc0c038ff0
@@ -18,6 +25,7 @@ dependencies:
     - nananaman/skills/meta/review-diff-skill#70caff47c46e18c6f3b9d495fcc3b2279934d46e
     - nananaman/skills/meta/review-skill#70caff47c46e18c6f3b9d495fcc3b2279934d46e
     - nananaman/skills/writing/japanese-tech-writing#020883d61164cab6f68d53cb3c0529232784d15d
-    - nananaman/skills/productivity/grill-me#5c1c1c71396b990542421930a025ce7dcf104ece
+    - nananaman/skills/productivity/grilling#187035b02c56027cdddb6edf82d54095e17a5f3a
+    - nananaman/skills/productivity/grill-me#187035b02c56027cdddb6edf82d54095e17a5f3a
     - nananaman/skills/productivity/teach#d331688c0006ff84aa2cab16169229d5d7cbb8f2
     - nananaman/skills/productivity/handoff#1415bd1dbac806ae0f9968add3d152d8439a05e5
