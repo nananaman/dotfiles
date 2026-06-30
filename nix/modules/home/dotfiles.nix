@@ -30,7 +30,10 @@ in
     if [ "$(readlink "${configHome}/zellij" 2>/dev/null || true)" = "${dotfilesDir}/zellij" ]; then
       $DRY_RUN_CMD rm -f "${configHome}/zellij"
     fi
-    link_force "${dotfilesDir}/tmux" "${configHome}/tmux"
+    if [ "$(readlink "${configHome}/tmux" 2>/dev/null || true)" = "${dotfilesDir}/tmux" ]; then
+      $DRY_RUN_CMD rm -f "${configHome}/tmux"
+    fi
+    link_force "${dotfilesDir}/herdr" "${configHome}/herdr"
 
     ${lib.optionalString pkgs.stdenv.isDarwin ''
       link_force "${dotfilesDir}/aerospace/aerospace.toml" "${homeDirectory}/.aerospace.toml"

@@ -6,7 +6,7 @@ unfocused-split-opacity = 0.8
 unfocused-split-fill = #000000
 
 # Tab / Pane
-# tmux に同じキーを渡すため、Ghostty 側では捕捉しない。
+# Herdr に同じキーを渡すため、Ghostty 側では捕捉しない。
 # keybind = shift+ctrl+w=new_tab
 # keybind = shift+ctrl+h=previous_tab
 # keybind = shift+ctrl+l=next_tab

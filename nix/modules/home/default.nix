@@ -4,11 +4,12 @@
   lib,
   helpers,
   dotfilesDir,
+  herdrPackage,
   ...
 }:
 {
   imports = [
-    ./packages.nix
+    (import ./packages.nix { inherit pkgs herdrPackage; })
 
     (import ./programs {
       inherit

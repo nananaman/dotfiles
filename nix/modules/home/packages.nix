@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, herdrPackage, ... }:
 let
   python = pkgs.python313Packages;
 
@@ -134,7 +134,7 @@ in
     tree-sitter
     secretlint
     apm-cli
-    tmux
+    herdrPackage
     rtk
     sandbox-runtime
 

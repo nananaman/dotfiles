@@ -14,6 +14,11 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    herdr = {
+      url = "github:ogulcancelik/herdr/v0.7.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -23,6 +28,7 @@
       nixpkgs,
       nix-darwin,
       home-manager,
+      herdr,
       ...
     }:
     let
@@ -159,6 +165,7 @@
                             helpers
                             dotfilesDir
                             ;
+                          herdrPackage = herdr.packages.${pkgs.system}.default;
                         })
                       ];
                     };
@@ -191,6 +198,7 @@
                         helpers
                         dotfilesDir
                         ;
+                      herdrPackage = herdr.packages.${pkgs.system}.default;
                     })
                   ];
 
