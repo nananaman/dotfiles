@@ -6,6 +6,7 @@
 - PR title / body / reviewer 向け説明は、ユーザーから別指定がない限り日本語で書く
 - Write PR titles, PR descriptions, and reviewer-facing explanations in Japanese unless the user explicitly asks for another language.
 - 不明瞭な指示は質問して明確にする
+- 「レビューさせて」「見せて」など、agent がレビューするのか人間がレビューするために Hunk 等で表示するのか曖昧な依頼では、レビュー tool を起動する前に主体を確認する
 - project の `AGENTS.md` や `CLAUDE.md` がある場合は、その追加指示も尊重する
 
 ## 開発スタイル
