@@ -64,6 +64,40 @@ assert_file_exists() {
   fi
 }
 
+json_array_contains() {
+  local file="$1"
+  local key="$2"
+  local expected="$3"
+
+  python3 - "$file" "$key" "$expected" <<'PY'
+import json
+import sys
+
+file, dotted_key, expected = sys.argv[1:]
+with open(file) as f:
+    data = json.load(f)
+
+value = data
+for part in dotted_key.split('.'):
+    value = value[part]
+
+sys.exit(0 if expected in value else 1)
+PY
+}
+
+assert_json_array_contains() {
+  local name="$1"
+  local file="$2"
+  local key="$3"
+  local expected="$4"
+
+  if json_array_contains "$file" "$key" "$expected"; then
+    pass "$name"
+  else
+    fail "$name: expected $key in $file to contain <$expected>"
+  fi
+}
+
 setup_repo_with_origin() {
   tmp_root="$(mktemp -d)"
   local origin="$tmp_root/origin.git"
@@ -280,6 +314,15 @@ test_spiw_creates_unique_worktrees_on_repeated_runs() {
   teardown_repo
 }
 
+test_srt_pi_allows_spiw_worktree_git_metadata_writes() {
+  # Arrange
+  local settings="$REPO_ROOT/srt/pi.json"
+
+  # Act & Assert
+  assert_json_array_contains "spiw worktree から Git metadata を書ける" "$settings" "filesystem.allowWrite" "../../../.git"
+  assert_json_array_contains "Git hooks は引き続き書き込み禁止にする" "$settings" "filesystem.denyWrite" "../../../.git/hooks/"
+}
+
 test_spiw_fails_outside_git_repository() {
   # Arrange
   tmp_root="$(mktemp -d)"
@@ -309,6 +352,7 @@ test_spiw_forwards_pi_arguments_unchanged
 test_spiw_warns_when_checkout_is_dirty
 test_spiw_does_not_copy_dirty_changes_to_fresh_worktree
 test_spiw_creates_unique_worktrees_on_repeated_runs
+test_srt_pi_allows_spiw_worktree_git_metadata_writes
 test_spiw_fails_outside_git_repository
 
 if (( failures > 0 )); then

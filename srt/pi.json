@@ -69,6 +69,7 @@
     "allowRead": [],
     "allowWrite": [
       ".",
+      "../../../.git",
       "~/ghq/github.com/nananaman/dotfiles",
       "~/ghq/github.com/nananaman/skills",
       "~/.pi/agent",
@@ -81,7 +82,8 @@
       ".env",
       ".env.*",
       "secrets/",
-      ".git/hooks/"
+      ".git/hooks/",
+      "../../../.git/hooks/"
     ]
   },
   "credentials": {
