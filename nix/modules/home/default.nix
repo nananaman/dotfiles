@@ -5,6 +5,7 @@
   helpers,
   dotfilesDir,
   herdrPackage,
+  hunkInput,
   ...
 }:
 {
@@ -18,6 +19,7 @@
         config
         dotfilesDir
         helpers
+        hunkInput
         ;
     })
 

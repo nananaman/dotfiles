@@ -19,6 +19,11 @@
       url = "github:ogulcancelik/herdr/v0.7.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    hunk = {
+      url = "github:modem-dev/hunk";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -29,6 +34,7 @@
       nix-darwin,
       home-manager,
       herdr,
+      hunk,
       ...
     }:
     let
@@ -166,6 +172,7 @@
                             dotfilesDir
                             ;
                           herdrPackage = herdr.packages.${pkgs.system}.default;
+                          hunkInput = hunk;
                         })
                       ];
                     };
@@ -199,6 +206,7 @@
                         dotfilesDir
                         ;
                       herdrPackage = herdr.packages.${pkgs.system}.default;
+                      hunkInput = hunk;
                     })
                   ];
 
