@@ -60,6 +60,10 @@ eval "$(atuin init zsh)"
 
 eval "$(mise activate zsh)"
 
+if command -v tirith >/dev/null 2>&1; then
+  eval "$(tirith init --shell zsh)"
+fi
+
 # Vite+ bin (https://viteplus.dev)
 [ -f "$HOME/.vite-plus/env" ] && . "$HOME/.vite-plus/env"
 

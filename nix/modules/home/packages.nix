@@ -123,7 +123,6 @@ in
     gh
     ghq
     lazygit
-    delta
 
     # Development
     go
@@ -137,6 +136,7 @@ in
     herdrPackage
     rtk
     sandbox-runtime
+    tirith
 
     # Cloud
     google-cloud-sdk

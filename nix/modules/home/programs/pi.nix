@@ -14,5 +14,7 @@ in
     };
     ".pi/agent/extensions/rtk.ts".source =
       config.lib.file.mkOutOfStoreSymlink "${piAgentDir}/extensions/rtk.ts";
+    ".pi/agent/extensions/tirith-guard.ts".source =
+      config.lib.file.mkOutOfStoreSymlink "${piAgentDir}/extensions/tirith-guard.ts";
   };
 }
