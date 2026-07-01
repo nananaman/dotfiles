@@ -4,31 +4,31 @@ target: claude,agent-skills
 
 dependencies:
   apm:
-    - nananaman/skills/meta/retrospective-codify#6fbec99f22e1f454ff294d5bbb4e5a1d693f36e8
-    - nananaman/skills/engineering/create-pr#12e17fdedf84b1810af5e274fe36713839ca6ebc
-    - nananaman/skills/engineering/ast-grep-practice#00f3c9511c3deb2dcbd4023af018287dc30147cf
-    - nananaman/skills/engineering/setup-engineering-flow#187035b02c56027cdddb6edf82d54095e17a5f3a
-    - nananaman/skills/engineering/draft-prd#187035b02c56027cdddb6edf82d54095e17a5f3a
-    - nananaman/skills/engineering/polish-prd#187035b02c56027cdddb6edf82d54095e17a5f3a
-    - nananaman/skills/engineering/draft-design-doc#187035b02c56027cdddb6edf82d54095e17a5f3a
-    - nananaman/skills/engineering/polish-design-doc#187035b02c56027cdddb6edf82d54095e17a5f3a
-    - nananaman/skills/engineering/draft-issue#187035b02c56027cdddb6edf82d54095e17a5f3a
-    - nananaman/skills/engineering/polish-issue#187035b02c56027cdddb6edf82d54095e17a5f3a
-    - nananaman/skills/meta/apm-usage#12e17fdedf84b1810af5e274fe36713839ca6ebc
-    - nananaman/skills/engineering/review-diff-code#d0913ca06392e1d330502f01c6d80257e717610f
-    - nananaman/skills/engineering/hunk-human-review#623255cecb8ec635549d9b8aada17001c8008a0f
-    - nananaman/skills/engineering/tdd#2b8f0ca6d149939950277402b60c3ccc0c038ff0
-    - nananaman/skills/engineering/test-writing-style#2b8f0ca6d149939950277402b60c3ccc0c038ff0
-    - nananaman/skills/engineering/sandbox-runtime#5e85fe6e71c5907f784741a851ccdd77d80c9466
-    - nananaman/skills/personal/chouge-git#0f419b091e798550d66d568a83d869691f75dddc
-    - nananaman/skills/personal/chouge-changelog#9ecd9cbf2fdfaf2b00ae9b5a934919bef3ff5123
+    - nananaman/skills/meta/retrospective-codify#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
+    - nananaman/skills/engineering/create-pr#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
+    - nananaman/skills/engineering/ast-grep-practice#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
+    - nananaman/skills/engineering/setup-engineering-flow#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
+    - nananaman/skills/engineering/draft-prd#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
+    - nananaman/skills/engineering/polish-prd#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
+    - nananaman/skills/engineering/draft-design-doc#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
+    - nananaman/skills/engineering/polish-design-doc#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
+    - nananaman/skills/engineering/draft-issue#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
+    - nananaman/skills/engineering/polish-issue#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
+    - nananaman/skills/meta/apm-usage#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
+    - nananaman/skills/engineering/review-diff-code#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
+    - nananaman/skills/engineering/hunk-human-review#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
+    - nananaman/skills/engineering/tdd#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
+    - nananaman/skills/engineering/test-writing-style#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
+    - nananaman/skills/engineering/sandbox-runtime#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
+    - nananaman/skills/personal/chouge-git#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
+    - nananaman/skills/personal/chouge-changelog#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
     - nananaman/skills/meta/create-skill#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
-    - nananaman/skills/meta/reviewing-skills#bdba9198b10fa9210526812f4664385206db9d11
-    - nananaman/skills/meta/review-diff-skill#bdba9198b10fa9210526812f4664385206db9d11
-    - nananaman/skills/meta/review-skill#bdba9198b10fa9210526812f4664385206db9d11
-    - nananaman/skills/writing/japanese-tech-writing#020883d61164cab6f68d53cb3c0529232784d15d
-    - nananaman/skills/productivity/grilling#187035b02c56027cdddb6edf82d54095e17a5f3a
-    - nananaman/skills/productivity/grill-me#187035b02c56027cdddb6edf82d54095e17a5f3a
-    - nananaman/skills/productivity/teach#d331688c0006ff84aa2cab16169229d5d7cbb8f2
-    - nananaman/skills/productivity/handoff#1415bd1dbac806ae0f9968add3d152d8439a05e5
+    - nananaman/skills/meta/reviewing-skills#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
+    - nananaman/skills/meta/review-diff-skill#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
+    - nananaman/skills/meta/review-skill#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
+    - nananaman/skills/writing/japanese-tech-writing#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
+    - nananaman/skills/productivity/grilling#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
+    - nananaman/skills/productivity/grill-me#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
+    - nananaman/skills/productivity/teach#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
+    - nananaman/skills/productivity/handoff#540eb8bb7347bece8d79d5d863d7aed80c56bb7e
     - nananaman/skills/productivity/herdr#3816dadf763befb0825e44f77e3cc01173ce3258
