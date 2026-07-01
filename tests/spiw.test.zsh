@@ -166,6 +166,51 @@ test_spiw_runs_pi_inside_created_worktree() {
   teardown_repo
 }
 
+test_spiw_trusts_worktree_mise_config_before_entering_worktree() {
+  # Arrange
+  setup_repo_with_origin
+  local repo="$test_repo"
+  print -r -- '[tools]' > "$repo/mise.toml"
+  git -C "$repo" add mise.toml
+  git -C "$repo" commit -m 'add mise config' >/dev/null
+  git -C "$repo" push --no-verify origin main >/dev/null 2>&1
+  git -C "$repo" fetch origin >/dev/null 2>&1
+
+  local stdout_file="$tmp_root/stdout"
+  local stderr_file="$tmp_root/stderr"
+  local log_file="$tmp_root/srt.log"
+  local mise_log="$tmp_root/mise.log"
+
+  # Act
+  (
+    cd "$repo" || exit 1
+    export SRT_STUB_LOG="$log_file"
+    export MISE_STUB_LOG="$mise_log"
+    source "$SPIW_SCRIPT"
+    mise() {
+      for arg in "$@"; do
+        print -r -- "ARG=$arg" >> "$MISE_STUB_LOG"
+      done
+    }
+    srt() {
+      print -r -- "PWD=$PWD" > "$SRT_STUB_LOG"
+    }
+    spiw
+  ) >"$stdout_file" 2>"$stderr_file"
+  local exit_code="$?"
+  local worktree="$(latest_worktree_dir "$repo")"
+  local mise_log_content="$(<"$mise_log")"
+  local srt_log_content="$(<"$log_file")"
+
+  # Assert
+  assert_eq "mise.toml がある worktree でも spiw は成功する" "0" "$exit_code"
+  assert_contains "worktree の mise.toml を trust する" "$mise_log_content" "ARG=trust"
+  assert_contains "trust 対象は作成した worktree の mise.toml" "$mise_log_content" "ARG=$worktree/mise.toml"
+  assert_contains "mise trust 後に worktree で srt を起動する" "$srt_log_content" "PWD=$worktree"
+
+  teardown_repo
+}
+
 test_spiw_forwards_pi_arguments_unchanged() {
   # Arrange
   setup_repo_with_origin
@@ -259,6 +304,7 @@ test_spiw_fails_outside_git_repository() {
 
 test_spiw_creates_worktree_from_origin_head
 test_spiw_runs_pi_inside_created_worktree
+test_spiw_trusts_worktree_mise_config_before_entering_worktree
 test_spiw_forwards_pi_arguments_unchanged
 test_spiw_warns_when_checkout_is_dirty
 test_spiw_does_not_copy_dirty_changes_to_fresh_worktree

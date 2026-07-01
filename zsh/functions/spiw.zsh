@@ -43,5 +43,9 @@ function spiw() {
 
   echo "spiw: created worktree $worktree_dir ($branch)" >&2
 
+  if [[ -f "$worktree_dir/mise.toml" ]] && command -v mise >/dev/null 2>&1; then
+    mise trust "$worktree_dir/mise.toml" || return 1
+  fi
+
   (cd "$worktree_dir" && srt --settings "$settings" pi --name "$name" "$@")
 }
