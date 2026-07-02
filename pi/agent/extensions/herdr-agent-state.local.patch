@@ -1,0 +1,195 @@
+--- herdr-agent-state.upstream.ts
++++ herdr-agent-state.ts
+@@ -1,21 +1,50 @@
+-// installed by herdr
+-// managed by herdr; reinstalling or updating the integration overwrites this file.
+-// add custom hooks/plugins beside this file instead of editing it.
++// Vendored from `herdr integration install pi`.
++// Dotfiles owns this copy and home-manager links it into ~/.pi/agent/extensions.
++// To update: reinstall the Herdr pi integration, copy the generated file here,
++// and re-apply the local hardening below.
+ // HERDR_INTEGRATION_ID=pi
+ // HERDR_INTEGRATION_VERSION=3
+ // @ts-nocheck
+ 
++import { lstatSync } from "node:fs";
+ import { createConnection } from "node:net";
++import { isAbsolute, normalize, sep } from "node:path";
+ 
+ const HERDR_ENV = process.env.HERDR_ENV;
+ const socketPath = process.env.HERDR_SOCKET_PATH;
+ const paneId = process.env.HERDR_PANE_ID;
+ const source = "herdr:pi";
+ 
++// BEGIN local hardening: trust only the user's Herdr socket.
+ function enabled() {
+-  return HERDR_ENV === "1" && !!socketPath && !!paneId;
++  return HERDR_ENV === "1" && isTrustedSocketPath(socketPath) && !!paneId;
+ }
+ 
++function isTrustedSocketPath(path: string | undefined): boolean {
++  if (!path || !isAbsolute(path)) {
++    return false;
++  }
++
++  const home = process.env.HOME;
++  if (!home) {
++    return false;
++  }
++
++  const normalizedPath = normalize(path);
++  const herdrConfigDir = `${normalize(home)}${sep}.config${sep}herdr`;
++  if (normalizedPath !== `${herdrConfigDir}${sep}herdr.sock`) {
++    return false;
++  }
++
++  try {
++    const stat = lstatSync(normalizedPath);
++    return stat.isSocket() && stat.uid === process.getuid?.();
++  } catch {
++    return false;
++  }
++}
++// END local hardening.
++
+ function sendRequest(request: unknown): Promise<void> {
+   if (!enabled()) {
+     return Promise.resolve();
+@@ -91,13 +120,7 @@
+ }
+ 
+ function withSessionRef(params: Record<string, unknown>): Record<string, unknown> {
+-  if (currentAgentSessionPath) {
+-    return { ...params, agent_session_path: currentAgentSessionPath };
+-  }
+-  if (currentAgentSessionId) {
+-    return { ...params, agent_session_id: currentAgentSessionId };
+-  }
+-  return params;
++  return { ...params, ...currentSessionRef() };
+ }
+ 
+ function currentSessionRef(): Record<string, unknown> | undefined {
+@@ -159,11 +182,19 @@
+ 
+ let sendInFlight = false;
+ let queuedState: QueuedState | undefined;
++// BEGIN local hardening: avoid stale state reports after release.
++let acceptingStateReports = true;
++let activeDrain: Promise<void> | undefined;
++// END local hardening.
+ 
+ function queueState(state: AgentState, message?: string): void {
++  if (!acceptingStateReports) {
++    return;
++  }
++
+   queuedState = { state, message, seq: nextReportSeq() };
+   if (!sendInFlight) {
+-    void drainStateQueue();
++    activeDrain = drainStateQueue();
+   }
+ }
+ 
+@@ -174,7 +205,7 @@
+ 
+   sendInFlight = true;
+   try {
+-    while (queuedState) {
++    while (queuedState && acceptingStateReports) {
+       const next = queuedState;
+       queuedState = undefined;
+       await sendState(next.state, next.message, next.seq);
+@@ -182,8 +213,10 @@
+   } finally {
+     sendInFlight = false;
+     if (queuedState) {
+-      void drainStateQueue();
++      activeDrain = drainStateQueue();
++      return;
+     }
++    activeDrain = undefined;
+   }
+ }
+ 
+@@ -215,6 +248,8 @@
+   if (!enabled()) {
+     return;
+   }
++  acceptingStateReports = true;
++  queuedState = undefined;
+ 
+   let agentActive = false;
+   let retryHoldActive = false;
+@@ -234,6 +269,13 @@
+     }
+   }
+ 
++  // BEGIN local hardening: blocked UI must not cancel retry-failure transition.
++  function clearIdleTimer() {
++    clearTimer(idleTimer);
++    idleTimer = undefined;
++  }
++  // END local hardening.
++
+   function clearPendingTimers() {
+     clearTimer(idleTimer);
+     clearTimer(retryTimer);
+@@ -247,6 +289,20 @@
+     failureMessage = undefined;
+   }
+ 
++  function clearSessionState() {
++    rootSession = false;
++    agentActive = false;
++    blockedCount = 0;
++    blockedMessage = undefined;
++    lastState = undefined;
++    lastMessage = undefined;
++    acceptingStateReports = false;
++    queuedState = undefined;
++    activeDrain = undefined;
++    clearPendingTimers();
++    clearFailureState();
++  }
++
+   function desiredState() {
+     if (blockedCount > 0) {
+       return { state: "blocked" as const, message: blockedMessage };
+@@ -309,16 +365,22 @@
+       return;
+     }
+ 
+-    clearPendingTimers();
++    clearIdleTimer();
+     blockedCount += 1;
+     blockedMessage = data.label;
+     publishState();
+   });
+ 
+   pi.on("session_start", (_event, ctx) => {
+-    if (ctx?.hasUI !== true) {
++    // BEGIN local hardening: report only real terminal TUI sessions.
++    if (ctx?.mode !== "tui") {
++      clearSessionState();
+       return;
+     }
++    // END local hardening.
++    acceptingStateReports = true;
++    queuedState = undefined;
++    activeDrain = undefined;
+     rootSession = true;
+     updateSessionRef(ctx);
+     void reportSession();
+@@ -361,7 +423,11 @@
+     if (!rootSession) {
+       return;
+     }
++    acceptingStateReports = false;
++    queuedState = undefined;
+     clearPendingTimers();
++    await activeDrain;
+     await releaseAgent();
++    rootSession = false;
+   });
+ }
