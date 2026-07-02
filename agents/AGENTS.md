@@ -12,6 +12,7 @@
 ## 開発スタイル
 - TDD で開発する（探索 → Red → Green → Refactoring）
 - KPI やカバレッジ目標が与えられたら、達成するまで試行する
+- コード・設定変更では、完了報告前に該当 review gate（通常は `review-diff-code`）を通し、採用指摘を修正して再確認する（理由: test だけでは設計・運用・security regression を拾い切れない）
 
 ## コード設計
 - 関心の分離を保つ
