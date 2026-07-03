@@ -62,10 +62,10 @@ rename_tab = "prefix+shift+t"
 close_tab = "prefix+shift+x"
 
 copy_mode = "prefix+["
-focus_pane_left = ["prefix+h", "shift+left"]
-focus_pane_down = ["prefix+j", "shift+down"]
-focus_pane_up = ["prefix+k", "shift+up"]
-focus_pane_right = ["prefix+l", "shift+right"]
+focus_pane_left = "shift+left"
+focus_pane_down = "shift+down"
+focus_pane_up = "shift+up"
+focus_pane_right = "shift+right"
 swap_pane_left = "prefix+shift+h"
 swap_pane_down = "prefix+shift+j"
 swap_pane_up = "prefix+shift+k"
@@ -80,6 +80,10 @@ resize_mode = "prefix+r"
 new_worktree = "prefix+shift+g"
 open_worktree = "prefix+shift+o"
 remove_worktree = "prefix+alt+d"
+previous_workspace = "ctrl+k"
+next_workspace = "ctrl+j"
+previous_agent = "prefix+k"
+next_agent = "prefix+j"
 
 [[keys.command]]
 key = "prefix+f"
