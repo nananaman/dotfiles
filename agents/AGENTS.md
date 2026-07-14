@@ -6,6 +6,7 @@
 - PR title / body / reviewer 向け説明は、ユーザーから別指定がない限り日本語で書く
 - Write PR titles, PR descriptions, and reviewer-facing explanations in Japanese unless the user explicitly asks for another language.
 - 不明瞭な指示は質問して明確にする
+- ユーザーが設計・方針について質問している段階では変更承認と解釈せず、選択肢と推奨案を説明して方向性の合意を待ってから着手する（理由: 問いかけへの即時修正は、未合意の設計を既成事実にして手戻りを増やす）
 - project の `AGENTS.md` や `CLAUDE.md` がある場合は、その追加指示も尊重する
 
 ## 開発スタイル
