@@ -15,6 +15,7 @@ dependencies:
     - path: ~/ghq/github.com/nananaman/skills/engineering/draft-issue
     - path: ~/ghq/github.com/nananaman/skills/engineering/polish-issue
     - path: ~/ghq/github.com/nananaman/skills/meta/apm-usage
+    - path: ~/ghq/github.com/nananaman/skills/meta/update-skills
     - path: ~/ghq/github.com/nananaman/skills/engineering/review-diff-code
     - path: ~/ghq/github.com/nananaman/skills/engineering/hunk-human-review
     - path: ~/ghq/github.com/nananaman/skills/engineering/tdd
@@ -29,3 +30,4 @@ dependencies:
     - path: ~/ghq/github.com/nananaman/skills/productivity/teach
     - path: ~/ghq/github.com/nananaman/skills/productivity/handoff
     - path: ~/ghq/github.com/nananaman/skills/productivity/herdr
+    - path: ~/ghq/github.com/nananaman/skills/productivity/improve-agent-prompt
