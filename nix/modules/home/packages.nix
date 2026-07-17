@@ -63,6 +63,8 @@ let
     '';
   };
 
+  omp-cli = import ../../../nix/packages/omp-cli { inherit pkgs; };
+
   apm-cli = python.buildPythonApplication rec {
     pname = "apm-cli";
     version = "0.14.2";
@@ -127,12 +129,13 @@ in
     # Development
     go
     deno
-    clang
+    stdenv.cc
     nixfmt
     neovim
     tree-sitter
     secretlint
     apm-cli
+    omp-cli
     herdrPackage
     rtk
     sandbox-runtime
