@@ -1,0 +1,8 @@
+{
+  "extends": ["chouge-agent-common", "pi"],
+  "meta": {
+    "name": "chouge-pi",
+    "version": "0.1.0",
+    "description": "Local Pi profile"
+  }
+}

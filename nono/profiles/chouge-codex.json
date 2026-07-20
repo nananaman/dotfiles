@@ -1,0 +1,8 @@
+{
+  "extends": ["chouge-agent-common", "codex"],
+  "meta": {
+    "name": "chouge-codex",
+    "version": "0.1.0",
+    "description": "Local Codex profile"
+  }
+}

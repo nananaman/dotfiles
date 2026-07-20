@@ -1,0 +1,8 @@
+{
+  "extends": ["chouge-agent-common", "claude-code"],
+  "meta": {
+    "name": "chouge-claude",
+    "version": "0.1.0",
+    "description": "Local Claude Code profile"
+  }
+}

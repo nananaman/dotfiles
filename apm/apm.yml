@@ -21,6 +21,8 @@ dependencies:
     - path: ~/ghq/github.com/nananaman/skills/engineering/tdd
     - path: ~/ghq/github.com/nananaman/skills/engineering/test-writing-style
     - path: ~/ghq/github.com/nananaman/skills/engineering/sandbox-runtime
+    - path: ~/ghq/github.com/nananaman/skills/engineering/apple-container
+    - path: ~/ghq/github.com/nananaman/skills/engineering/nono-sandbox-maintenance
     - path: ~/ghq/github.com/nananaman/skills/personal/chouge-git
     - path: ~/ghq/github.com/nananaman/skills/personal/chouge-changelog
     - path: ~/ghq/github.com/nananaman/skills/meta/skill-workbench

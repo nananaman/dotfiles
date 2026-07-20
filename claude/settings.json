@@ -40,7 +40,8 @@
     "hookify@claude-plugins-official": true,
     "gopls-lsp@claude-plugins-official": true,
     "superpowers@superpowers-marketplace": true,
-    "superpowers-developing-for-claude-code@superpowers-marketplace": true
+    "superpowers-developing-for-claude-code@superpowers-marketplace": true,
+    "nono@nolabs-ai": true
   },
   "extraKnownMarketplaces": {
     "superpowers-marketplace": {

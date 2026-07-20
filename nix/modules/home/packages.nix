@@ -64,6 +64,105 @@ let
   };
 
   omp-cli = import ../../../nix/packages/omp-cli { inherit pkgs; };
+  nono-cli =
+    let
+      version = "0.68.0";
+      artifacts = {
+        aarch64-darwin = {
+          target = "aarch64-apple-darwin";
+          hash = "sha256-vECYLyarOAIG4ek8rMmJjQwxtdiGP+Xt1CsXzhhGXQQ=";
+        };
+        x86_64-linux = {
+          target = "x86_64-unknown-linux-gnu";
+          hash = "sha256-enD79VQjP9X5ZzrNuAZTS1FAE3RgSH0Nhq9JrShsn6o=";
+        };
+      };
+      artifact = artifacts.${pkgs.stdenv.hostPlatform.system};
+    in
+    pkgs.stdenvNoCC.mkDerivation {
+      pname = "nono";
+      inherit version;
+
+      src = pkgs.fetchurl {
+        url = "https://github.com/nolabs-ai/nono/releases/download/v${version}/nono-v${version}-${artifact.target}.tar.gz";
+        inherit (artifact) hash;
+      };
+
+      sourceRoot = ".";
+
+      installPhase = ''
+        runHook preInstall
+
+        install -Dm755 nono $out/bin/nono
+
+        runHook postInstall
+      '';
+
+      meta = {
+        description = "Capability-based sandbox shell for AI agents with OS-enforced isolation";
+        homepage = "https://nono.sh";
+        license = pkgs.lib.licenses.asl20;
+        mainProgram = "nono";
+        platforms = builtins.attrNames artifacts;
+      };
+    };
+
+  codex-sandboxed = pkgs.writeShellScriptBin "codex" ''
+    codex_bin=""
+    old_ifs="$IFS"
+    IFS=:
+    for bin_dir in $PATH; do
+      candidate="$bin_dir/codex"
+      if [ -x "$candidate" ] && [ ! "$candidate" -ef "$0" ]; then
+        codex_bin="$candidate"
+        break
+      fi
+    done
+    IFS="$old_ifs"
+    if [ -z "$codex_bin" ]; then
+      echo "codex: raw executable not found on PATH" >&2
+      exit 127
+    fi
+    if [ -n "''${NONO_CAP_FILE:-}" ]; then
+      exec "$codex_bin" "$@"
+    fi
+    exec ${nono-cli}/bin/nono run --profile chouge-codex --allow-cwd -- \
+      "$codex_bin" --sandbox danger-full-access --ask-for-approval on-request "$@"
+  '';
+
+  claude-sandboxed = pkgs.writeShellScriptBin "claude" ''
+    claude_bin="$HOME/.local/bin/claude"
+    if [ ! -x "$claude_bin" ]; then
+      echo "claude: raw executable not found: $claude_bin" >&2
+      exit 127
+    fi
+    if [ -n "''${NONO_CAP_FILE:-}" ]; then
+      exec "$claude_bin" "$@"
+    fi
+    exec ${nono-cli}/bin/nono run --profile chouge-claude --allow-cwd -- \
+      "$claude_bin" --dangerously-skip-permissions "$@"
+  '';
+
+  pi-sandboxed = pkgs.writeShellScriptBin "pi" ''
+    pi_bin="$HOME/.vite-plus/bin/pi"
+    if [ ! -x "$pi_bin" ]; then
+      echo "pi: raw executable not found: $pi_bin" >&2
+      exit 127
+    fi
+    if [ -n "''${NONO_CAP_FILE:-}" ]; then
+      exec "$pi_bin" "$@"
+    fi
+    exec ${nono-cli}/bin/nono run --profile chouge-pi --allow-cwd -- "$pi_bin" "$@"
+  '';
+
+  agent-wrappers = pkgs.symlinkJoin {
+    name = "sandboxed-agent-wrappers";
+    paths = [
+      codex-sandboxed
+      claude-sandboxed
+      pi-sandboxed
+    ];
+  };
 
   apm-cli = python.buildPythonApplication rec {
     pname = "apm-cli";
@@ -104,6 +203,8 @@ in
     RTK_TELEMETRY_DISABLED = "1";
   };
 
+  home.file.".local/share/nono-agent-wrappers".source = "${agent-wrappers}/bin";
+
   home.packages = with pkgs; [
     # Shell
     zsh
@@ -139,6 +240,8 @@ in
     herdrPackage
     rtk
     sandbox-runtime
+    nono-cli
+    agent-wrappers
     tirith
 
     # Cloud

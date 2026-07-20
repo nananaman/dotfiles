@@ -86,3 +86,9 @@ esac
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+# Keep the default agent commands behind the common nono boundary.
+NONO_AGENT_WRAPPER_BIN="$HOME/.local/share/nono-agent-wrappers"
+if [[ -d "$NONO_AGENT_WRAPPER_BIN" ]]; then
+  export PATH="$NONO_AGENT_WRAPPER_BIN:$PATH"
+fi

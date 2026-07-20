@@ -1,0 +1,129 @@
+{
+  "extends": "default",
+  "meta": {
+    "name": "chouge-agent-common",
+    "version": "0.1.0",
+    "description": "Shared runtime access for local coding agents"
+  },
+  "groups": {
+    "include": ["mise_manager"]
+  },
+  "filesystem": {
+    "allow": [
+      "$HOME/.agents",
+      "$HOME/.claude",
+      "$HOME/.codex",
+      "$HOME/.pi"
+    ],
+    "allow_file": [
+      "$HOME/.claude.json",
+      "$HOME/.claude.json.lock",
+      "$HOME/.claude.lock"
+    ],
+    "read": [
+      "$HOME/.local/share/nono-agent-wrappers"
+    ]
+  },
+  "platform_overrides": {
+    "macos": {
+      "filesystem": {
+        "read": ["$HOME/.vite-plus"],
+        "write_file": [
+          "$HOME/.vite-plus/cache/resolve_cache.json",
+          "$HOME/.vite-plus/js_runtime/node/index_cache.json"
+        ]
+      }
+    }
+  },
+  "command_policies": {
+    "approval_backends": {
+      "terminal": {
+        "type": "terminal"
+      }
+    },
+    "approval_defaults": {
+      "backend": "terminal",
+      "timeout_secs": 60
+    },
+    "commands": {
+      "container": {
+        "executable": "/opt/homebrew/opt/container/libexec/container",
+        "from": {
+          "session": {
+            "sandbox": {
+              "fs_read": [
+                "/opt/homebrew/opt/container",
+                "$WORKDIR",
+                "$HOME/Library/Application Support/com.apple.container"
+              ],
+              "fs_read_file": [
+                "/bin/launchctl"
+              ],
+              "fs_write": [
+                "$WORKDIR",
+                "$HOME/Library/Application Support/com.apple.container"
+              ],
+              "environment": {
+                "set_vars": {
+                  "CONTAINER_INSTALL_ROOT": "/opt/homebrew/opt/container"
+                }
+              },
+              "unsafe_macos_seatbelt_rules": [
+                "(allow process-exec (literal \"/bin/launchctl\"))"
+              ]
+            },
+            "invocation_policy": {
+              "default": "approve",
+              "deny": [
+                {
+                  "argv": { "prefix": ["registry", "login"] },
+                  "reason": "registry credential changes stay outside agent sessions"
+                },
+                {
+                  "argv": { "prefix": ["registry", "logout"] },
+                  "reason": "registry credential changes stay outside agent sessions"
+                },
+                {
+                  "argv": { "prefix": ["system", "dns", "create"] },
+                  "reason": "host DNS and packet-filter changes are not delegated to agents"
+                },
+                {
+                  "argv": { "prefix": ["system", "dns", "delete"] },
+                  "reason": "host DNS and packet-filter changes are not delegated to agents"
+                },
+                {
+                  "argv": { "prefix": ["system", "kernel", "set"] },
+                  "reason": "system kernel changes are not delegated to agents"
+                }
+              ],
+              "allow": [
+                { "argv": { "exact": [] } },
+                { "argv": { "exact": ["--help"] } },
+                { "argv": { "exact": ["--version"] } },
+                { "argv": { "prefix": ["list"] } },
+                { "argv": { "prefix": ["inspect"] } },
+                { "argv": { "prefix": ["logs"] } },
+                { "argv": { "prefix": ["stats"] } },
+                { "argv": { "prefix": ["builder", "status"] } },
+                { "argv": { "prefix": ["image", "list"] } },
+                { "argv": { "prefix": ["image", "inspect"] } },
+                { "argv": { "prefix": ["registry", "list"] } },
+                { "argv": { "prefix": ["network", "list"] } },
+                { "argv": { "prefix": ["network", "inspect"] } },
+                { "argv": { "prefix": ["volume", "list"] } },
+                { "argv": { "prefix": ["volume", "inspect"] } },
+                { "argv": { "prefix": ["machine", "list"] } },
+                { "argv": { "prefix": ["machine", "inspect"] } },
+                { "argv": { "prefix": ["machine", "logs"] } },
+                { "argv": { "prefix": ["system", "version"] } },
+                { "argv": { "prefix": ["system", "df"] } },
+                { "argv": { "prefix": ["system", "property", "list"] } },
+                { "argv": { "prefix": ["system", "dns", "list"] } }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

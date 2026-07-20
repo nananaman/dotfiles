@@ -46,6 +46,12 @@ in
     link_force "${dotfilesDir}/stylua.toml" "${configHome}/stylua.toml"
     link_force "${dotfilesDir}/srt" "${configHome}/srt"
 
+    $DRY_RUN_CMD mkdir -p "${configHome}/nono/profiles"
+    link_force "${dotfilesDir}/nono/profiles/chouge-agent-common.json" "${configHome}/nono/profiles/chouge-agent-common.json"
+    link_force "${dotfilesDir}/nono/profiles/chouge-codex.json" "${configHome}/nono/profiles/chouge-codex.json"
+    link_force "${dotfilesDir}/nono/profiles/chouge-claude.json" "${configHome}/nono/profiles/chouge-claude.json"
+    link_force "${dotfilesDir}/nono/profiles/chouge-pi.json" "${configHome}/nono/profiles/chouge-pi.json"
+
     link_force "${dotfilesDir}/apm" "${homeDirectory}/.apm"
 
     ${lib.optionalString pkgs.stdenv.isLinux ''

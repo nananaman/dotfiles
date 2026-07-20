@@ -69,6 +69,10 @@
       "nikitabobko/tap"
     ];
 
+    brews = [
+      "container"
+    ];
+
     casks = [
       "ghostty"
       "nikitabobko/tap/aerospace"

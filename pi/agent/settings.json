@@ -7,7 +7,10 @@
     "npm:@tintinweb/pi-subagents@0.10.3",
     "npm:@juicesharp/rpiv-ask-user-question@1.20.0",
     "npm:@howaboua/pi-codex-conversion",
-    "npm:pi-mcp-extension@1.5.0"
+    "npm:pi-mcp-extension@1.5.0",
+    {
+      "source": "/Users/juntawatanabe/.config/nono/packages/nolabs-ai/pi"
+    }
   ],
   "lastChangelogVersion": "0.80.3",
   "theme": "dark"
