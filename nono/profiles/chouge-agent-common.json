@@ -13,7 +13,9 @@
       "$HOME/.agents",
       "$HOME/.claude",
       "$HOME/.codex",
-      "$HOME/.pi"
+      "$HOME/.pi",
+      "$HOME/.local/state/mise",
+      "$HOME/go/pkg/mod"
     ],
     "allow_file": [
       "$HOME/.claude.json",
