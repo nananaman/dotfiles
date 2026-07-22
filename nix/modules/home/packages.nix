@@ -124,7 +124,7 @@ let
       exit 127
     fi
     if [ -n "''${NONO_CAP_FILE:-}" ]; then
-      exec "$codex_bin" "$@"
+      exec "$codex_bin" --sandbox danger-full-access --ask-for-approval on-request "$@"
     fi
     exec ${nono-cli}/bin/nono run --silent --profile chouge-codex --allow-cwd -- \
       "$codex_bin" --sandbox danger-full-access --ask-for-approval on-request "$@"

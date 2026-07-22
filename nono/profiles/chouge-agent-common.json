@@ -15,7 +15,9 @@
       "$HOME/.codex",
       "$HOME/.pi",
       "$HOME/.local/state/mise",
-      "$HOME/go/pkg/mod"
+      "$HOME/go/pkg/mod",
+      "$HOME/ghq/github.com/nananaman/dotfiles",
+      "$HOME/ghq/github.com/nananaman/skills"
     ],
     "allow_file": [
       "$HOME/.claude.json",
@@ -52,6 +54,59 @@
       "timeout_secs": 60
     },
     "commands": {
+      "herdr": {
+        "executable": "/etc/profiles/per-user/juntawatanabe/bin/herdr",
+        "from": {
+          "session": {
+            "sandbox": {},
+            "invocation_policy": {
+              "default": "deny",
+              "deny": [
+                { "argv": { "prefix": ["workspace", "create"] } },
+                { "argv": { "prefix": ["workspace", "focus"] } },
+                { "argv": { "prefix": ["workspace", "close"] } },
+                { "argv": { "prefix": ["tab", "create"] } },
+                { "argv": { "prefix": ["tab", "focus"] } },
+                { "argv": { "prefix": ["tab", "close"] } },
+                { "argv": { "prefix": ["pane", "focus"] } },
+                { "argv": { "prefix": ["pane", "send-text"] } },
+                { "argv": { "prefix": ["pane", "send-keys"] } },
+                { "argv": { "prefix": ["pane", "move"] } },
+                { "argv": { "prefix": ["pane", "swap"] } },
+                { "argv": { "prefix": ["pane", "resize"] } },
+                { "argv": { "prefix": ["pane", "zoom"] } },
+                { "argv": { "prefix": ["pane", "run"] } },
+                { "argv": { "prefix": ["agent", "focus"] } },
+                { "argv": { "prefix": ["agent", "attach"] } },
+                { "argv": { "contains": ["--focus"] } }
+              ],
+              "allow": [
+                { "argv": { "exact": [] } },
+                { "argv": { "exact": ["--help"] } },
+                { "argv": { "exact": ["--version"] } },
+                { "argv": { "prefix": ["status"] } },
+                { "argv": { "prefix": ["workspace", "list"] } },
+                { "argv": { "prefix": ["workspace", "get"] } },
+                { "argv": { "prefix": ["tab", "list"] } },
+                { "argv": { "prefix": ["tab", "get"] } },
+                { "argv": { "prefix": ["pane", "list"] } },
+                { "argv": { "prefix": ["pane", "current"] } },
+                { "argv": { "prefix": ["pane", "get"] } },
+                { "argv": { "prefix": ["pane", "read"] } },
+                { "argv": { "prefix": ["pane", "close"] } },
+                { "argv": { "prefix": ["agent", "list"] } },
+                { "argv": { "prefix": ["agent", "get"] } },
+                { "argv": { "prefix": ["agent", "read"] } },
+                { "argv": { "prefix": ["agent", "send"] } },
+                { "argv": { "prefix": ["agent", "wait"] } },
+                { "argv": { "prefix": ["wait", "output"] } },
+                { "argv": { "prefix": ["wait", "agent-status"] } },
+                { "argv": { "contains": ["--no-focus"] } }
+              ]
+            }
+          }
+        }
+      },
       "container": {
         "executable": "/opt/homebrew/opt/container/libexec/container",
         "from": {
