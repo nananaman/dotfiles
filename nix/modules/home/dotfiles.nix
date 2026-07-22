@@ -56,8 +56,6 @@ in
     link_force "${agentCommonProfile}" "${configHome}/nono/profiles/chouge-agent-common.json"
     link_force "${dotfilesDir}/nono/profiles/chouge-codex.json" "${configHome}/nono/profiles/chouge-codex.json"
     link_force "${dotfilesDir}/nono/profiles/chouge-claude.json" "${configHome}/nono/profiles/chouge-claude.json"
-    link_force "${dotfilesDir}/nono/profiles/chouge-pi.json" "${configHome}/nono/profiles/chouge-pi.json"
-
     link_force "${dotfilesDir}/apm" "${homeDirectory}/.apm"
 
     ${lib.optionalString pkgs.stdenv.isLinux ''
