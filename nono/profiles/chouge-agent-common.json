@@ -54,11 +54,52 @@
       "timeout_secs": 60
     },
     "commands": {
+      "gh": {
+        "executable": "/etc/profiles/per-user/juntawatanabe/bin/gh",
+        "from": {
+          "session": {
+            "sandbox": {
+              "fs_read_file": [
+                "$HOME/.config/gh/config.yml",
+                "$HOME/.config/gh/hosts.yml"
+              ]
+            },
+            "invocation_policy": {
+              "default": "approve",
+              "deny": [
+                {
+                  "argv": { "prefix": ["auth"] },
+                  "reason": "GitHub credential changes stay outside agent sessions"
+                },
+                {
+                  "argv": { "prefix": ["config", "set"] },
+                  "reason": "GitHub CLI configuration changes stay outside agent sessions"
+                },
+                {
+                  "argv": { "prefix": ["secret"] },
+                  "reason": "GitHub secret changes stay outside agent sessions"
+                }
+              ],
+              "allow": [
+                { "argv": { "exact": ["--version"] } },
+                { "argv": { "prefix": ["repo", "view"] } },
+                { "argv": { "prefix": ["pr", "create"] } },
+                { "argv": { "prefix": ["pr", "view"] } }
+              ]
+            }
+          }
+        }
+      },
       "herdr": {
         "executable": "/etc/profiles/per-user/juntawatanabe/bin/herdr",
         "from": {
           "session": {
-            "sandbox": {},
+            "sandbox": {
+              "fs_read": [
+                "/nix/store/fc8v072pz2cqnqh2fyvmjn9b02avixc2-herdr-0.7.5",
+                "/nix/store/wjb6smwmv8cynnr776j01kjjzdks1863-libiconv-113"
+              ]
+            },
             "invocation_policy": {
               "default": "deny",
               "deny": [
@@ -76,9 +117,16 @@
                 { "argv": { "prefix": ["pane", "resize"] } },
                 { "argv": { "prefix": ["pane", "zoom"] } },
                 { "argv": { "prefix": ["pane", "run"] } },
+                { "argv": { "prefix": ["pane", "close"] } },
                 { "argv": { "prefix": ["agent", "focus"] } },
                 { "argv": { "prefix": ["agent", "attach"] } },
+                { "argv": { "prefix": ["agent", "send"] } },
                 { "argv": { "contains": ["--focus"] } }
+              ],
+              "approve": [
+                { "argv": { "prefix": ["workspace", "rename"] } },
+                { "argv": { "prefix": ["tab", "rename"] } },
+                { "argv": { "prefix": ["pane", "rename"] } }
               ],
               "allow": [
                 { "argv": { "exact": [] } },
@@ -93,12 +141,15 @@
                 { "argv": { "prefix": ["pane", "current"] } },
                 { "argv": { "prefix": ["pane", "get"] } },
                 { "argv": { "prefix": ["pane", "read"] } },
-                { "argv": { "prefix": ["pane", "close"] } },
+                { "argv": { "prefix": ["pane", "layout"] } },
+                { "argv": { "prefix": ["pane", "process-info"] } },
+                { "argv": { "prefix": ["pane", "neighbor"] } },
+                { "argv": { "prefix": ["pane", "edges"] } },
                 { "argv": { "prefix": ["agent", "list"] } },
                 { "argv": { "prefix": ["agent", "get"] } },
                 { "argv": { "prefix": ["agent", "read"] } },
-                { "argv": { "prefix": ["agent", "send"] } },
                 { "argv": { "prefix": ["agent", "wait"] } },
+                { "argv": { "prefix": ["agent", "prompt"] } },
                 { "argv": { "prefix": ["wait", "output"] } },
                 { "argv": { "prefix": ["wait", "agent-status"] } },
                 { "argv": { "contains": ["--no-focus"] } }
