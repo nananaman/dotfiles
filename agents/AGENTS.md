@@ -41,5 +41,3 @@
 - **判断不能なとき**: 「project 固有かグローバルか」を質問してから作成
 
 現在のグローバル skill は `apm/apm.yml` を唯一の source of truth として管理する。APM 0.14.2 の user scope では `targets:` ではなく `target: claude,agent-skills` を使う。`apm.lock.yaml` と `apm_modules/` は `apm/.gitignore` で除外する。`gogcli` は未使用のため廃止済み。
-
-タスク完了時に「最初に知っていれば遠回りしなかった」知見を見つけたら、`/retrospective` で skill / CLAUDE.md ルール / hook のいずれかに固定する。採用指示を待ってから書き出すこと。
