@@ -24,6 +24,9 @@
       "$HOME/.claude.json.lock",
       "$HOME/.claude.lock"
     ],
+    "bypass_protection": [
+      "$HOME/ghq/github.com/nananaman/dotfiles/zsh/zshrc"
+    ],
     "read": [
       "$HOME/.local/share/nono-agent-wrappers",
       "$HOME/ghq/github.com/nananaman/dotfiles/apm"
