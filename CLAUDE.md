@@ -1,11 +1,11 @@
 # Repository instructions
 
-macOS aarch64 環境の dotfiles を、Nix Flakes、nix-darwin、home-manager で管理する repository。
+macOS（aarch64-darwin）と WSL（x86_64-linux）の dotfiles を、Nix Flakes、nix-darwin、home-manager で管理する repository。
 
 ## 設計
 
 - `flake.nix` を Nix 構成のエントリポイントとする。
-- macOS のシステム設定は nix-darwin、ユーザー環境は home-manager で管理する。
+- macOS のシステム設定は nix-darwin、macOS と WSL のユーザー環境は home-manager で管理する。
 - dotfile 本体は Nix で生成せず、この repository から out-of-store symlink する。
 - package の導入と symlink の作成は Nix module で管理する。
 - グローバル agent 指示は `agents/AGENTS.md` を source of truth とする。
