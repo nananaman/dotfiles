@@ -1,43 +1,30 @@
 # グローバル Agent 指示
 
 ## コミュニケーション
-- 常に日本語で対話する
-- Always respond in Japanese, even when the prompt, tool output, or reviewed content is written in English.
-- PR title / body / reviewer 向け説明は、ユーザーから別指定がない限り日本語で書く
-- Write PR titles, PR descriptions, and reviewer-facing explanations in Japanese unless the user explicitly asks for another language.
-- 不明瞭な指示は質問して明確にする
-- ユーザーが設計・方針について質問している段階では変更承認と解釈せず、選択肢と推奨案を説明して方向性の合意を待ってから着手する（理由: 問いかけへの即時修正は、未合意の設計を既成事実にして手戻りを増やす）
-- project の `AGENTS.md` や `CLAUDE.md` がある場合は、その追加指示も尊重する
 
-## 開発スタイル
-- TDD で開発する（探索 → Red → Green → Refactoring）
-- KPI やカバレッジ目標が与えられたら、達成するまで試行する
-- コード・設定変更では、完了報告前に該当 review gate（通常は `review-diff-code`）を通し、採用指摘を修正して再確認する（理由: test だけでは設計・運用・security regression を拾い切れない）
+- ユーザーとの対話、PR title・body、reviewer 向け説明は、別指定がない限り日本語で書く。
+- 設計や方針についての質問は変更承認と解釈しない。選択肢と推奨案を示し、方向性の合意後に変更する。
+- 結果や変更範囲を大きく左右する不明点は確認する。それ以外は、安全な仮定を明示して進める。
 
-## コード設計
-- 関心の分離を保つ
-- 状態とロジックを分離する
-- 可読性と保守性を重視する
-- コントラクト層（API/型）を厳密に定義し、実装層は再生成可能に保つ
-- 静的検査可能なルールはプロンプトではなく、その環境の linter で記述する
-- コメントは必要な箇所にのみ付け、自明なことは書かない
+## 開発と検証
 
-## TODO / 後続タスク
-- 意図的に未完了・暫定・後続タスク依存の実装を残す場合は、先に追跡 issue / task を用意し、コード内 TODO に `TODO: <issue/task link> <何をいつ実装/削除/置換するか>` を書く（理由: レビュー時と後日の見返しで、未完了状態の意図と回収先を追えるようにする）
+- 実行可能な振る舞いを変更するときは `tdd` skill に従う。
+- テストを追加・変更・レビューするときは `test-writing-style` skill に従う。
+- KPI やカバレッジ目標が指定された場合は、達成するまで検証と改善を続ける。
+- コード、設定、テスト、schema、依存関係、agent 指示を変更した場合は、完了報告前に `review-diff-code` で累積差分を確認する。
+- 差分全体が、振る舞いと契約に影響しないコメント、誤字、空白、formatter のみの変更であることを確認できる場合は、review を省略してよい。
+- review やその他の検証を実行できなかった場合は、未検証事項と残るリスクを報告する。
 
-## テスト
-- テストを新規追加・修正・レビューするときは `test-writing-style` skill を使う
+## 実装上の契約
 
-## 環境
-- GitHub: {{ .github_username }}
-- リポジトリ: ghq 管理（`~/ghq/github.com/owner/repo`）
+- 公開 API、型、設定 schema など、利用側との境界を明確に定義する。
+- 静的に検査できる規則は、agent 指示ではなく、その環境の linter や formatter に実装する。
+- 意図的な未完了実装や暫定対応を残す場合は、追跡 issue または task を先に用意する。
+- コード内 TODO には、追跡先と、何をいつ実装・削除・置換するかを書く。
 
-## スキル作成・改善
-新規 skill の配置先は次の指針で決める:
+## Workflows
 
-- **project 固有**（`<repo>/.claude/skills/`）: 特定 repo のドメイン知識・規約・ファイルレイアウトに依存し、他 repo で使う見込みがない
-- **グローバル**: APM user scope で管理する。外部由来・自作汎用 skill は `apm/apm.yml` に full SHA で pin し、`apm install -g` で `~/.claude/skills/` と `~/.agents/skills/` に展開する
-- **自作汎用 skill**: `nananaman/skills` を source-of-truth として追加し、dotfiles の `apm/apm.yml` から `nananaman/skills/<path>#<full-sha>` で参照する
-- **判断不能なとき**: 「project 固有かグローバルか」を質問してから作成
-
-現在のグローバル skill は `apm/apm.yml` を唯一の source of truth として管理する。APM 0.14.2 の user scope では `targets:` ではなく `target: claude,agent-skills` を使う。`apm.lock.yaml` と `apm_modules/` は `apm/.gitignore` で除外する。`gogcli` は未使用のため廃止済み。
+- Git 操作では `chouge-git` skill に従う。
+- `CHANGES.md` の変更履歴では `chouge-changelog` skill に従う。
+- agent skill の作成・改善では `skill-workbench` skill に従う。
+- APM の設定や運用では `apm-usage` skill に従う。
