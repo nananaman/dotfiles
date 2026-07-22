@@ -40,7 +40,7 @@
     let
       darwinUsername = "juntawatanabe";
       darwinHomedir = "/Users/${darwinUsername}";
-      darwinDotfilesDir = "${darwinHomedir}/ghq/github.com/chouge/dotfiles";
+      darwinDotfilesDir = "${darwinHomedir}/ghq/github.com/nananaman/dotfiles";
 
       wslUsername = "chouge";
       wslHomedir = "/home/${wslUsername}";

@@ -23,7 +23,11 @@
       "$HOME/.claude.lock"
     ],
     "read": [
-      "$HOME/.local/share/nono-agent-wrappers"
+      "$HOME/.local/share/nono-agent-wrappers",
+      "$HOME/ghq/github.com/nananaman/dotfiles/apm"
+    ],
+    "unix_socket": [
+      "$HOME/.config/herdr/herdr.sock"
     ]
   },
   "platform_overrides": {

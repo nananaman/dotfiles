@@ -9,6 +9,7 @@ result
 
 # Node.js
 node_modules/
+__pycache__/
 
 # Secrets
 zsh/conf.d/local.zsh
