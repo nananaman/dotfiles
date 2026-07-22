@@ -20,6 +20,9 @@ zsh/conf.d/local.zsh
 # Pi worktrees
 .pi/worktrees/
 
+# Local development worktrees
+.worktrees/
+
 # Agent skills are installed by APM, not vendored in dotfiles
 .agents/skills/
 .claude/skills/
