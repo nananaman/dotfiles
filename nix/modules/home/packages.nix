@@ -126,7 +126,7 @@ let
     if [ -n "''${NONO_CAP_FILE:-}" ]; then
       exec "$codex_bin" "$@"
     fi
-    exec ${nono-cli}/bin/nono run --silent --profile chouge-codex --allow-cwd -- \
+    HERDR_AGENT=codex exec ${nono-cli}/bin/nono run --silent --profile chouge-codex --allow-cwd -- \
       "$codex_bin" --sandbox danger-full-access --ask-for-approval on-request "$@"
   '';
 
@@ -139,7 +139,7 @@ let
     if [ -n "''${NONO_CAP_FILE:-}" ]; then
       exec "$claude_bin" "$@"
     fi
-    exec ${nono-cli}/bin/nono run --silent --profile chouge-claude --allow-cwd -- \
+    HERDR_AGENT=claude exec ${nono-cli}/bin/nono run --silent --profile chouge-claude --allow-cwd -- \
       "$claude_bin" --dangerously-skip-permissions "$@"
   '';
 
@@ -152,7 +152,7 @@ let
     if [ -n "''${NONO_CAP_FILE:-}" ]; then
       exec "$pi_bin" "$@"
     fi
-    exec ${nono-cli}/bin/nono run --silent --profile chouge-pi --allow-cwd -- "$pi_bin" "$@"
+    HERDR_AGENT=pi exec ${nono-cli}/bin/nono run --silent --profile chouge-pi --allow-cwd -- "$pi_bin" "$@"
   '';
 
   agent-wrappers = pkgs.symlinkJoin {
