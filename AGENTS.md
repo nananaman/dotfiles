@@ -40,6 +40,12 @@ apm install -g
 
 設定ファイルは Nix で生成するのではなく、このリポジトリに直接置いて `dotfiles.nix` の `link_force` でシンボリックリンクしている。Nix が管理するのはパッケージインストールとリンク作成のみ。
 
+### Nix / Home Manager の変更規則
+
+- Flake から新規ファイルを参照するときは、Git の追跡対象と確認できるまで build 検証へ進まない（理由: Git source の Flake は未追跡ファイルを入力に含めない）。
+- activation や手動配置から `home.file` へ管理を移すときは、既存 target を確認し、`force`、backup、または削除の方針を決めてから switch する（理由: build 成功後の activation で clobber が発覚するため）。
+- 配布する dotfile には literal な home directory を書かず、consumer が対応する `~`、`$HOME`、または Home Manager の値を使う（理由: username と配置場所への不要な依存を防ぐため）。
+
 ### Global Agent Instructions
 
 グローバル agent 指示は `agents/AGENTS.md` を唯一の source of truth として管理する。home-manager が同じファイルを `~/.claude/CLAUDE.md`, `~/.config/codex/instructions.md`, `~/.pi/agent/AGENTS.md` にリンクする。
