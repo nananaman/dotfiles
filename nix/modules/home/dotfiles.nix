@@ -10,6 +10,11 @@
 let
   inherit (config.home) homeDirectory;
   inherit (config.xdg) configHome;
+  agentCommonProfile = pkgs.writeText "chouge-agent-common.json" (
+    builtins.replaceStrings [ "@HOME@" ] [ homeDirectory ] (
+      builtins.readFile ../../../nono/profiles/chouge-agent-common.json
+    )
+  );
 in
 {
   home.activation.linkDotfiles = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
@@ -48,7 +53,7 @@ in
     link_force "${dotfilesDir}/srt" "${configHome}/srt"
 
     $DRY_RUN_CMD mkdir -p "${configHome}/nono/profiles"
-    link_force "${dotfilesDir}/nono/profiles/chouge-agent-common.json" "${configHome}/nono/profiles/chouge-agent-common.json"
+    link_force "${agentCommonProfile}" "${configHome}/nono/profiles/chouge-agent-common.json"
     link_force "${dotfilesDir}/nono/profiles/chouge-codex.json" "${configHome}/nono/profiles/chouge-codex.json"
     link_force "${dotfilesDir}/nono/profiles/chouge-claude.json" "${configHome}/nono/profiles/chouge-claude.json"
     link_force "${dotfilesDir}/nono/profiles/chouge-pi.json" "${configHome}/nono/profiles/chouge-pi.json"

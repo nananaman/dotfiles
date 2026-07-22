@@ -55,13 +55,12 @@
     },
     "commands": {
       "pi": {
-        "executable": "/Users/juntawatanabe/.local/share/nono-agent-wrappers/pi",
         "from": {
           "session": {
             "sandbox": {
               "unsafe_macos_seatbelt_rules": [
-                "(allow process-exec (literal \"/Users/juntawatanabe/.vite-plus/js_runtime/node/24.16.0/lib/node_modules/@earendil-works/pi-coding-agent/dist/cli.js\"))",
-                "(allow process-exec (literal \"/Users/juntawatanabe/.vite-plus/0.1.11/bin/vp\"))"
+                "(allow process-exec (literal \"@HOME@/.vite-plus/js_runtime/node/24.16.0/lib/node_modules/@earendil-works/pi-coding-agent/dist/cli.js\"))",
+                "(allow process-exec (literal \"@HOME@/.vite-plus/0.1.11/bin/vp\"))"
               ]
             },
             "invocation_policy": {
@@ -97,7 +96,6 @@
         }
       },
       "gh": {
-        "executable": "/etc/profiles/per-user/juntawatanabe/bin/gh",
         "from": {
           "session": {
             "sandbox": {
@@ -133,7 +131,6 @@
         }
       },
       "herdr": {
-        "executable": "/etc/profiles/per-user/juntawatanabe/bin/herdr",
         "from": {
           "session": {
             "sandbox": {
