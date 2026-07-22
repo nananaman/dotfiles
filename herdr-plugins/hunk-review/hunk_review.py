@@ -237,7 +237,7 @@ def open_review(
     if placement not in {"split", "tab", "popup"}:
         raise PluginError(f"unsupported review placement: {placement}")
 
-    if placement != "popup":
+    if placement not in {"popup", "split"}:
         pane_id = state.get(context.workspace_id, context.cwd, mode, placement)
         if pane_id:
             try:
@@ -271,7 +271,6 @@ def open_review(
             raise PluginError("Herdr did not return a managed pane id")
         herdr.json(["pane", "rename", pane_id, "hunk"])
         herdr.json(["pane", "run", pane_id, _run_command(mode, context.cwd, git)])
-        state.set(context.workspace_id, context.cwd, mode, placement, pane_id)
         return pane_id
 
     opened = herdr.json(_open_args(mode, placement, context))

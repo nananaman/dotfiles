@@ -120,7 +120,7 @@ class BuildHunkArgvErrorTest(unittest.TestCase):
 
 
 class OpenReviewTest(unittest.TestCase):
-    def test_split_opens_managed_pane_and_records_it(self) -> None:
+    def test_split_opens_named_pane_and_runs_hunk(self) -> None:
         # Arrange
         context = hunk_review.ReviewContext(
             workspace_id="w5",
@@ -164,90 +164,44 @@ class OpenReviewTest(unittest.TestCase):
 
             # Assert
             self.assertEqual(pane_id, "w5:p2")
-            self.assertEqual(
-                state.get("w5", Path("/repo"), "worktree", "split"), "w5:p2"
-            )
             self.assertEqual(herdr.calls, [split_args, rename_args, run_args])
 
-    def test_existing_managed_pane_is_focused_instead_of_duplicated(self) -> None:
+    def test_repeated_split_opens_a_new_pane_without_plugin_focus(self) -> None:
         # Arrange
-        context = hunk_review.ReviewContext(
-            workspace_id="w5",
-            pane_id="w5:p1",
-            cwd=Path("/repo"),
-        )
-        herdr = FakeHerdr(
-            {
-                ("pane", "get", "w5:p2"): {
-                    "result": {"pane": {"pane_id": "w5:p2", "workspace_id": "w5"}}
-                },
-                ("plugin", "pane", "focus", "w5:p2"): {
-                    "result": {"type": "plugin_pane_focused"}
-                },
-            }
-        )
+        context = hunk_review.ReviewContext("w5", "w5:p1", Path("/repo"))
+
+        class RepeatedSplitHerdr:
+            def __init__(self) -> None:
+                self.calls: list[tuple[str, ...]] = []
+                self.split_count = 0
+
+            def json(self, args: list[str]) -> dict:
+                self.calls.append(tuple(args))
+                if args[:2] == ["pane", "split"]:
+                    self.split_count += 1
+                    return {
+                        "result": {"pane": {"pane_id": f"w5:p{self.split_count + 1}"}}
+                    }
+                if args[:2] in (["pane", "rename"], ["pane", "run"]):
+                    return {"result": {}}
+                raise AssertionError(f"unexpected Herdr call: {args}")
+
+        herdr = RepeatedSplitHerdr()
 
         with tempfile.TemporaryDirectory() as state_dir:
             state = hunk_review.PaneState(Path(state_dir) / "panes.json")
-            state.set("w5", Path("/repo"), "worktree", "split", "w5:p2")
 
             # Act
-            pane_id = hunk_review.open_review(
+            first_pane = hunk_review.open_review(
+                "worktree", "split", context, herdr, state, FakeGit({})
+            )
+            second_pane = hunk_review.open_review(
                 "worktree", "split", context, herdr, state, FakeGit({})
             )
 
             # Assert
-            self.assertEqual(pane_id, "w5:p2")
-            self.assertEqual(
-                herdr.calls,
-                [
-                    ("pane", "get", "w5:p2"),
-                    ("plugin", "pane", "focus", "w5:p2"),
-                ],
-            )
-
-    def test_cached_pane_from_another_repository_is_not_reused(self) -> None:
-        # Arrange
-        context = hunk_review.ReviewContext("w5", "w5:p1", Path("/repo-b"))
-        split_args = (
-            "pane",
-            "split",
-            "w5:p1",
-            "--direction",
-            "right",
-            "--cwd",
-            "/repo-b",
-            "--env",
-            "HUNK_REVIEW_MODE=worktree",
-            "--focus",
-        )
-        rename_args = ("pane", "rename", "w5:p3", "hunk")
-        run_args = (
-            "pane",
-            "run",
-            "w5:p3",
-            "exec hunk diff --watch --no-transparent-bg",
-        )
-        herdr = FakeHerdr(
-            {
-                split_args: {"result": {"pane": {"pane_id": "w5:p3"}}},
-                rename_args: {"result": {"type": "pane_renamed"}},
-                run_args: {"result": {"type": "pane_input_sent"}},
-            }
-        )
-
-        with tempfile.TemporaryDirectory() as state_dir:
-            state = hunk_review.PaneState(Path(state_dir) / "panes.json")
-            state.set("w5", Path("/repo-a"), "worktree", "split", "w5:p2")
-
-            # Act
-            pane_id = hunk_review.open_review(
-                "worktree", "split", context, herdr, state, FakeGit({})
-            )
-
-            # Assert
-            self.assertEqual(pane_id, "w5:p3")
-            self.assertEqual(herdr.calls, [split_args, rename_args, run_args])
+            self.assertEqual((first_pane, second_pane), ("w5:p2", "w5:p3"))
+            self.assertNotIn("plugin", [call[0] for call in herdr.calls])
 
     def test_popup_is_not_recorded_as_a_pane(self) -> None:
         # Arrange
@@ -291,60 +245,6 @@ class OpenReviewTest(unittest.TestCase):
             self.assertIsNone(
                 state.get("w5", Path("/repo"), "worktree", "popup")
             )
-
-    def test_missing_managed_pane_is_recreated(self) -> None:
-        # Arrange
-        context = hunk_review.ReviewContext("w5", "w5:p1", Path("/repo"))
-        split_args = (
-            "pane",
-            "split",
-            "w5:p1",
-            "--direction",
-            "right",
-            "--cwd",
-            "/repo",
-            "--env",
-            "HUNK_REVIEW_MODE=worktree",
-            "--focus",
-        )
-        run_args = (
-            "pane",
-            "run",
-            "w5:p2",
-            "exec hunk diff --watch --no-transparent-bg",
-        )
-        rename_args = ("pane", "rename", "w5:p2", "hunk")
-
-        class StalePaneHerdr(FakeHerdr):
-            def json(self, args: list[str]) -> dict:
-                if args == ["pane", "get", "w5:p9"]:
-                    self.calls.append(tuple(args))
-                    raise hunk_review.PluginError("pane not found")
-                return super().json(args)
-
-        herdr = StalePaneHerdr(
-            {
-                split_args: {"result": {"pane": {"pane_id": "w5:p2"}}},
-                rename_args: {"result": {"type": "pane_renamed"}},
-                run_args: {"result": {"type": "pane_input_sent"}},
-            }
-        )
-
-        with tempfile.TemporaryDirectory() as state_dir:
-            state = hunk_review.PaneState(Path(state_dir) / "panes.json")
-            state.set("w5", Path("/repo"), "worktree", "split", "w5:p9")
-
-            # Act
-            pane_id = hunk_review.open_review(
-                "worktree", "split", context, herdr, state, FakeGit({})
-            )
-
-            # Assert
-            self.assertEqual(pane_id, "w5:p2")
-            self.assertEqual(
-                state.get("w5", Path("/repo"), "worktree", "split"), "w5:p2"
-            )
-
 
 class OpenReviewErrorTest(unittest.TestCase):
     def test_unknown_mode_is_rejected_before_calling_herdr(self) -> None:

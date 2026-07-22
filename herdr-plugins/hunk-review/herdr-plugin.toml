@@ -2,7 +2,7 @@ id = "hunk-review"
 name = "Hunk Review"
 version = "0.1.0"
 min_herdr_version = "0.7.0"
-description = "Open or focus locally managed Hunk reviews."
+description = "Open locally managed Hunk reviews."
 platforms = ["linux", "macos"]
 
 [[actions]]
