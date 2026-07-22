@@ -8,6 +8,7 @@
 
 ## 開発と検証
 
+- ファイルを変更する前に、現在の branch と working tree を確認し、default branch や別目的の branch に変更を混ぜない。（理由: commit や PR の分離が困難になるのを防ぐ）
 - 実行可能な振る舞いを変更するときは `tdd` skill に従う。
 - テストを追加・変更・レビューするときは `test-writing-style` skill に従う。
 - KPI やカバレッジ目標が指定された場合は、達成するまで検証と改善を続ける。
