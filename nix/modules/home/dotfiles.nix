@@ -111,17 +111,18 @@ in
     if [ -z "''${DRY_RUN_CMD:-}" ]; then
       plugin_path="${dotfilesDir}/herdr-plugins/hunk-review"
       plugin_manifest="$plugin_path/herdr-plugin.toml"
-      plugin_json="$(${herdrPackage}/bin/herdr plugin list --plugin hunk-review --json 2>/dev/null || true)"
-      registered_manifest="$(printf '%s\n' "$plugin_json" \
-        | ${pkgs.jq}/bin/jq -r '.result.plugins[]? | select(.plugin_id == "hunk-review") | .manifest_path')"
-      registered_enabled="$(printf '%s\n' "$plugin_json" \
-        | ${pkgs.jq}/bin/jq -r '.result.plugins[]? | select(.plugin_id == "hunk-review") | .enabled')"
+      if plugin_json="$(${herdrPackage}/bin/herdr plugin list --plugin hunk-review --json 2>/dev/null)"; then
+        registered_manifest="$(printf '%s\n' "$plugin_json" \
+          | ${pkgs.jq}/bin/jq -r '.result.plugins[]? | select(.plugin_id == "hunk-review") | .manifest_path')"
+        registered_enabled="$(printf '%s\n' "$plugin_json" \
+          | ${pkgs.jq}/bin/jq -r '.result.plugins[]? | select(.plugin_id == "hunk-review") | .enabled')"
 
-      if [ "$registered_manifest" != "$plugin_manifest" ]; then
-        if [ "$registered_enabled" = "false" ]; then
-          ${herdrPackage}/bin/herdr plugin link "$plugin_path" --disabled
-        else
-          ${herdrPackage}/bin/herdr plugin link "$plugin_path"
+        if [ "$registered_manifest" != "$plugin_manifest" ]; then
+          if [ "$registered_enabled" = "false" ]; then
+            ${herdrPackage}/bin/herdr plugin link "$plugin_path" --disabled
+          else
+            ${herdrPackage}/bin/herdr plugin link "$plugin_path"
+          fi
         fi
       fi
     fi
