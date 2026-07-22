@@ -30,6 +30,7 @@
         config
         dotfilesDir
         helpers
+        herdrPackage
         ;
     })
   ];

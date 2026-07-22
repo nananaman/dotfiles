@@ -91,6 +91,12 @@ type = "pane"
 command = "zsh -ic herdr-ghq-workspace"
 description = "open ghq project as workspace"
 
+[[keys.command]]
+key = "prefix+d"
+type = "plugin_action"
+command = "hunk-review.worktree-split"
+description = "open or focus Hunk worktree review"
+
 [experimental]
 reveal_hidden_cursor_for_cjk_ime = true
 cjk_ime_agents = ["pi", "claude", "codex"]

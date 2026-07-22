@@ -1,0 +1,48 @@
+id = "hunk-review"
+name = "Hunk Review"
+version = "0.1.0"
+min_herdr_version = "0.7.0"
+description = "Open or focus locally managed Hunk reviews."
+platforms = ["linux", "macos"]
+
+[[actions]]
+id = "worktree-split"
+title = "Hunk worktree diff in split"
+contexts = ["pane", "workspace"]
+command = ["python3", "hunk_review.py", "open", "worktree", "split"]
+
+[[actions]]
+id = "worktree-tab"
+title = "Hunk worktree diff in tab"
+contexts = ["pane", "workspace"]
+command = ["python3", "hunk_review.py", "open", "worktree", "tab"]
+
+[[actions]]
+id = "worktree-popup"
+title = "Hunk worktree diff in popup"
+contexts = ["pane", "workspace"]
+command = ["python3", "hunk_review.py", "open", "worktree", "popup"]
+
+[[actions]]
+id = "branch-split"
+title = "Hunk branch diff in split"
+contexts = ["pane", "workspace"]
+command = ["python3", "hunk_review.py", "open", "branch", "split"]
+
+[[actions]]
+id = "branch-tab"
+title = "Hunk branch diff in tab"
+contexts = ["pane", "workspace"]
+command = ["python3", "hunk_review.py", "open", "branch", "tab"]
+
+[[actions]]
+id = "branch-popup"
+title = "Hunk branch diff in popup"
+contexts = ["pane", "workspace"]
+command = ["python3", "hunk_review.py", "open", "branch", "popup"]
+
+[[panes]]
+id = "review"
+title = "Hunk review"
+placement = "split"
+command = ["python3", "hunk_review.py", "run"]
