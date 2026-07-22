@@ -42,6 +42,15 @@
     }
   },
   "command_policies": {
+    "approval_backends": {
+      "terminal": {
+        "type": "terminal"
+      }
+    },
+    "approval_defaults": {
+      "backend": "terminal",
+      "timeout_secs": 60
+    },
     "commands": {
       "container": {
         "executable": "/opt/homebrew/opt/container/libexec/container",
@@ -70,7 +79,7 @@
               ]
             },
             "invocation_policy": {
-              "default": "allow",
+              "default": "approve",
               "deny": [
                 {
                   "argv": { "prefix": ["registry", "login"] },
@@ -92,6 +101,30 @@
                   "argv": { "prefix": ["system", "kernel", "set"] },
                   "reason": "system kernel changes are not delegated to agents"
                 }
+              ],
+              "allow": [
+                { "argv": { "exact": [] } },
+                { "argv": { "exact": ["--help"] } },
+                { "argv": { "exact": ["--version"] } },
+                { "argv": { "prefix": ["list"] } },
+                { "argv": { "prefix": ["inspect"] } },
+                { "argv": { "prefix": ["logs"] } },
+                { "argv": { "prefix": ["stats"] } },
+                { "argv": { "prefix": ["builder", "status"] } },
+                { "argv": { "prefix": ["image", "list"] } },
+                { "argv": { "prefix": ["image", "inspect"] } },
+                { "argv": { "prefix": ["registry", "list"] } },
+                { "argv": { "prefix": ["network", "list"] } },
+                { "argv": { "prefix": ["network", "inspect"] } },
+                { "argv": { "prefix": ["volume", "list"] } },
+                { "argv": { "prefix": ["volume", "inspect"] } },
+                { "argv": { "prefix": ["machine", "list"] } },
+                { "argv": { "prefix": ["machine", "inspect"] } },
+                { "argv": { "prefix": ["machine", "logs"] } },
+                { "argv": { "prefix": ["system", "version"] } },
+                { "argv": { "prefix": ["system", "df"] } },
+                { "argv": { "prefix": ["system", "property", "list"] } },
+                { "argv": { "prefix": ["system", "dns", "list"] } }
               ]
             }
           }

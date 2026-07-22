@@ -81,8 +81,10 @@ class PaneState:
         self.path = path
 
     @staticmethod
-    def _key(workspace_id: str, mode: str, placement: str) -> str:
-        return f"{workspace_id}:{mode}:{placement}"
+    def _key(workspace_id: str, repo: Path, mode: str, placement: str) -> str:
+        return json.dumps(
+            [workspace_id, str(repo), mode, placement], separators=(",", ":")
+        )
 
     def _read(self) -> dict[str, str]:
         try:
@@ -91,22 +93,33 @@ class PaneState:
             return {}
         return payload if isinstance(payload, dict) else {}
 
-    def get(self, workspace_id: str, mode: str, placement: str) -> str | None:
-        value = self._read().get(self._key(workspace_id, mode, placement))
+    def get(
+        self, workspace_id: str, repo: Path, mode: str, placement: str
+    ) -> str | None:
+        value = self._read().get(self._key(workspace_id, repo, mode, placement))
         return value if isinstance(value, str) else None
 
-    def set(self, workspace_id: str, mode: str, placement: str, pane_id: str) -> None:
+    def set(
+        self,
+        workspace_id: str,
+        repo: Path,
+        mode: str,
+        placement: str,
+        pane_id: str,
+    ) -> None:
         payload = self._read()
-        payload[self._key(workspace_id, mode, placement)] = pane_id
+        payload[self._key(workspace_id, repo, mode, placement)] = pane_id
         self.path.parent.mkdir(parents=True, exist_ok=True)
         temporary = self.path.with_suffix(".tmp")
         temporary.write_text(json.dumps(payload, sort_keys=True) + "\n")
         os.chmod(temporary, 0o600)
         temporary.replace(self.path)
 
-    def remove(self, workspace_id: str, mode: str, placement: str) -> None:
+    def remove(
+        self, workspace_id: str, repo: Path, mode: str, placement: str
+    ) -> None:
         payload = self._read()
-        payload.pop(self._key(workspace_id, mode, placement), None)
+        payload.pop(self._key(workspace_id, repo, mode, placement), None)
         if not payload:
             self.path.unlink(missing_ok=True)
             return
@@ -225,18 +238,18 @@ def open_review(
         raise PluginError(f"unsupported review placement: {placement}")
 
     if placement != "popup":
-        pane_id = state.get(context.workspace_id, mode, placement)
+        pane_id = state.get(context.workspace_id, context.cwd, mode, placement)
         if pane_id:
             try:
                 pane = herdr.json(["pane", "get", pane_id])
             except PluginError:
-                state.remove(context.workspace_id, mode, placement)
+                state.remove(context.workspace_id, context.cwd, mode, placement)
             else:
                 workspace_id = pane.get("result", {}).get("pane", {}).get("workspace_id")
                 if workspace_id == context.workspace_id:
                     herdr.json(["plugin", "pane", "focus", pane_id])
                     return pane_id
-                state.remove(context.workspace_id, mode, placement)
+                state.remove(context.workspace_id, context.cwd, mode, placement)
 
     if placement == "split":
         opened = herdr.json(
@@ -258,7 +271,7 @@ def open_review(
             raise PluginError("Herdr did not return a managed pane id")
         herdr.json(["pane", "rename", pane_id, "hunk"])
         herdr.json(["pane", "run", pane_id, _run_command(mode, context.cwd, git)])
-        state.set(context.workspace_id, mode, placement, pane_id)
+        state.set(context.workspace_id, context.cwd, mode, placement, pane_id)
         return pane_id
 
     opened = herdr.json(_open_args(mode, placement, context))
@@ -268,7 +281,7 @@ def open_review(
     pane_id = _pane_from(opened)
     if pane_id is None:
         raise PluginError("Herdr did not return a managed pane id")
-    state.set(context.workspace_id, mode, placement, pane_id)
+    state.set(context.workspace_id, context.cwd, mode, placement, pane_id)
     return pane_id
 
 

@@ -164,7 +164,9 @@ class OpenReviewTest(unittest.TestCase):
 
             # Assert
             self.assertEqual(pane_id, "w5:p2")
-            self.assertEqual(state.get("w5", "worktree", "split"), "w5:p2")
+            self.assertEqual(
+                state.get("w5", Path("/repo"), "worktree", "split"), "w5:p2"
+            )
             self.assertEqual(herdr.calls, [split_args, rename_args, run_args])
 
     def test_existing_managed_pane_is_focused_instead_of_duplicated(self) -> None:
@@ -187,7 +189,7 @@ class OpenReviewTest(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as state_dir:
             state = hunk_review.PaneState(Path(state_dir) / "panes.json")
-            state.set("w5", "worktree", "split", "w5:p2")
+            state.set("w5", Path("/repo"), "worktree", "split", "w5:p2")
 
             # Act
             pane_id = hunk_review.open_review(
@@ -203,6 +205,49 @@ class OpenReviewTest(unittest.TestCase):
                     ("plugin", "pane", "focus", "w5:p2"),
                 ],
             )
+
+    def test_cached_pane_from_another_repository_is_not_reused(self) -> None:
+        # Arrange
+        context = hunk_review.ReviewContext("w5", "w5:p1", Path("/repo-b"))
+        split_args = (
+            "pane",
+            "split",
+            "w5:p1",
+            "--direction",
+            "right",
+            "--cwd",
+            "/repo-b",
+            "--env",
+            "HUNK_REVIEW_MODE=worktree",
+            "--focus",
+        )
+        rename_args = ("pane", "rename", "w5:p3", "hunk")
+        run_args = (
+            "pane",
+            "run",
+            "w5:p3",
+            "exec hunk diff --watch --no-transparent-bg",
+        )
+        herdr = FakeHerdr(
+            {
+                split_args: {"result": {"pane": {"pane_id": "w5:p3"}}},
+                rename_args: {"result": {"type": "pane_renamed"}},
+                run_args: {"result": {"type": "pane_input_sent"}},
+            }
+        )
+
+        with tempfile.TemporaryDirectory() as state_dir:
+            state = hunk_review.PaneState(Path(state_dir) / "panes.json")
+            state.set("w5", Path("/repo-a"), "worktree", "split", "w5:p2")
+
+            # Act
+            pane_id = hunk_review.open_review(
+                "worktree", "split", context, herdr, state, FakeGit({})
+            )
+
+            # Assert
+            self.assertEqual(pane_id, "w5:p3")
+            self.assertEqual(herdr.calls, [split_args, rename_args, run_args])
 
     def test_popup_is_not_recorded_as_a_pane(self) -> None:
         # Arrange
@@ -243,7 +288,9 @@ class OpenReviewTest(unittest.TestCase):
 
             # Assert
             self.assertIsNone(pane_id)
-            self.assertIsNone(state.get("w5", "worktree", "popup"))
+            self.assertIsNone(
+                state.get("w5", Path("/repo"), "worktree", "popup")
+            )
 
     def test_missing_managed_pane_is_recreated(self) -> None:
         # Arrange
@@ -285,7 +332,7 @@ class OpenReviewTest(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as state_dir:
             state = hunk_review.PaneState(Path(state_dir) / "panes.json")
-            state.set("w5", "worktree", "split", "w5:p9")
+            state.set("w5", Path("/repo"), "worktree", "split", "w5:p9")
 
             # Act
             pane_id = hunk_review.open_review(
@@ -294,7 +341,9 @@ class OpenReviewTest(unittest.TestCase):
 
             # Assert
             self.assertEqual(pane_id, "w5:p2")
-            self.assertEqual(state.get("w5", "worktree", "split"), "w5:p2")
+            self.assertEqual(
+                state.get("w5", Path("/repo"), "worktree", "split"), "w5:p2"
+            )
 
 
 class OpenReviewErrorTest(unittest.TestCase):
