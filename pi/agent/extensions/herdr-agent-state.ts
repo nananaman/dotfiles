@@ -8,7 +8,7 @@
 
 import { lstatSync } from "node:fs";
 import { createConnection } from "node:net";
-import { isAbsolute, normalize, sep } from "node:path";
+import { isAbsolute, normalize, resolve } from "node:path";
 
 const HERDR_ENV = process.env.HERDR_ENV;
 const socketPath = process.env.HERDR_SOCKET_PATH;
@@ -31,8 +31,8 @@ function isTrustedSocketPath(path: string | undefined): boolean {
   }
 
   const normalizedPath = normalize(path);
-  const herdrConfigDir = `${normalize(home)}${sep}.config${sep}herdr`;
-  if (normalizedPath !== `${herdrConfigDir}${sep}herdr.sock`) {
+  const trustedSocketPath = resolve(home, "ghq/github.com/nananaman/dotfiles/herdr/herdr.sock");
+  if (normalizedPath !== trustedSocketPath) {
     return false;
   }
 

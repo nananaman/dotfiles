@@ -5,8 +5,14 @@
     "version": "0.1.0",
     "description": "Shared runtime access for local coding agents"
   },
+  "unsafe_macos_seatbelt_rules": [
+    "(allow network-outbound (path \"@HOME@/ghq/github.com/nananaman/dotfiles/herdr/herdr.sock\"))"
+  ],
   "groups": {
     "include": ["mise_manager"]
+  },
+  "network": {
+    "allow_domain": ["api.github.com"]
   },
   "filesystem": {
     "allow": [
@@ -30,9 +36,6 @@
     "read": [
       "$HOME/.local/share/nono-agent-wrappers",
       "$HOME/ghq/github.com/nananaman/dotfiles/apm"
-    ],
-    "unix_socket": [
-      "$HOME/.config/herdr/herdr.sock"
     ]
   },
   "platform_overrides": {
@@ -55,6 +58,14 @@
     "approval_defaults": {
       "backend": "terminal",
       "timeout_secs": 60
+    },
+    "credentials": {
+      "herdr-socket": {
+        "type": "local-socket",
+        "path": "$HERDR_SOCKET_PATH",
+        "mode": "connect",
+        "env_var": "HERDR_SOCKET_PATH"
+      }
     },
     "commands": {
       "pi": {
@@ -83,14 +94,7 @@
                 },
                 {
                   "argv": {
-                    "exact": [
-                      "--no-session",
-                      "--tools",
-                      "",
-                      "--thinking",
-                      "low",
-                      "-p"
-                    ]
+                    "exact": ["--no-session", "--tools", "", "--thinking", "low", "-p"]
                   }
                 }
               ]
@@ -102,16 +106,49 @@
         "from": {
           "session": {
             "sandbox": {
+              "fs_read": ["$WORKDIR"],
               "fs_read_file": [
                 "$HOME/.config/gh/config.yml",
                 "$HOME/.config/gh/hosts.yml"
+              ],
+              "unsafe_macos_seatbelt_rules": [
+                "(allow process-exec (literal \"@GH_WRAPPED@\"))",
+                "(allow network-outbound (remote tcp \"localhost:*\"))"
               ]
             },
             "invocation_policy": {
               "default": "approve",
               "deny": [
                 {
-                  "argv": { "prefix": ["auth"] },
+                  "argv": { "prefix": ["auth", "login"] },
+                  "reason": "GitHub credential changes stay outside agent sessions"
+                },
+                {
+                  "argv": { "prefix": ["auth", "logout"] },
+                  "reason": "GitHub credential changes stay outside agent sessions"
+                },
+                {
+                  "argv": { "prefix": ["auth", "refresh"] },
+                  "reason": "GitHub credential changes stay outside agent sessions"
+                },
+                {
+                  "argv": { "prefix": ["auth", "setup-git"] },
+                  "reason": "GitHub credential changes stay outside agent sessions"
+                },
+                {
+                  "argv": { "prefix": ["auth", "switch"] },
+                  "reason": "GitHub credential changes stay outside agent sessions"
+                },
+                {
+                  "argv": { "prefix": ["auth", "token"] },
+                  "reason": "GitHub credential reads stay outside agent sessions"
+                },
+                {
+                  "argv": { "prefix": ["auth", "git-credential", "store"] },
+                  "reason": "GitHub credential changes stay outside agent sessions"
+                },
+                {
+                  "argv": { "prefix": ["auth", "git-credential", "erase"] },
                   "reason": "GitHub credential changes stay outside agent sessions"
                 },
                 {
@@ -125,6 +162,9 @@
               ],
               "allow": [
                 { "argv": { "exact": ["--version"] } },
+                { "argv": { "exact": ["auth", "git-credential", "get"] } },
+                { "argv": { "exact": ["api", "/rate_limit"] } },
+                { "argv": { "prefix": ["api", "repos/nananaman/skills/pulls"] } },
                 { "argv": { "prefix": ["repo", "view"] } },
                 { "argv": { "prefix": ["pr", "create"] } },
                 { "argv": { "prefix": ["pr", "view"] } }
@@ -140,6 +180,10 @@
               "fs_read": [
                 "/nix/store/fc8v072pz2cqnqh2fyvmjn9b02avixc2-herdr-0.7.5",
                 "/nix/store/wjb6smwmv8cynnr776j01kjjzdks1863-libiconv-113"
+              ],
+              "credentials": ["herdr-socket"],
+              "unsafe_macos_seatbelt_rules": [
+                "(allow network-outbound (path \"@HOME@/ghq/github.com/nananaman/dotfiles/herdr/herdr.sock\"))"
               ]
             },
             "invocation_policy": {
@@ -148,9 +192,7 @@
                 { "argv": { "prefix": ["workspace", "create"] } },
                 { "argv": { "prefix": ["workspace", "focus"] } },
                 { "argv": { "prefix": ["workspace", "close"] } },
-                { "argv": { "prefix": ["tab", "create"] } },
                 { "argv": { "prefix": ["tab", "focus"] } },
-                { "argv": { "prefix": ["tab", "close"] } },
                 { "argv": { "prefix": ["pane", "focus"] } },
                 { "argv": { "prefix": ["pane", "send-text"] } },
                 { "argv": { "prefix": ["pane", "send-keys"] } },
@@ -179,6 +221,8 @@
                 { "argv": { "prefix": ["workspace", "get"] } },
                 { "argv": { "prefix": ["tab", "list"] } },
                 { "argv": { "prefix": ["tab", "get"] } },
+                { "argv": { "prefix": ["tab", "create"] } },
+                { "argv": { "prefix": ["tab", "close"] } },
                 { "argv": { "prefix": ["pane", "list"] } },
                 { "argv": { "prefix": ["pane", "current"] } },
                 { "argv": { "prefix": ["pane", "get"] } },
@@ -190,6 +234,7 @@
                 { "argv": { "prefix": ["agent", "list"] } },
                 { "argv": { "prefix": ["agent", "get"] } },
                 { "argv": { "prefix": ["agent", "read"] } },
+                { "argv": { "prefix": ["agent", "start"] } },
                 { "argv": { "prefix": ["agent", "wait"] } },
                 { "argv": { "prefix": ["agent", "prompt"] } },
                 { "argv": { "prefix": ["wait", "output"] } },
@@ -210,21 +255,14 @@
                 "$WORKDIR",
                 "$HOME/Library/Application Support/com.apple.container"
               ],
-              "fs_read_file": [
-                "/bin/launchctl"
-              ],
-              "fs_write": [
-                "$WORKDIR",
-                "$HOME/Library/Application Support/com.apple.container"
-              ],
+              "fs_read_file": ["/bin/launchctl"],
+              "fs_write": ["$WORKDIR", "$HOME/Library/Application Support/com.apple.container"],
               "environment": {
                 "set_vars": {
                   "CONTAINER_INSTALL_ROOT": "/opt/homebrew/opt/container"
                 }
               },
-              "unsafe_macos_seatbelt_rules": [
-                "(allow process-exec (literal \"/bin/launchctl\"))"
-              ]
+              "unsafe_macos_seatbelt_rules": ["(allow process-exec (literal \"/bin/launchctl\"))"]
             },
             "invocation_policy": {
               "default": "approve",

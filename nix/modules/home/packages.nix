@@ -107,7 +107,18 @@ let
       };
     };
 
+  canonicalize-herdr-socket = ''
+    if [ -n "''${HERDR_SOCKET_PATH:-}" ]; then
+      herdr_socket_dir="''${HERDR_SOCKET_PATH%/*}"
+      herdr_socket_name="''${HERDR_SOCKET_PATH##*/}"
+      if canonical_herdr_socket_dir="$(cd -P -- "$herdr_socket_dir" 2>/dev/null && pwd -P)"; then
+        export HERDR_SOCKET_PATH="$canonical_herdr_socket_dir/$herdr_socket_name"
+      fi
+    fi
+  '';
+
   codex-sandboxed = pkgs.writeShellScriptBin "codex" ''
+    ${canonicalize-herdr-socket}
     codex_bin=""
     old_ifs="$IFS"
     IFS=:
@@ -124,13 +135,14 @@ let
       exit 127
     fi
     if [ -n "''${NONO_CAP_FILE:-}" ]; then
-      exec "$codex_bin" --sandbox danger-full-access --ask-for-approval on-request "$@"
+      exec "$codex_bin" --sandbox danger-full-access --ask-for-approval never "$@"
     fi
-    HERDR_AGENT=codex exec ${nono-cli}/bin/nono run --silent --profile chouge-codex --allow-cwd -- \
-      "$codex_bin" --sandbox danger-full-access --ask-for-approval on-request "$@"
+    HERDR_AGENT=codex exec ${nono-cli}/bin/nono run --silent --profile "$HOME/.config/nono/profiles/chouge-codex.json" --allow-cwd -- \
+      "$codex_bin" --sandbox danger-full-access --ask-for-approval never "$@"
   '';
 
   claude-sandboxed = pkgs.writeShellScriptBin "claude" ''
+    ${canonicalize-herdr-socket}
     claude_bin="$HOME/.local/bin/claude"
     if [ ! -x "$claude_bin" ]; then
       echo "claude: raw executable not found: $claude_bin" >&2
@@ -139,11 +151,12 @@ let
     if [ -n "''${NONO_CAP_FILE:-}" ]; then
       exec "$claude_bin" "$@"
     fi
-    HERDR_AGENT=claude exec ${nono-cli}/bin/nono run --silent --profile chouge-claude --allow-cwd -- \
+    HERDR_AGENT=claude exec ${nono-cli}/bin/nono run --silent --profile "$HOME/.config/nono/profiles/chouge-claude.json" --allow-cwd -- \
       "$claude_bin" --dangerously-skip-permissions "$@"
   '';
 
   pi-sandboxed = pkgs.writeShellScriptBin "pi" ''
+    ${canonicalize-herdr-socket}
     pi_bin="$HOME/.vite-plus/bin/pi"
     if [ ! -x "$pi_bin" ]; then
       echo "pi: raw executable not found: $pi_bin" >&2
@@ -152,7 +165,7 @@ let
     if [ -n "''${NONO_CAP_FILE:-}" ]; then
       exec "$pi_bin" "$@"
     fi
-    HERDR_AGENT=pi exec ${nono-cli}/bin/nono run --silent --profile chouge-pi --allow-cwd -- "$pi_bin" "$@"
+    HERDR_AGENT=pi exec ${nono-cli}/bin/nono run --silent --profile "$HOME/.config/nono/profiles/chouge-pi.json" --allow-cwd -- "$pi_bin" "$@"
   '';
 
   agent-wrappers = pkgs.symlinkJoin {
