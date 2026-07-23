@@ -11,7 +11,7 @@ let
   inherit (config.home) homeDirectory;
   inherit (config.xdg) configHome;
   agentCommonProfile = pkgs.writeText "chouge-agent-common.json" (
-    builtins.replaceStrings [ "@HOME@" ] [ homeDirectory ] (
+    builtins.replaceStrings [ "@HOME@" "@GH_WRAPPED@" ] [ homeDirectory "${pkgs.gh}/bin/.gh-wrapped" ] (
       builtins.readFile ../../../nono/profiles/chouge-agent-common.json
     )
   );

@@ -4,5 +4,8 @@
     "name": "chouge-pi",
     "version": "0.1.0",
     "description": "Local Pi profile"
+  },
+  "network": {
+    "allow_domain": ["chatgpt.com"]
   }
 }

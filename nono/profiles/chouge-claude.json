@@ -4,5 +4,8 @@
     "name": "chouge-claude",
     "version": "0.1.0",
     "description": "Local Claude Code profile"
+  },
+  "network": {
+    "allow_domain": ["api.anthropic.com"]
   }
 }

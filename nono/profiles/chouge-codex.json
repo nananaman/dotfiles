@@ -4,5 +4,8 @@
     "name": "chouge-codex",
     "version": "0.1.0",
     "description": "Local Codex profile"
+  },
+  "network": {
+    "allow_domain": ["chatgpt.com"]
   }
 }
