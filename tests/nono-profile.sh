@@ -288,6 +288,16 @@ test_container_wrapper_prefers_the_tool_sandbox_shim() {
   rg -q 'container-sandboxed' "$packages_module"
 }
 
+test_codex_wrapper_requires_the_parent_nono_capability() {
+  local packages_module='nix/modules/home/packages.nix'
+
+  # Arrange: Codex自身のsandboxは無効化し、外側のnonoだけをsecurity boundaryとして使う。
+  # Act: nonoが起動するchild commandにcapability確認用guardがあるか調べる。
+  # Assert: NONO_CAP_FILEが注入されなければ、raw Codexを起動する前に失敗する。
+  rg -q 'codex-nono-guard' "$packages_module"
+  rg -q 'codex: nono capability was not injected' "$packages_module"
+}
+
 test_local_agent_tools_use_the_parent_sandbox() {
   local command
 
@@ -328,6 +338,7 @@ test_github_auth_token_is_captured_with_a_per_intercept_sandbox
 test_github_credential_changes_are_denied_without_approval
 test_command_policies_never_require_human_approval
 test_container_wrapper_prefers_the_tool_sandbox_shim
+test_codex_wrapper_requires_the_parent_nono_capability
 test_local_agent_tools_use_the_parent_sandbox
 test_codex_allows_chatgpt_subscription_endpoint
 test_claude_allows_anthropic_api_endpoint

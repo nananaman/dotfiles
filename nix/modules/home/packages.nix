@@ -117,6 +117,14 @@ let
     fi
   '';
 
+  codex-nono-guard = pkgs.writeShellScript "codex-nono-guard" ''
+    if [ -z "''${NONO_CAP_FILE:-}" ]; then
+      echo "codex: nono capability was not injected" >&2
+      exit 1
+    fi
+    exec "$@"
+  '';
+
   codex-sandboxed = pkgs.writeShellScriptBin "codex" ''
     ${canonicalize-herdr-socket}
     codex_bin=""
@@ -139,6 +147,7 @@ let
     fi
     HERDR_AGENT=codex exec ${nono-cli}/bin/nono run --silent \
       --profile "$HOME/.config/nono/profiles/chouge-codex.jsonc" --allow-cwd -- \
+      ${codex-nono-guard} \
       "$codex_bin" --sandbox danger-full-access --ask-for-approval never "$@"
   '';
 
