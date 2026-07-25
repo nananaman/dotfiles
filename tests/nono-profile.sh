@@ -281,9 +281,9 @@ test_command_policies_never_require_human_approval() {
 test_container_wrapper_prefers_the_tool_sandbox_shim() {
   local packages_module='nix/modules/home/packages.nix'
 
-  # Arrange: Codexがnonoのshimより前へagent wrapper directoryを置く環境を対象にする。
-  # Act: 配布するcontainer wrapperのdispatch条件をsourceから確認する。
-  # Assert: nono session内ではHomebrew wrapperを直接起動せず、生成済みshimへ委譲する。
+  # Arrange: Codex sessionではagent wrapper directoryがnonoのshimよりPATHの前に置かれる。
+  # Act: PATH順序を補正するcontainer wrapperのdispatch条件をsourceから確認する。
+  # Assert: Homebrew launcherからlibexecを直接起動せず、生成済みshimへ委譲する。
   rg -q 'NONO_TOOL_SANDBOX_SHIM_DIR.*/container' "$packages_module"
   rg -q 'container-sandboxed' "$packages_module"
 }
