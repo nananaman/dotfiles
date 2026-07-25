@@ -1,0 +1,20 @@
+{
+  // 共通のlocal accessとnono組み込みのPi policyを合成する。
+  "extends": ["chouge-agent-common", "pi"],
+  "meta": {
+    "name": "chouge-pi",
+    "version": "0.1.0",
+    "description": "Local Pi profile"
+  },
+  "network": {
+    "allow_domain": ["chatgpt.com"]
+  },
+  "platform_overrides": {
+    "macos": {
+      // PiがNix store内のpackage managerを直接実行できるようにする。
+      "unsafe_macos_seatbelt_rules": [
+        "(allow process-exec (literal \"@PACKAGE_MANAGER@\"))"
+      ]
+    }
+  }
+}

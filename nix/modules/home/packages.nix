@@ -137,7 +137,8 @@ let
     if [ -n "''${NONO_CAP_FILE:-}" ]; then
       exec "$codex_bin" --sandbox danger-full-access --ask-for-approval never "$@"
     fi
-    HERDR_AGENT=codex exec ${nono-cli}/bin/nono run --silent --profile "$HOME/.config/nono/profiles/chouge-codex.json" --allow-cwd -- \
+    HERDR_AGENT=codex exec ${nono-cli}/bin/nono run --silent \
+      --profile "$HOME/.config/nono/profiles/chouge-codex.jsonc" --allow-cwd -- \
       "$codex_bin" --sandbox danger-full-access --ask-for-approval never "$@"
   '';
 
@@ -151,7 +152,8 @@ let
     if [ -n "''${NONO_CAP_FILE:-}" ]; then
       exec "$claude_bin" "$@"
     fi
-    HERDR_AGENT=claude exec ${nono-cli}/bin/nono run --silent --profile "$HOME/.config/nono/profiles/chouge-claude.json" --allow-cwd -- \
+    HERDR_AGENT=claude exec ${nono-cli}/bin/nono run --silent \
+      --profile "$HOME/.config/nono/profiles/chouge-claude.jsonc" --allow-cwd -- \
       "$claude_bin" --dangerously-skip-permissions "$@"
   '';
 
@@ -165,7 +167,16 @@ let
     if [ -n "''${NONO_CAP_FILE:-}" ]; then
       exec "$pi_bin" "$@"
     fi
-    HERDR_AGENT=pi exec ${nono-cli}/bin/nono run --silent --profile "$HOME/.config/nono/profiles/chouge-pi.json" --allow-cwd -- "$pi_bin" "$@"
+    HERDR_AGENT=pi exec ${nono-cli}/bin/nono run --silent \
+      --profile "$HOME/.config/nono/profiles/chouge-pi.jsonc" --allow-cwd -- "$pi_bin" "$@"
+  '';
+
+  container-sandboxed = pkgs.writeShellScriptBin "container" ''
+    if [ -n "''${NONO_TOOL_SANDBOX_SHIM_DIR:-}" ] &&
+      [ -x "$NONO_TOOL_SANDBOX_SHIM_DIR/container" ]; then
+      exec "$NONO_TOOL_SANDBOX_SHIM_DIR/container" "$@"
+    fi
+    exec /opt/homebrew/bin/container "$@"
   '';
 
   agent-wrappers = pkgs.symlinkJoin {
@@ -174,7 +185,8 @@ let
       codex-sandboxed
       claude-sandboxed
       pi-sandboxed
-    ];
+    ]
+    ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [ container-sandboxed ];
   };
 
   apm-cli = python.buildPythonApplication rec {

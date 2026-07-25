@@ -10,28 +10,11 @@ let
   settings = builtins.fromJSON (builtins.readFile ../../../../pi/agent/settings.json) // {
     npmCommand = [ packageManager ];
   };
-  baseProfile = builtins.fromJSON (builtins.readFile ../../../../nono/profiles/chouge-pi.json);
-  platformOverrides = baseProfile.platform_overrides or { };
-  macos = platformOverrides.macos or { };
-  seatbeltRules = macos.unsafe_macos_seatbelt_rules or [ ];
-  profile = baseProfile // {
-    platform_overrides = platformOverrides // {
-      macos = macos // {
-        unsafe_macos_seatbelt_rules = seatbeltRules ++ [
-          ''(allow process-exec (literal "${packageManager}"))''
-        ];
-      };
-    };
-  };
 in
 {
   home.file = {
     ".pi/agent/settings.json" = {
       text = builtins.toJSON settings;
-      force = true;
-    };
-    ".config/nono/profiles/chouge-pi.json" = {
-      text = builtins.toJSON profile;
       force = true;
     };
     ".pi/agent/pi-codex-conversion.json" = {

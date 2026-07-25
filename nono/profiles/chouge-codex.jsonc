@@ -1,4 +1,5 @@
 {
+  // 共通のlocal accessとnono組み込みのCodex policyを合成する。
   "extends": ["chouge-agent-common", "codex"],
   "meta": {
     "name": "chouge-codex",

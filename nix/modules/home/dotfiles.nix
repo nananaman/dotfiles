@@ -10,9 +10,21 @@
 let
   inherit (config.home) homeDirectory;
   inherit (config.xdg) configHome;
-  agentCommonProfile = pkgs.writeText "chouge-agent-common.json" (
-    builtins.replaceStrings [ "@HOME@" "@GH_WRAPPED@" ] [ homeDirectory "${pkgs.gh}/bin/.gh-wrapped" ] (
-      builtins.readFile ../../../nono/profiles/chouge-agent-common.json
+  agentCommonProfile = pkgs.writeText "chouge-agent-common.jsonc" (
+    builtins.replaceStrings
+      [
+        "@HOME@"
+        "@GH_BIN@"
+      ]
+      [
+        homeDirectory
+        "${pkgs.gh}/bin/.gh-wrapped"
+      ]
+      (builtins.readFile ../../../nono/profiles/chouge-agent-common.jsonc)
+  );
+  agentPiProfile = pkgs.writeText "chouge-pi.jsonc" (
+    builtins.replaceStrings [ "@PACKAGE_MANAGER@" ] [ "${pkgs.bun}/bin/bun" ] (
+      builtins.readFile ../../../nono/profiles/chouge-pi.jsonc
     )
   );
 in
@@ -53,9 +65,19 @@ in
     link_force "${dotfilesDir}/srt" "${configHome}/srt"
 
     $DRY_RUN_CMD mkdir -p "${configHome}/nono/profiles"
-    link_force "${agentCommonProfile}" "${configHome}/nono/profiles/chouge-agent-common.json"
-    link_force "${dotfilesDir}/nono/profiles/chouge-codex.json" "${configHome}/nono/profiles/chouge-codex.json"
-    link_force "${dotfilesDir}/nono/profiles/chouge-claude.json" "${configHome}/nono/profiles/chouge-claude.json"
+    for legacy_profile in chouge-agent-common chouge-codex chouge-claude chouge-pi; do
+      legacy_path="${configHome}/nono/profiles/$legacy_profile.json"
+      legacy_target="$(readlink "$legacy_path" 2>/dev/null || true)"
+      case "$legacy_target" in
+        "${dotfilesDir}/nono/profiles/"*.json | /nix/store/*)
+          $DRY_RUN_CMD rm -f "$legacy_path"
+          ;;
+      esac
+    done
+    link_force "${agentCommonProfile}" "${configHome}/nono/profiles/chouge-agent-common.jsonc"
+    link_force "${dotfilesDir}/nono/profiles/chouge-codex.jsonc" "${configHome}/nono/profiles/chouge-codex.jsonc"
+    link_force "${dotfilesDir}/nono/profiles/chouge-claude.jsonc" "${configHome}/nono/profiles/chouge-claude.jsonc"
+    link_force "${agentPiProfile}" "${configHome}/nono/profiles/chouge-pi.jsonc"
     link_force "${dotfilesDir}/apm" "${homeDirectory}/.apm"
 
     ${lib.optionalString pkgs.stdenv.isLinux ''
