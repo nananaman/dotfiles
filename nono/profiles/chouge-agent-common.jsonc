@@ -50,6 +50,10 @@
       "proxy.golang.org",
       "sum.golang.org",
 
+      // OpenAIの開発者向け文書とGitHub Releasesの成果物取得で利用する。
+      "developers.openai.com",
+      "release-assets.githubusercontent.com",
+
       // Google認証とcontainer registryで利用する。
       "accounts.google.com",
       "gcr.io",
