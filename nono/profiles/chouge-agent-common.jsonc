@@ -67,6 +67,7 @@
       "$HOME/.codex",
       "$HOME/.pi",
       "$HOME/.local/state/mise",
+      "$HOME/.local/share/host-artifact/public",
       "$HOME/go/pkg/mod",
 
       // ghq管理のrepositoryを調査、clone、修正できるようにする。
@@ -79,6 +80,7 @@
     ],
     "bypass_protection": [
       "$HOME/.config/gh",
+      "$HOME/.local/share/host-artifact/public",
       "$HOME/ghq/github.com/nananaman/dotfiles/zsh/zshrc"
     ],
     "read": [
@@ -100,6 +102,82 @@
   },
   "command_policies": {
     "commands": {
+      "host-artifact-service": {
+        "executable": "@HOME@/.local/share/nono-agent-wrappers/host-artifact-service",
+        "from": {
+          "session": {
+            "sandbox": {
+              "fs_read_file": [
+                "/bin/launchctl",
+                "/bin/sleep",
+                "/usr/bin/curl",
+                "/usr/bin/seq"
+              ],
+              "unsafe_macos_seatbelt_rules": [
+                "(allow process-exec (literal \"/bin/launchctl\"))",
+                "(allow process-exec (literal \"/bin/sleep\"))",
+                "(allow process-exec (literal \"/usr/bin/curl\"))",
+                "(allow process-exec (literal \"/usr/bin/seq\"))",
+                "(allow network-outbound (remote tcp \"localhost:9417\"))"
+              ]
+            },
+            "invocation_policy": {
+              "default": "deny",
+              "allow": [{ "argv": { "exact": ["ensure"] } }]
+            }
+          },
+          "host-artifact": {
+            "sandbox": {
+              "fs_read_file": [
+                "/bin/launchctl",
+                "/bin/sleep",
+                "/usr/bin/curl",
+                "/usr/bin/seq"
+              ],
+              "unsafe_macos_seatbelt_rules": [
+                "(allow process-exec (literal \"/bin/launchctl\"))",
+                "(allow process-exec (literal \"/bin/sleep\"))",
+                "(allow process-exec (literal \"/usr/bin/curl\"))",
+                "(allow process-exec (literal \"/usr/bin/seq\"))",
+                "(allow network-outbound (remote tcp \"localhost:9417\"))"
+              ]
+            },
+            "invocation_policy": {
+              "default": "deny",
+              "allow": [{ "argv": { "exact": ["ensure"] } }]
+            }
+          }
+        }
+      },
+      "host-artifact": {
+        "executable": "@HOME@/.local/share/nono-agent-wrappers/host-artifact",
+        "can_use": ["host-artifact-service"],
+        "from": {
+          "session": {
+            "sandbox": {
+              "fs_read": [
+                "/nix/store",
+                "$HOME/.agents/skills/host-artifact",
+                "$WORKDIR",
+                "$TMPDIR"
+              ],
+              "fs_write": ["$HOME/.local/share/host-artifact/public"],
+              "unsafe_macos_seatbelt_rules": [
+                "(allow process-exec (literal \"@BUN@\"))",
+                "(allow network-outbound (remote tcp \"localhost:9417\"))"
+              ]
+            },
+            "invocation_policy": {
+              "default": "deny",
+              "allow": [
+                { "argv": { "exact": ["status"] } },
+                { "argv": { "prefix": ["host"] } },
+                { "argv": { "prefix": ["remove"] } }
+              ]
+            }
+          }
+        }
+      },
       "container": {
         "executable": "/opt/homebrew/opt/container/libexec/container",
         "from": {

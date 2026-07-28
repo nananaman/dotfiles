@@ -184,12 +184,99 @@ let
     exec /opt/homebrew/bin/container "$@"
   '';
 
+  host-artifact-service = pkgs.writeShellScriptBin "host-artifact-service" ''
+    if [ "$#" -ne 1 ] || [ "$1" != "ensure" ]; then
+      echo "usage: host-artifact-service ensure" >&2
+      exit 64
+    fi
+
+    health_url="http://127.0.0.1:9417/.well-known/host-artifact/health"
+    is_expected_health() {
+      case "$1" in
+        '{"service":"host-artifact","version":1,"status":"ok"}'|'{"service":"host-artifact","version":1,"status":"ok",'*)
+          return 0
+          ;;
+        *)
+          return 1
+          ;;
+      esac
+    }
+    health_body="$(/usr/bin/curl --fail --silent --show-error --max-time 1 "$health_url" 2>/dev/null || true)"
+    if is_expected_health "$health_body"; then
+      exit 0
+    fi
+
+    /bin/launchctl kickstart -k "gui/$UID/com.nananaman.host-artifact"
+    for _attempt in $(/usr/bin/seq 1 20); do
+      health_body="$(/usr/bin/curl --fail --silent --show-error --max-time 1 "$health_url" 2>/dev/null || true)"
+      if is_expected_health "$health_body"; then
+        exit 0
+      fi
+      /bin/sleep 0.25
+    done
+
+    echo "host-artifact-service: service did not become ready" >&2
+    exit 1
+  '';
+
+  host-artifact = pkgs.writeShellScriptBin "host-artifact" ''
+    case "''${1:-}" in
+      host)
+        if [ "$#" -ne 2 ] && { [ "$#" -ne 3 ] || [ "$3" != "--tailscale" ]; }; then
+          echo "usage: host-artifact host PATH [--tailscale]" >&2
+          exit 64
+        fi
+        ;;
+      remove)
+        if [ "$#" -ne 2 ]; then
+          echo "usage: host-artifact remove ARTIFACT_ID" >&2
+          exit 64
+        fi
+        ;;
+      status)
+        if [ "$#" -ne 1 ]; then
+          echo "usage: host-artifact status" >&2
+          exit 64
+        fi
+        ;;
+      *)
+        echo "usage: host-artifact <host PATH [--tailscale] | remove ARTIFACT_ID | status>" >&2
+        exit 64
+        ;;
+    esac
+
+    exec ${pkgs.bun}/bin/bun \
+      "$HOME/.agents/skills/host-artifact/src/cli.ts" "$@"
+  '';
+
+  host-artifact-server = pkgs.writeShellScriptBin "host-artifact-server" ''
+    tailscale_address_file="$HOME/.local/state/host-artifact/tailscale-address"
+    update_tailscale_address() {
+      /usr/local/bin/tailscale ip -4 2>/dev/null | /usr/bin/head -n 1 >"$tailscale_address_file.tmp" || true
+      /bin/mv -f "$tailscale_address_file.tmp" "$tailscale_address_file"
+    }
+    update_tailscale_address
+    while /bin/sleep 15; do
+      update_tailscale_address
+    done &
+    exec ${nono-cli}/bin/nono run --silent \
+      --profile "$HOME/.config/nono/profiles/host-artifact-server.jsonc" -- \
+      ${pkgs.bun}/bin/bun \
+      "$HOME/.agents/skills/host-artifact/src/server-main.ts" \
+      --port 9417 \
+      --publish-root "$HOME/.local/share/host-artifact/public" \
+      --tailscale-address-file "$tailscale_address_file"
+  '';
+
   agent-wrappers = pkgs.symlinkJoin {
     name = "sandboxed-agent-wrappers";
     paths = [
       codex-sandboxed
       claude-sandboxed
       pi-sandboxed
+      host-artifact
+      host-artifact-service
+      host-artifact-server
     ]
     ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [ container-sandboxed ];
   };
