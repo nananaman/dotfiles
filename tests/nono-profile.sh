@@ -6,10 +6,19 @@ source_profile="${1:-nono/profiles/chouge-agent-common.jsonc}"
 source_profile_dir="$(dirname "$source_profile")"
 source_profile_json="$(sed '/^[[:space:]]*[/][/]/d' "$source_profile")"
 test_config_root="$(mktemp -d "${TMPDIR:-/tmp}/nono-profile-test.XXXXXX")"
+test_publish_root="$test_config_root/host-artifact/public"
 profile_dir="$test_config_root/nono/profiles"
-mkdir -p "$profile_dir"
+mkdir -p "$profile_dir" "$test_publish_root/example"
 for source in "$source_profile_dir"/*.jsonc; do
   cp "$source" "$profile_dir/$(basename "$source")"
+done
+for copied_profile in "$profile_dir"/*.jsonc; do
+  rendered_profile="$copied_profile.rendered"
+  sed \
+    -e "s|@HOME@|$HOME|g" \
+    -e 's|$HOME/.local/share/host-artifact/public|'"$test_publish_root"'|g' \
+    "$copied_profile" >"$rendered_profile"
+  mv "$rendered_profile" "$copied_profile"
 done
 ln -s "$HOME/.config/nono/packages" "$test_config_root/nono/packages"
 trap 'rm -rf "$test_config_root"' EXIT
@@ -258,6 +267,48 @@ test_local_agent_tools_use_the_parent_sandbox() {
   done
 }
 
+test_host_artifact_publish_root_is_writable_without_broadening_its_parent() {
+  # Arrange: Artifacts are copied into one dedicated service-owned subtree.
+  # Act & Assert: The publish root is writable while an adjacent directory stays denied.
+  assert_path_decision \
+    "ALLOWED" \
+    "$test_publish_root/example/report.html" \
+    "readwrite"
+  assert_path_decision \
+    "DENIED" \
+    "$test_config_root/host-artifact-private/report.html" \
+    "readwrite"
+  assert_path_decision \
+    "DENIED" \
+    "$HOME/.local/share/host-artifact" \
+    "write"
+}
+
+test_host_artifact_service_policy_allows_only_exact_ensure() {
+  # Arrange: Service recovery is delegated through one canonical wrapper.
+  # Act & Assert: The policy defaults to deny and grants only the argument-free ensure operation.
+  assert_profile_value \
+    '.command_policies.commands["host-artifact-service"].executable' \
+    '@HOME@/.local/share/nono-agent-wrappers/host-artifact-service'
+  assert_profile_value \
+    '.command_policies.commands["host-artifact-service"].from.session.invocation_policy.default' \
+    'deny'
+  assert_profile_value \
+    '.command_policies.commands["host-artifact-service"].from.session.invocation_policy.allow | tojson' \
+    '[{"argv":{"exact":["ensure"]}}]'
+}
+
+test_host_artifact_service_policy_does_not_delegate_launchctl() {
+  # Arrange: Agents receive a fixed recovery operation rather than general service control.
+  # Act & Assert: launchctl itself has no command policy and no other wrapper argv is allowed.
+  assert_profile_value \
+    '.command_policies.commands | has("launchctl")' \
+    'false'
+  assert_profile_value \
+    '.command_policies.commands["host-artifact-service"].from.session.invocation_policy.allow | length' \
+    '1'
+}
+
 test_codex_allows_chatgpt_subscription_endpoint() {
   assert_agent_network_boundary codex chatgpt.com
 }
@@ -283,6 +334,9 @@ test_command_policies_never_require_human_approval
 test_container_wrapper_prefers_the_tool_sandbox_shim
 test_codex_wrapper_requires_the_parent_nono_capability
 test_local_agent_tools_use_the_parent_sandbox
+test_host_artifact_publish_root_is_writable_without_broadening_its_parent
+test_host_artifact_service_policy_allows_only_exact_ensure
+test_host_artifact_service_policy_does_not_delegate_launchctl
 test_codex_allows_chatgpt_subscription_endpoint
 test_claude_allows_anthropic_api_endpoint
 test_pi_allows_configured_openai_codex_endpoint

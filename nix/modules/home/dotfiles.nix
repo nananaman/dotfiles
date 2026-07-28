@@ -11,13 +11,18 @@ let
   inherit (config.home) homeDirectory;
   inherit (config.xdg) configHome;
   agentCommonProfile = pkgs.writeText "chouge-agent-common.jsonc" (
-    builtins.replaceStrings [ "@HOME@" ] [ homeDirectory ] (
+    builtins.replaceStrings [ "@HOME@" "@BUN@" ] [ homeDirectory "${pkgs.bun}/bin/bun" ] (
       builtins.readFile ../../../nono/profiles/chouge-agent-common.jsonc
     )
   );
   agentPiProfile = pkgs.writeText "chouge-pi.jsonc" (
     builtins.replaceStrings [ "@PACKAGE_MANAGER@" ] [ "${pkgs.bun}/bin/bun" ] (
       builtins.readFile ../../../nono/profiles/chouge-pi.jsonc
+    )
+  );
+  hostArtifactServerProfile = pkgs.writeText "host-artifact-server.jsonc" (
+    builtins.replaceStrings [ "@HOME@" ] [ homeDirectory ] (
+      builtins.readFile ../../../nono/profiles/host-artifact-server.jsonc
     )
   );
 in
@@ -71,6 +76,7 @@ in
     link_force "${dotfilesDir}/nono/profiles/chouge-codex.jsonc" "${configHome}/nono/profiles/chouge-codex.jsonc"
     link_force "${dotfilesDir}/nono/profiles/chouge-claude.jsonc" "${configHome}/nono/profiles/chouge-claude.jsonc"
     link_force "${agentPiProfile}" "${configHome}/nono/profiles/chouge-pi.jsonc"
+    link_force "${hostArtifactServerProfile}" "${configHome}/nono/profiles/host-artifact-server.jsonc"
     link_force "${dotfilesDir}/apm" "${homeDirectory}/.apm"
 
     ${lib.optionalString pkgs.stdenv.isLinux ''
