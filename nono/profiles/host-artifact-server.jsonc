@@ -22,7 +22,8 @@
   },
   "network": {
     "block": true,
-    "listen_port": [9417]
+    // nono 0.68.0 on macOS requires open_port for a bind exception when block is enabled.
+    "open_port": [9417]
   },
   "filesystem": {
     "read": [

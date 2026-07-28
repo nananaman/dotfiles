@@ -154,7 +154,7 @@ test_server_profile_is_read_only_and_listens_only_on_the_service_port() {
       ]
   ' <<<"$profile_json" >/dev/null
   jq -e '.filesystem | has("allow") | not' <<<"$profile_json" >/dev/null
-  jq -e '.network == {"block":true,"listen_port":[9417]}' <<<"$profile_json" >/dev/null
+  jq -e '.network == {"block":true,"open_port":[9417]}' <<<"$profile_json" >/dev/null
   jq -e 'has("extends") | not' <<<"$profile_json" >/dev/null
   jq -e '
     .groups.include
