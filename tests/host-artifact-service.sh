@@ -190,12 +190,13 @@ test_launch_agent_runs_typescript_with_bun_through_nono() {
   rg -q 'host-artifact-server\.jsonc' "$dotfiles_module"
 }
 
-test_server_wrapper_passes_the_authoritative_tailscale_address() {
+test_server_wrapper_refreshes_the_authoritative_tailscale_address() {
   # Arrange: The fixed host wrapper runs before the server enters its nono sandbox.
   # Act: Inspect how it discovers and passes the Tailscale listener address.
   # Assert: Only the Tailscale CLI result becomes the server's authoritative candidate.
   rg -Fq '/usr/local/bin/tailscale ip -4' "$packages_module" || return 1
-  rg -Fq -- '--tailscale-address "$tailscale_address"' "$packages_module" || return 1
+  rg -Fq 'while /bin/sleep 15' "$packages_module" || return 1
+  rg -Fq -- '--tailscale-address-file "$tailscale_address_file"' "$packages_module" || return 1
 }
 
 test_activation_installs_frozen_bun_dependencies_before_service_use() {

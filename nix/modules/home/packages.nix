@@ -241,14 +241,22 @@ let
   '';
 
   host-artifact-server = pkgs.writeShellScriptBin "host-artifact-server" ''
-    tailscale_address="$(/usr/local/bin/tailscale ip -4 2>/dev/null | /usr/bin/head -n 1 || true)"
+    tailscale_address_file="$HOME/.local/share/host-artifact/public/.tailscale-address"
+    update_tailscale_address() {
+      /usr/local/bin/tailscale ip -4 2>/dev/null | /usr/bin/head -n 1 >"$tailscale_address_file.tmp" || true
+      /bin/mv -f "$tailscale_address_file.tmp" "$tailscale_address_file"
+    }
+    update_tailscale_address
+    while /bin/sleep 15; do
+      update_tailscale_address
+    done &
     exec ${nono-cli}/bin/nono run --silent \
       --profile "$HOME/.config/nono/profiles/host-artifact-server.jsonc" -- \
       ${pkgs.bun}/bin/bun \
       "$HOME/.agents/skills/host-artifact/src/server-main.ts" \
       --port 9417 \
       --publish-root "$HOME/.local/share/host-artifact/public" \
-      --tailscale-address "$tailscale_address"
+      --tailscale-address-file "$tailscale_address_file"
   '';
 
   agent-wrappers = pkgs.symlinkJoin {
