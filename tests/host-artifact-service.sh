@@ -134,7 +134,12 @@ test_ensure_command_sandbox_executes_only_its_fixed_dependencies() {
   ' <<<"$profile_json" >/dev/null
   jq -e '
     .command_policies.commands["host-artifact-service"].from.session.sandbox
-      .network.tcp_connect_ports == [9417]
+      | has("network") | not
+  ' <<<"$profile_json" >/dev/null
+  jq -e '
+    .command_policies.commands["host-artifact-service"].from.session.sandbox
+      .unsafe_macos_seatbelt_rules
+      | index("(allow network-outbound (remote tcp \"localhost:9417\"))") != null
   ' <<<"$profile_json" >/dev/null
 }
 
@@ -206,6 +211,15 @@ test_agent_cli_runs_typescript_through_a_fixed_bun_wrapper() {
   jq -e '
     .command_policies.commands["host-artifact"].can_use
       == ["host-artifact-service"]
+  ' <<<"$profile_json" >/dev/null
+  jq -e '
+    .command_policies.commands["host-artifact"].from.session.sandbox
+      | has("network") | not
+  ' <<<"$profile_json" >/dev/null
+  jq -e '
+    .command_policies.commands["host-artifact"].from.session.sandbox
+      .unsafe_macos_seatbelt_rules
+      | index("(allow network-outbound (remote tcp \"localhost:9417\"))") != null
   ' <<<"$profile_json" >/dev/null
   jq -e '
     .command_policies.commands["host-artifact"].from.session.invocation_policy

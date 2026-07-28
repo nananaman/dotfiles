@@ -113,14 +113,12 @@
                 "/usr/bin/curl",
                 "/usr/bin/seq"
               ],
-              "network": {
-                "tcp_connect_ports": [9417]
-              },
               "unsafe_macos_seatbelt_rules": [
                 "(allow process-exec (literal \"/bin/launchctl\"))",
                 "(allow process-exec (literal \"/bin/sleep\"))",
                 "(allow process-exec (literal \"/usr/bin/curl\"))",
-                "(allow process-exec (literal \"/usr/bin/seq\"))"
+                "(allow process-exec (literal \"/usr/bin/seq\"))",
+                "(allow network-outbound (remote tcp \"localhost:9417\"))"
               ]
             },
             "invocation_policy": {
@@ -136,14 +134,12 @@
                 "/usr/bin/curl",
                 "/usr/bin/seq"
               ],
-              "network": {
-                "tcp_connect_ports": [9417]
-              },
               "unsafe_macos_seatbelt_rules": [
                 "(allow process-exec (literal \"/bin/launchctl\"))",
                 "(allow process-exec (literal \"/bin/sleep\"))",
                 "(allow process-exec (literal \"/usr/bin/curl\"))",
-                "(allow process-exec (literal \"/usr/bin/seq\"))"
+                "(allow process-exec (literal \"/usr/bin/seq\"))",
+                "(allow network-outbound (remote tcp \"localhost:9417\"))"
               ]
             },
             "invocation_policy": {
@@ -165,11 +161,9 @@
                 "$TMPDIR"
               ],
               "fs_write": ["$HOME/.local/share/host-artifact/public"],
-              "network": {
-                "tcp_connect_ports": [9417]
-              },
               "unsafe_macos_seatbelt_rules": [
-                "(allow process-exec (literal \"@BUN@\"))"
+                "(allow process-exec (literal \"@BUN@\"))",
+                "(allow network-outbound (remote tcp \"localhost:9417\"))"
               ]
             },
             "invocation_policy": {
