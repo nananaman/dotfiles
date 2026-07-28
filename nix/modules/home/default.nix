@@ -6,11 +6,18 @@
   dotfilesDir,
   herdrPackage,
   hunkInput,
+  codexCliPackage,
   ...
 }:
 {
   imports = [
-    (import ./packages.nix { inherit pkgs herdrPackage; })
+    (import ./packages.nix {
+      inherit
+        pkgs
+        herdrPackage
+        codexCliPackage
+        ;
+    })
 
     (import ./programs {
       inherit
