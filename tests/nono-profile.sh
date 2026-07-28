@@ -7,18 +7,9 @@ source_profile_dir="$(dirname "$source_profile")"
 source_profile_json="$(sed '/^[[:space:]]*[/][/]/d' "$source_profile")"
 test_config_root="$(mktemp -d "${TMPDIR:-/tmp}/nono-profile-test.XXXXXX")"
 profile_dir="$test_config_root/nono/profiles"
-gh_command="/etc/profiles/per-user/$USER/bin/gh"
-if [[ ! -x "$gh_command" ]]; then
-  gh_command="$(command -v gh)"
-fi
-gh_bin="$(realpath "$gh_command")"
 mkdir -p "$profile_dir"
-touch "$test_config_root/gh-config.yml"
 for source in "$source_profile_dir"/*.jsonc; do
-  sed \
-    -e "s|@GH_BIN@|$gh_bin|g" \
-    -e "s|\\\$HOME/.config/gh/config.yml|$test_config_root/gh-config.yml|g" \
-    "$source" >"$profile_dir/$(basename "$source")"
+  cp "$source" "$profile_dir/$(basename "$source")"
 done
 ln -s "$HOME/.config/nono/packages" "$test_config_root/nono/packages"
 trap 'rm -rf "$test_config_root"' EXIT
@@ -124,18 +115,27 @@ assert_agent_network_boundary() {
 
 }
 
-test_protected_credentials_remain_unreadable() {
-  assert_path_read_is_denied "$HOME/.config/gh/hosts.yml"
-}
-
-test_github_credential_files_are_not_granted_to_the_parent_session() {
-  # Arrange: hosts.ymlはgh childだけにgrantし、agent本体のprotected path denyを維持する。
-  # Act & Assert: 親profileのfilesystemとenvironmentにはgh credential例外を持たない。
+test_github_cli_uses_the_parent_sandbox() {
+  # Arrange: ghはgitと同じ親sandboxでrepositoryと認証設定を利用する。
+  # Act: gh固有のcommand policyとGitHub CLI設定directoryの権限を確認する。
+  # Assert: child sandboxを作らず、親sandboxから設定を読み書きできる。
   assert_profile_value \
-    '.filesystem.read_file | index("$HOME/.config/gh/config.yml") == null' \
+    '.command_policies.commands | has("gh")' \
+    'false'
+  assert_profile_value \
+    '.filesystem.read | index("$HOME/.config/gh") != null' \
     'true'
-  assert_profile_value '.environment.set_vars.GH_CONFIG_DIR // null' 'null'
-  assert_profile_value '.network.credentials // [] | index("github") == null' 'true'
+  assert_profile_value \
+    '.filesystem.bypass_protection | index("$HOME/.config/gh") != null' \
+    'true'
+  assert_path_decision \
+    "ALLOWED" \
+    "$HOME/.config/gh/hosts.yml" \
+    "read"
+  assert_path_decision \
+    "DENIED" \
+    "$HOME/.config/gh/hosts.yml" \
+    "write"
 }
 
 test_ssh_private_key_remains_unreadable() {
@@ -214,59 +214,6 @@ test_common_profile_allows_new_ghq_clone_destinations() {
     "readwrite"
 }
 
-test_github_credential_is_scoped_to_the_tool_sandbox() {
-  local packages_module='nix/modules/home/packages.nix'
-  local dotfiles_module='nix/modules/home/dotfiles.nix'
-
-  # Arrange: ghはKeychain依存のTLS interceptionを使わず、nono標準shimからNix packageの実体を実行する。
-  # Act: ghのcredential、network、filesystem境界とpackage構成を確認する。
-  # Assert: hosts.ymlはghだけが読み、重複wrapperやsandbox内での二段execなしにGitHub操作を自走できる。
-  assert_profile_value \
-    '.command_policies.commands.gh.from.session.sandbox.fs_read_file | index("$HOME/.config/gh/hosts.yml") != null' \
-    'true'
-  assert_profile_value \
-    '.command_policies.commands.gh.from.session.sandbox.network.allow_all' \
-    'true'
-  assert_profile_value \
-    '.command_policies.commands.gh.from.session.invocation_policy.default' \
-    'allow'
-  rg -q '^[[:space:]]+gh$' "$packages_module"
-  if rg -q 'gh-sandboxed' "$packages_module"; then
-    printf 'expected gh to use the standard nono shim without a duplicate wrapper\n' >&2
-    return 1
-  fi
-  rg -Fq '"${pkgs.gh}/bin/.gh-wrapped"' "$dotfiles_module"
-}
-
-test_github_auth_token_is_captured_with_a_per_intercept_sandbox() {
-  # Arrange: ghは認証済みhosts.ymlを利用するが、実tokenをagentのstdoutへ返してはならない。
-  # Act: auth token用interceptのactionと置換sandboxを確認する。
-  # Assert: 実tokenをambient credentialへcaptureし、通常gh sandboxとは分離する。
-  assert_profile_value \
-    '.command_policies.commands.gh.intercept[] | select(.args == ["auth", "token"]) | .action.type' \
-    'capture_credential'
-  assert_profile_value \
-    '.command_policies.commands.gh.intercept[] | select(.args == ["auth", "token"]) | .action.credential' \
-    'github'
-  assert_profile_value \
-    '.command_policies.commands.gh.intercept[] | select(.args == ["auth", "token"]) | .sandbox.fs_read_file | index("$HOME/.config/gh/hosts.yml") != null' \
-    'true'
-}
-
-test_github_credential_changes_are_denied_without_approval() {
-  # Arrange: agentはGitHub APIを自走できるが、host側のlogin状態は変更しない。
-  # Act & Assert: credential変更commandをdenyし、approve decisionを導入しない。
-  assert_profile_value \
-    '[.command_policies.commands.gh.from.session.invocation_policy.deny[].argv.prefix] | any(. == ["auth", "login"])' \
-    'true'
-  assert_profile_value \
-    '[.command_policies.commands.gh.from.session.invocation_policy.deny[].argv.prefix] | any(. == ["auth", "logout"])' \
-    'true'
-  assert_profile_value \
-    '[.. | strings | select(. == "approve")] | length' \
-    '0'
-}
-
 test_command_policies_never_require_human_approval() {
   # Arrange: agent commandは対話待ちを発生させず、allowまたはdenyで即時決定する。
   # Act & Assert: approval backend、approve decision、default approveを一切持たない。
@@ -323,8 +270,7 @@ test_pi_allows_configured_openai_codex_endpoint() {
   assert_agent_network_boundary pi chatgpt.com
 }
 
-test_protected_credentials_remain_unreadable
-test_github_credential_files_are_not_granted_to_the_parent_session
+test_github_cli_uses_the_parent_sandbox
 test_ssh_private_key_remains_unreadable
 test_common_profile_includes_general_development_groups
 test_common_profile_keeps_sensitive_data_denied_by_group
@@ -333,9 +279,6 @@ test_common_profile_allows_development_endpoints
 test_common_profile_denies_unconfigured_clouds
 test_common_profile_allows_all_ghq_repositories
 test_common_profile_allows_new_ghq_clone_destinations
-test_github_credential_is_scoped_to_the_tool_sandbox
-test_github_auth_token_is_captured_with_a_per_intercept_sandbox
-test_github_credential_changes_are_denied_without_approval
 test_command_policies_never_require_human_approval
 test_container_wrapper_prefers_the_tool_sandbox_shim
 test_codex_wrapper_requires_the_parent_nono_capability
