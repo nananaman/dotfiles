@@ -156,6 +156,7 @@
           "session": {
             "sandbox": {
               "fs_read": [
+                "/nix/store",
                 "$HOME/.agents/skills/host-artifact",
                 "$WORKDIR",
                 "$TMPDIR"

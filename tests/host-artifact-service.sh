@@ -217,6 +217,10 @@ test_agent_cli_runs_typescript_through_a_fixed_bun_wrapper() {
       | has("network") | not
   ' <<<"$profile_json" >/dev/null
   jq -e '
+    .command_policies.commands["host-artifact"].from.session.sandbox.fs_read
+      | index("/nix/store") != null
+  ' <<<"$profile_json" >/dev/null || return 1
+  jq -e '
     .command_policies.commands["host-artifact"].from.session.sandbox
       .unsafe_macos_seatbelt_rules
       | index("(allow network-outbound (remote tcp \"localhost:9417\"))") != null
