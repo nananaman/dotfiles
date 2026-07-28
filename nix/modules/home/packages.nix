@@ -1,6 +1,12 @@
-{ pkgs, herdrPackage, ... }:
+{
+  pkgs,
+  herdrPackage,
+  codexCliPackage,
+  ...
+}:
 let
   python = pkgs.python313Packages;
+  agent-wrapper-dir = ".local/share/nono-agent-wrappers";
 
   azure-ai-inference = python.buildPythonPackage rec {
     pname = "azure-ai-inference";
@@ -127,28 +133,15 @@ let
 
   codex-sandboxed = pkgs.writeShellScriptBin "codex" ''
     ${canonicalize-herdr-socket}
-    codex_bin=""
-    old_ifs="$IFS"
-    IFS=:
-    for bin_dir in $PATH; do
-      candidate="$bin_dir/codex"
-      if [ -x "$candidate" ] && [ ! "$candidate" -ef "$0" ]; then
-        codex_bin="$candidate"
-        break
-      fi
-    done
-    IFS="$old_ifs"
-    if [ -z "$codex_bin" ]; then
-      echo "codex: raw executable not found on PATH" >&2
-      exit 127
-    fi
+    export CODEX_EXECUTABLE_PATH="$HOME/${agent-wrapper-dir}/codex"
+    export DISABLE_AUTOUPDATER=1
     if [ -n "''${NONO_CAP_FILE:-}" ]; then
-      exec "$codex_bin" --sandbox danger-full-access --ask-for-approval never "$@"
+      exec ${codexCliPackage}/bin/codex-raw --sandbox danger-full-access --ask-for-approval never "$@"
     fi
     HERDR_AGENT=codex exec ${nono-cli}/bin/nono run --silent \
       --profile "$HOME/.config/nono/profiles/chouge-codex.jsonc" --allow-cwd -- \
       ${codex-nono-guard} \
-      "$codex_bin" --sandbox danger-full-access --ask-for-approval never "$@"
+      ${codexCliPackage}/bin/codex-raw --sandbox danger-full-access --ask-for-approval never "$@"
   '';
 
   claude-sandboxed = pkgs.writeShellScriptBin "claude" ''
@@ -240,7 +233,7 @@ in
     RTK_TELEMETRY_DISABLED = "1";
   };
 
-  home.file.".local/share/nono-agent-wrappers".source = "${agent-wrappers}/bin";
+  home.file.${agent-wrapper-dir}.source = "${agent-wrappers}/bin";
 
   home.packages = with pkgs; [
     # Shell

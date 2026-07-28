@@ -24,6 +24,8 @@
       url = "github:modem-dev/hunk";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    codex-cli-nix.url = "github:sadjow/codex-cli-nix";
   };
 
   outputs =
@@ -35,6 +37,7 @@
       home-manager,
       herdr,
       hunk,
+      codex-cli-nix,
       ...
     }:
     let
@@ -173,6 +176,7 @@
                             ;
                           herdrPackage = herdr.packages.${pkgs.system}.default;
                           hunkInput = hunk;
+                          codexCliPackage = codex-cli-nix.packages.${pkgs.system}.codex;
                         })
                       ];
                     };
@@ -207,6 +211,7 @@
                         ;
                       herdrPackage = herdr.packages.${pkgs.system}.default;
                       hunkInput = hunk;
+                      codexCliPackage = codex-cli-nix.packages.${pkgs.system}.codex;
                     })
                   ];
 
