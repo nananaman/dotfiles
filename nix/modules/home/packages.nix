@@ -241,12 +241,14 @@ let
   '';
 
   host-artifact-server = pkgs.writeShellScriptBin "host-artifact-server" ''
+    tailscale_address="$(/usr/local/bin/tailscale ip -4 2>/dev/null | /usr/bin/head -n 1 || true)"
     exec ${nono-cli}/bin/nono run --silent \
       --profile "$HOME/.config/nono/profiles/host-artifact-server.jsonc" -- \
       ${pkgs.bun}/bin/bun \
       "$HOME/.agents/skills/host-artifact/src/server-main.ts" \
       --port 9417 \
-      --publish-root "$HOME/.local/share/host-artifact/public"
+      --publish-root "$HOME/.local/share/host-artifact/public" \
+      --tailscale-address "$tailscale_address"
   '';
 
   agent-wrappers = pkgs.symlinkJoin {
