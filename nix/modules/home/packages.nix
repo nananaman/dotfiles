@@ -222,8 +222,20 @@ let
   host-artifact = pkgs.writeShellScriptBin "host-artifact" ''
     case "''${1:-}" in
       host)
-        if [ "$#" -ne 2 ] && { [ "$#" -ne 3 ] || [ "$3" != "--tailscale" ]; }; then
-          echo "usage: host-artifact host PATH [--tailscale]" >&2
+        if [ "$#" -lt 2 ] || [ "$#" -gt 4 ]; then
+          echo "usage: host-artifact host PATH [--tailscale] [--no-reload]" >&2
+          exit 64
+        fi
+        for flag in "''${@:3}"; do
+          if [ "$flag" != "--tailscale" ] && [ "$flag" != "--no-reload" ]; then
+            echo "usage: host-artifact host PATH [--tailscale] [--no-reload]" >&2
+            exit 64
+          fi
+        done
+        ;;
+      update)
+        if [ "$#" -ne 3 ]; then
+          echo "usage: host-artifact update ARTIFACT_ID PATH" >&2
           exit 64
         fi
         ;;
@@ -240,7 +252,7 @@ let
         fi
         ;;
       *)
-        echo "usage: host-artifact <host PATH [--tailscale] | remove ARTIFACT_ID | status>" >&2
+        echo "usage: host-artifact <host PATH [--tailscale] [--no-reload] | update ARTIFACT_ID PATH | remove ARTIFACT_ID | status>" >&2
         exit 64
         ;;
     esac

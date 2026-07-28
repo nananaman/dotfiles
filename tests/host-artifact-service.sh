@@ -232,6 +232,7 @@ test_agent_cli_runs_typescript_through_a_fixed_bun_wrapper() {
   # Assert: The trusted wrapper runs only the installed CLI source with bounded public argv.
   rg -q 'writeShellScriptBin "host-artifact"' "$packages_module" || return 1
   rg -q 'src/cli\.ts' "$packages_module" || return 1
+  rg -q -- '--no-reload' "$packages_module" || return 1
   jq -e '
     .command_policies.commands["host-artifact"].can_use
       == ["host-artifact-service"]
@@ -256,6 +257,7 @@ test_agent_cli_runs_typescript_through_a_fixed_bun_wrapper() {
         "allow":[
           {"argv":{"exact":["status"]}},
           {"argv":{"prefix":["host"]}},
+          {"argv":{"prefix":["update"]}},
           {"argv":{"prefix":["remove"]}}
         ]
       }
