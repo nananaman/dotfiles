@@ -78,9 +78,14 @@
       "$HOME/.claude.lock"
     ],
     "bypass_protection": [
+      "$HOME/.config/gh",
       "$HOME/ghq/github.com/nananaman/dotfiles/zsh/zshrc"
     ],
-    "read": ["$HOME/.local/share/nono-agent-wrappers"]
+    "read": [
+      // ghはgitと同じ親sandboxで認証設定を読み、host側の設定変更は許可しない。
+      "$HOME/.config/gh",
+      "$HOME/.local/share/nono-agent-wrappers"
+    ]
   },
   "platform_overrides": {
     "macos": {
@@ -94,106 +99,7 @@
     }
   },
   "command_policies": {
-    "credentials": {
-      // gh auth tokenの出力をbroker内へ保持し、agentにはnonceだけを返す。
-      "github": {
-        "type": "ambient"
-      }
-    },
-    // credentialやhost daemonを扱うcommandだけを、親sessionより狭い権限で実行する。
     "commands": {
-      "gh": {
-        "executable": "@GH_BIN@",
-        "intercept": [
-          {
-            "args": ["auth", "token"],
-            "action": {
-              "type": "capture_credential",
-              "credential": "github"
-            },
-            "sandbox": {
-              // token取得時だけhost側のgh login情報を読み、networkは許可しない。
-              "fs_read_file": [
-                "$HOME/.config/gh/config.yml",
-                "$HOME/.config/gh/hosts.yml"
-              ],
-              "environment": {
-                "allow_vars": ["HOME", "LANG", "LC_*", "PATH"]
-              }
-            }
-          }
-        ],
-        "from": {
-          "session": {
-            "sandbox": {
-              // ghは認証済み設定を読めるが、agent本体はprotected pathを読めない。
-              "fs_read": ["$HOME/ghq"],
-              "fs_read_file": [
-                "$HOME/.config/gh/config.yml",
-                "$HOME/.config/gh/hosts.yml"
-              ],
-              "fs_write": ["$HOME/ghq"],
-              // macOSのTool Sandboxはhostname単位のraw network制限を行えない。
-              "network": {
-                "allow_all": true
-              },
-              "environment": {
-                "allow_vars": ["HOME", "LANG", "LC_*", "PATH", "TERM"],
-                "set_vars": {
-                  "GH_PAGER": "",
-                  "PAGER": ""
-                }
-              }
-            },
-            "invocation_policy": {
-              // 日常的なGitHub操作は自走させ、credentialやhost設定の変更だけ拒否する。
-              "default": "allow",
-              "deny": [
-                {
-                  "argv": { "prefix": ["auth", "login"] },
-                  "reason": "GitHub credential changes stay outside agent sessions"
-                },
-                {
-                  "argv": { "prefix": ["auth", "logout"] },
-                  "reason": "GitHub credential changes stay outside agent sessions"
-                },
-                {
-                  "argv": { "prefix": ["auth", "refresh"] },
-                  "reason": "GitHub credential changes stay outside agent sessions"
-                },
-                {
-                  "argv": { "prefix": ["auth", "setup-git"] },
-                  "reason": "GitHub credential changes stay outside agent sessions"
-                },
-                {
-                  "argv": { "prefix": ["auth", "switch"] },
-                  "reason": "GitHub credential changes stay outside agent sessions"
-                },
-                {
-                  "argv": { "prefix": ["auth", "git-credential", "store"] },
-                  "reason": "GitHub credential changes stay outside agent sessions"
-                },
-                {
-                  "argv": { "prefix": ["auth", "git-credential", "erase"] },
-                  "reason": "GitHub credential changes stay outside agent sessions"
-                },
-                {
-                  "argv": { "prefix": ["config", "set"] },
-                  "reason": "GitHub CLI configuration changes stay outside agent sessions"
-                },
-                {
-                  "argv": { "prefix": ["secret"] },
-                  "reason": "GitHub secret changes stay outside agent sessions"
-                },
-                {
-                  "argv": { "contains": ["--hostname"] },
-                  "reason": "GitHub credential use is restricted to the configured host"
-                }
-              ]
-            }
-          }
-        }
-      },
       "container": {
         "executable": "/opt/homebrew/opt/container/libexec/container",
         "from": {

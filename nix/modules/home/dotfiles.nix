@@ -11,16 +11,9 @@ let
   inherit (config.home) homeDirectory;
   inherit (config.xdg) configHome;
   agentCommonProfile = pkgs.writeText "chouge-agent-common.jsonc" (
-    builtins.replaceStrings
-      [
-        "@HOME@"
-        "@GH_BIN@"
-      ]
-      [
-        homeDirectory
-        "${pkgs.gh}/bin/.gh-wrapped"
-      ]
-      (builtins.readFile ../../../nono/profiles/chouge-agent-common.jsonc)
+    builtins.replaceStrings [ "@HOME@" ] [ homeDirectory ] (
+      builtins.readFile ../../../nono/profiles/chouge-agent-common.jsonc
+    )
   );
   agentPiProfile = pkgs.writeText "chouge-pi.jsonc" (
     builtins.replaceStrings [ "@PACKAGE_MANAGER@" ] [ "${pkgs.bun}/bin/bun" ] (
