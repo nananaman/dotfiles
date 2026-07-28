@@ -172,6 +172,7 @@
               "allow": [
                 { "argv": { "exact": ["status"] } },
                 { "argv": { "prefix": ["host"] } },
+                { "argv": { "prefix": ["update"] } },
                 { "argv": { "prefix": ["remove"] } }
               ]
             }

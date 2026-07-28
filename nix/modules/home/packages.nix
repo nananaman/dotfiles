@@ -227,6 +227,12 @@ let
           exit 64
         fi
         ;;
+      update)
+        if [ "$#" -ne 3 ]; then
+          echo "usage: host-artifact update ARTIFACT_ID PATH" >&2
+          exit 64
+        fi
+        ;;
       remove)
         if [ "$#" -ne 2 ]; then
           echo "usage: host-artifact remove ARTIFACT_ID" >&2
@@ -240,7 +246,7 @@ let
         fi
         ;;
       *)
-        echo "usage: host-artifact <host PATH [--tailscale] | remove ARTIFACT_ID | status>" >&2
+        echo "usage: host-artifact <host PATH [--tailscale] | update ARTIFACT_ID PATH | remove ARTIFACT_ID | status>" >&2
         exit 64
         ;;
     esac

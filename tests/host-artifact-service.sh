@@ -256,6 +256,7 @@ test_agent_cli_runs_typescript_through_a_fixed_bun_wrapper() {
         "allow":[
           {"argv":{"exact":["status"]}},
           {"argv":{"prefix":["host"]}},
+          {"argv":{"prefix":["update"]}},
           {"argv":{"prefix":["remove"]}}
         ]
       }
