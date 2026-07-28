@@ -30,6 +30,7 @@
       "@HOME@/.agents/skills/host-artifact",
       "@HOME@/.local/share/host-artifact/public"
     ],
+    "read_file": ["@HOME@/.local/state/host-artifact/tailscale-address"],
     "bypass_protection": ["@HOME@/.local/share/host-artifact/public"]
   }
 }

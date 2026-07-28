@@ -191,16 +191,25 @@ let
     fi
 
     health_url="http://127.0.0.1:9417/.well-known/host-artifact/health"
-    expected_health='{"service":"host-artifact","version":1,"status":"ok"}'
+    is_expected_health() {
+      case "$1" in
+        '{"service":"host-artifact","version":1,"status":"ok"}'|'{"service":"host-artifact","version":1,"status":"ok",'*)
+          return 0
+          ;;
+        *)
+          return 1
+          ;;
+      esac
+    }
     health_body="$(/usr/bin/curl --fail --silent --show-error --max-time 1 "$health_url" 2>/dev/null || true)"
-    if [ "$health_body" = "$expected_health" ]; then
+    if is_expected_health "$health_body"; then
       exit 0
     fi
 
     /bin/launchctl kickstart -k "gui/$UID/com.nananaman.host-artifact"
     for _attempt in $(/usr/bin/seq 1 20); do
       health_body="$(/usr/bin/curl --fail --silent --show-error --max-time 1 "$health_url" 2>/dev/null || true)"
-      if [ "$health_body" = "$expected_health" ]; then
+      if is_expected_health "$health_body"; then
         exit 0
       fi
       /bin/sleep 0.25
@@ -241,7 +250,7 @@ let
   '';
 
   host-artifact-server = pkgs.writeShellScriptBin "host-artifact-server" ''
-    tailscale_address_file="$HOME/.local/share/host-artifact/public/.tailscale-address"
+    tailscale_address_file="$HOME/.local/state/host-artifact/tailscale-address"
     update_tailscale_address() {
       /usr/local/bin/tailscale ip -4 2>/dev/null | /usr/bin/head -n 1 >"$tailscale_address_file.tmp" || true
       /bin/mv -f "$tailscale_address_file.tmp" "$tailscale_address_file"

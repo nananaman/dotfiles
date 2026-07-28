@@ -87,7 +87,8 @@ test_ensure_wrapper_requires_the_server_identity() {
   # Act: Inspect the readiness predicate used before and after kickstart.
   # Assert: Only the versioned host-artifact health document counts as healthy.
   rg -q '\{"service":"host-artifact","version":1,"status":"ok"\}' "$packages_module"
-  rg -q '\[ "\$health_body" = "\$expected_health" \]' "$packages_module"
+  rg -q 'is_expected_health "\$health_body"' "$packages_module"
+  rg -q '\{"service":"host-artifact","version":1,"status":"ok",'\''\*' "$packages_module"
 }
 
 test_profile_grants_only_the_publish_root_and_exact_ensure_command() {
@@ -196,7 +197,21 @@ test_server_wrapper_refreshes_the_authoritative_tailscale_address() {
   # Assert: Only the Tailscale CLI result becomes the server's authoritative candidate.
   rg -Fq '/usr/local/bin/tailscale ip -4' "$packages_module" || return 1
   rg -Fq 'while /bin/sleep 15' "$packages_module" || return 1
+  rg -Fq '.local/state/host-artifact/tailscale-address' "$packages_module" || return 1
   rg -Fq -- '--tailscale-address-file "$tailscale_address_file"' "$packages_module" || return 1
+}
+
+test_server_profile_reads_only_the_protected_tailscale_address_state() {
+  local profile_json
+
+  # Arrange: Normalize the dedicated server profile.
+  profile_json="$(sed '/^[[:space:]]*[/][/]/d' "$server_profile")"
+
+  # Act & Assert: The server reads the exact state file without gaining state-directory write access.
+  jq -e '
+    .filesystem.read_file == ["@HOME@/.local/state/host-artifact/tailscale-address"]
+    and (.filesystem.bypass_protection | index("@HOME@/.local/state/host-artifact") == null)
+  ' <<<"$profile_json" >/dev/null || return 1
 }
 
 test_activation_installs_frozen_bun_dependencies_before_service_use() {
