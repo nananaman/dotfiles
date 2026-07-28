@@ -17,6 +17,7 @@ dependencies:
     - path: ~/ghq/github.com/nananaman/skills/meta/apm-usage
     - path: ~/ghq/github.com/nananaman/skills/meta/update-skills
     - path: ~/ghq/github.com/nananaman/skills/engineering/review-diff-code
+    - path: ~/ghq/github.com/nananaman/skills/engineering/implement
     - path: ~/ghq/github.com/nananaman/skills/engineering/tdd
     - path: ~/ghq/github.com/nananaman/skills/engineering/test-writing-style
     - path: ~/ghq/github.com/nananaman/skills/engineering/sandbox-runtime
