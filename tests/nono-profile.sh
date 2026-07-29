@@ -124,6 +124,42 @@ assert_agent_network_boundary() {
 
 }
 
+assert_agent_profile_value() {
+  local agent="$1"
+  local jq_filter="$2"
+  local expected="$3"
+  local agent_source_json
+  local actual
+
+  # Arrange: Normalize the checked-in agent profile while retaining it as the source of truth.
+  agent_source_json="$(sed '/^[[:space:]]*[/][/]/d' "$source_profile_dir/chouge-$agent.jsonc")"
+
+  # Act: Select the exact agent-specific capability under review.
+  actual="$(jq -r "$jq_filter" <<<"$agent_source_json")"
+
+  # Assert: The source profile contains only the explicitly reviewed boundary.
+  if [[ "$actual" != "$expected" ]]; then
+    printf 'expected agent profile value %q, got %q\n' "$expected" "$actual" >&2
+    return 1
+  fi
+}
+
+assert_container_command_decision() {
+  local expected="$1"
+  shift
+  local output
+
+  # Arrange: Use nono's policy evaluator so no container state is changed.
+  # Act: Classify the requested Apple container CLI invocation.
+  output="$(nono why --profile "$profile" --command container -- "$@")"
+
+  # Assert: The command matches the reviewed allow or deny boundary.
+  if [[ "${output%%$'\n'*}" != "$expected" ]]; then
+    printf 'expected %s for container %q, got:\n%s\n' "$expected" "$*" "$output" >&2
+    return 1
+  fi
+}
+
 test_github_cli_uses_the_parent_sandbox() {
   # Arrange: ghはgitと同じ親sandboxでrepositoryと認証設定を利用する。
   # Act: gh固有のcommand policyとGitHub CLI設定directoryの権限を確認する。
@@ -244,6 +280,23 @@ test_container_wrapper_prefers_the_tool_sandbox_shim() {
   rg -q 'container-sandboxed' "$packages_module"
 }
 
+test_container_policy_allows_mysql_integration_test_lifecycle() {
+  # Arrange, Act & Assert: Repeated test setup and inspection operations are delegated.
+  assert_container_command_decision "ALLOWED" image pull mysql:8.0.33
+  assert_container_command_decision "ALLOWED" run --name katohome-mysql mysql:8.0.33
+  assert_container_command_decision "ALLOWED" start katohome-mysql
+  assert_container_command_decision "ALLOWED" exec katohome-mysql mysqladmin ping
+  assert_container_command_decision "ALLOWED" copy ./fixture.sql katohome-mysql:/tmp/fixture.sql
+  assert_container_command_decision "ALLOWED" stop katohome-mysql
+}
+
+test_container_policy_keeps_destructive_cleanup_denied() {
+  # Arrange, Act & Assert: Destructive bulk or removal operations remain outside delegation.
+  assert_container_command_decision "DENIED" delete katohome-mysql
+  assert_container_command_decision "DENIED" prune
+  assert_container_command_decision "DENIED" image prune --all
+}
+
 test_codex_wrapper_requires_the_parent_nono_capability() {
   local packages_module='nix/modules/home/packages.nix'
 
@@ -313,6 +366,23 @@ test_codex_allows_chatgpt_subscription_endpoint() {
   assert_agent_network_boundary codex chatgpt.com
 }
 
+test_codex_allows_unrestricted_localhost_outbound_on_macos() {
+  # Arrange, Act & Assert: Port zero is nono's canonical macOS localhost:* outbound grant.
+  assert_agent_profile_value codex '.network.open_port | tojson' '[0]'
+  assert_agent_profile_value \
+    codex \
+    '.network.allow_domain | tojson' \
+    '["chatgpt.com","localhost","127.0.0.1"]'
+}
+
+test_codex_localhost_access_does_not_grant_the_container_vm_address() {
+  # Arrange, Act & Assert: Non-loopback container VM addresses remain outside this grant.
+  assert_agent_profile_value \
+    codex \
+    '.network.allow_domain | index("192.168.65.2") == null' \
+    'true'
+}
+
 test_claude_allows_anthropic_api_endpoint() {
   assert_agent_network_boundary claude api.anthropic.com
 }
@@ -332,11 +402,15 @@ test_common_profile_allows_all_ghq_repositories
 test_common_profile_allows_new_ghq_clone_destinations
 test_command_policies_never_require_human_approval
 test_container_wrapper_prefers_the_tool_sandbox_shim
+test_container_policy_allows_mysql_integration_test_lifecycle
+test_container_policy_keeps_destructive_cleanup_denied
 test_codex_wrapper_requires_the_parent_nono_capability
 test_local_agent_tools_use_the_parent_sandbox
 test_host_artifact_publish_root_is_writable_without_broadening_its_parent
 test_host_artifact_service_policy_allows_only_exact_ensure
 test_host_artifact_service_policy_does_not_delegate_launchctl
 test_codex_allows_chatgpt_subscription_endpoint
+test_codex_allows_unrestricted_localhost_outbound_on_macos
+test_codex_localhost_access_does_not_grant_the_container_vm_address
 test_claude_allows_anthropic_api_endpoint
 test_pi_allows_configured_openai_codex_endpoint

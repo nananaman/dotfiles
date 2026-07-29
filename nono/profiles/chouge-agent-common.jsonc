@@ -244,7 +244,15 @@
                 { "argv": { "prefix": ["system", "version"] } },
                 { "argv": { "prefix": ["system", "df"] } },
                 { "argv": { "prefix": ["system", "property", "list"] } },
-                { "argv": { "prefix": ["system", "dns", "list"] } }
+                { "argv": { "prefix": ["system", "dns", "list"] } },
+
+                // Local integration tests may manage and inspect their container lifecycle.
+                { "argv": { "prefix": ["image", "pull"] } },
+                { "argv": { "prefix": ["run"] } },
+                { "argv": { "prefix": ["start"] } },
+                { "argv": { "prefix": ["exec"] } },
+                { "argv": { "prefix": ["copy"] } },
+                { "argv": { "prefix": ["stop"] } }
               ]
             }
           }

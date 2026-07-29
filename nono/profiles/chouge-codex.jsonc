@@ -7,6 +7,10 @@
     "description": "Local Codex profile"
   },
   "network": {
-    "allow_domain": ["chatgpt.com"]
+    // Local development services, including container-published MySQL, use loopback.
+    "allow_domain": ["chatgpt.com", "localhost", "127.0.0.1"],
+
+    // On macOS, port 0 is nono's canonical localhost:* outbound grant.
+    "open_port": [0]
   }
 }
