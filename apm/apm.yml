@@ -14,6 +14,7 @@ dependencies:
     - path: ~/ghq/github.com/nananaman/skills/engineering/polish-design-doc
     - path: ~/ghq/github.com/nananaman/skills/engineering/task-breakdown
     - path: ~/ghq/github.com/nananaman/skills/engineering/create-plan
+    - path: ~/ghq/github.com/nananaman/skills/engineering/review-plan
     - path: ~/ghq/github.com/nananaman/skills/meta/apm-usage
     - path: ~/ghq/github.com/nananaman/skills/meta/update-skills
     - path: ~/ghq/github.com/nananaman/skills/engineering/review-diff-code
