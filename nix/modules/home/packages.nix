@@ -262,22 +262,51 @@ let
   '';
 
   host-artifact-server = pkgs.writeShellScriptBin "host-artifact-server" ''
+    skill_root="$HOME/.agents/skills/host-artifact"
     tailscale_address_file="$HOME/.local/state/host-artifact/tailscale-address"
+    host_artifact_runtime_fingerprint() {
+      {
+        ${pkgs.findutils}/bin/find "$skill_root/src" -type f -exec ${pkgs.coreutils}/bin/sha256sum {} \;
+        for runtime_file in "$skill_root/package.json" "$skill_root/bun.lock"; do
+          if [ -f "$runtime_file" ]; then
+            ${pkgs.coreutils}/bin/sha256sum "$runtime_file"
+          fi
+        done
+      } | ${pkgs.coreutils}/bin/sort | ${pkgs.coreutils}/bin/sha256sum
+    }
     update_tailscale_address() {
       /usr/local/bin/tailscale ip -4 2>/dev/null | /usr/bin/head -n 1 >"$tailscale_address_file.tmp" || true
       /bin/mv -f "$tailscale_address_file.tmp" "$tailscale_address_file"
     }
+    runtime_fingerprint="$(host_artifact_runtime_fingerprint)"
     update_tailscale_address
     while /bin/sleep 15; do
       update_tailscale_address
     done &
-    exec ${nono-cli}/bin/nono run --silent \
+    tailscale_updater_pid=$!
+    ${nono-cli}/bin/nono run --silent \
       --profile "$HOME/.config/nono/profiles/host-artifact-server.jsonc" -- \
       ${pkgs.bun}/bin/bun \
-      "$HOME/.agents/skills/host-artifact/src/server-main.ts" \
+      "$skill_root/src/server-main.ts" \
       --port 9417 \
       --publish-root "$HOME/.local/share/host-artifact/public" \
-      --tailscale-address-file "$tailscale_address_file"
+      --tailscale-address-file "$tailscale_address_file" &
+    server_pid=$!
+
+    while /bin/kill -0 "$server_pid" 2>/dev/null; do
+      /bin/sleep 2
+      if [ "$(host_artifact_runtime_fingerprint)" != "$runtime_fingerprint" ]; then
+        /bin/kill -TERM "$server_pid"
+        wait "$server_pid" 2>/dev/null || true
+        /bin/kill -TERM "$tailscale_updater_pid" 2>/dev/null || true
+        exit 75
+      fi
+    done
+
+    wait "$server_pid"
+    server_exit=$?
+    /bin/kill -TERM "$tailscale_updater_pid" 2>/dev/null || true
+    exit "$server_exit"
   '';
 
   agent-wrappers = pkgs.symlinkJoin {

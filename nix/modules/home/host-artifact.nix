@@ -31,6 +31,14 @@ in
           )
         '';
 
+    home.activation.restartHostArtifactService =
+      lib.hm.dag.entryAfter [ "prepareHostArtifactRuntime" ]
+        ''
+          if /bin/launchctl print "gui/$UID/com.nananaman.host-artifact" >/dev/null 2>&1; then
+            $DRY_RUN_CMD /bin/launchctl kickstart -k "gui/$UID/com.nananaman.host-artifact"
+          fi
+        '';
+
     launchd.agents.com-nananaman-host-artifact = {
       enable = true;
       config = {

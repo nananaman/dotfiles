@@ -65,6 +65,14 @@ test_launch_agent_is_persistent_and_has_dedicated_logs() {
   rg -q 'host-artifact-stderr\.log' "$module"
 }
 
+test_activation_restarts_the_service_after_preparing_the_runtime() {
+  # Arrange: Home Manager may update the wrapper symlink without changing the launchd plist.
+  # Act: Inspect the activation ordering and exact service operation.
+  # Assert: Each switch reloads the prepared runtime through only the host-artifact label.
+  rg -Fq 'entryAfter [ "prepareHostArtifactRuntime" ]' "$module" || return 1
+  rg -Fq '/bin/launchctl kickstart -k "gui/$UID/com.nananaman.host-artifact"' "$module" || return 1
+}
+
 test_ensure_wrapper_exposes_only_the_ensure_operation() {
   # Arrange: The sandbox may recover one fixed LaunchAgent but may not control others.
   # Act: Inspect the generated wrapper's argument and launchctl invocation.
@@ -201,6 +209,15 @@ test_server_wrapper_refreshes_the_authoritative_tailscale_address() {
   rg -Fq -- '--tailscale-address-file "$tailscale_address_file"' "$packages_module" || return 1
 }
 
+test_server_wrapper_recycles_stale_runtime_after_skill_update() {
+  # Arrange: APM may replace the installed TypeScript runtime while the LaunchAgent stays active.
+  # Act: Inspect the wrapper's runtime-change handling.
+  # Assert: A content change terminates only the stale server child so launchd KeepAlive reloads it.
+  rg -Fq 'host_artifact_runtime_fingerprint' "$packages_module" || return 1
+  rg -Fq 'server_pid=$!' "$packages_module" || return 1
+  rg -Fq 'kill -TERM "$server_pid"' "$packages_module" || return 1
+}
+
 test_server_profile_reads_only_the_protected_tailscale_address_state() {
   local profile_json
 
@@ -331,6 +348,7 @@ test_apm_installs_the_host_artifact_skill() {
 
 test_launch_agent_uses_the_shared_service_contract
 test_launch_agent_is_persistent_and_has_dedicated_logs
+test_activation_restarts_the_service_after_preparing_the_runtime || exit 1
 test_ensure_wrapper_exposes_only_the_ensure_operation
 test_ensure_wrapper_uses_a_finite_health_check
 test_ensure_wrapper_requires_the_server_identity
@@ -338,6 +356,7 @@ test_profile_grants_only_the_publish_root_and_exact_ensure_command
 test_ensure_command_sandbox_executes_only_its_fixed_dependencies
 test_server_profile_is_read_only_and_listens_only_on_the_service_port
 test_launch_agent_runs_typescript_with_bun_through_nono || exit 1
+test_server_wrapper_recycles_stale_runtime_after_skill_update || exit 1
 test_activation_installs_frozen_bun_dependencies_before_service_use || exit 1
 test_agent_cli_runs_typescript_through_a_fixed_bun_wrapper || exit 1
 test_server_profile_reads_published_content_but_not_its_neighbor
