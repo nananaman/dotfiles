@@ -358,6 +358,7 @@ let
 in
 {
   home.sessionVariables = {
+    NVIM_LOG_FILE = "/dev/null";
     RTK_TELEMETRY_DISABLED = "1";
   };
 
