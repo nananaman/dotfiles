@@ -94,9 +94,9 @@ test_ensure_wrapper_requires_the_server_identity() {
   # Arrange: An unrelated process can occupy the fixed port and return HTTP 200.
   # Act: Inspect the readiness predicate used before and after kickstart.
   # Assert: Only the versioned host-artifact health document counts as healthy.
-  rg -q '\{"service":"host-artifact","version":1,"status":"ok"\}' "$packages_module"
+  rg -q '\{"service":"host-artifact","version":2,"status":"ok"\}' "$packages_module"
   rg -q 'is_expected_health "\$health_body"' "$packages_module"
-  rg -q '\{"service":"host-artifact","version":1,"status":"ok",'\''\*' "$packages_module"
+  rg -q '\{"service":"host-artifact","version":2,"status":"ok",'\''\*' "$packages_module"
 }
 
 test_profile_grants_only_the_publish_root_and_exact_ensure_command() {
@@ -199,14 +199,10 @@ test_launch_agent_runs_typescript_with_bun_through_nono() {
   rg -q 'host-artifact-server\.jsonc' "$dotfiles_module"
 }
 
-test_server_wrapper_refreshes_the_authoritative_tailscale_address() {
-  # Arrange: The fixed host wrapper runs before the server enters its nono sandbox.
-  # Act: Inspect how it discovers and passes the Tailscale listener address.
-  # Assert: Only the Tailscale CLI result becomes the server's authoritative candidate.
-  rg -Fq '/usr/local/bin/tailscale ip -4' "$packages_module" || return 1
-  rg -Fq 'while /bin/sleep 15' "$packages_module" || return 1
-  rg -Fq '.local/state/host-artifact/tailscale-address' "$packages_module" || return 1
-  rg -Fq -- '--tailscale-address-file "$tailscale_address_file"' "$packages_module" || return 1
+test_server_wrapper_has_no_tailscale_listener_state() {
+  # Arrange: Remote access is owned by Tailscale Serve outside the server process.
+  # Act & Assert: The server wrapper neither discovers an address nor passes listener state.
+  if rg -q 'tailscale_address|tailscale-address|tailscale ip' "$packages_module"; then return 1; fi
 }
 
 test_server_wrapper_recycles_stale_runtime_after_skill_update() {
@@ -218,17 +214,14 @@ test_server_wrapper_recycles_stale_runtime_after_skill_update() {
   rg -Fq 'kill -TERM "$server_pid"' "$packages_module" || return 1
 }
 
-test_server_profile_reads_only_the_protected_tailscale_address_state() {
+test_server_profile_has_no_tailscale_state_grant() {
   local profile_json
 
   # Arrange: Normalize the dedicated server profile.
   profile_json="$(sed '/^[[:space:]]*[/][/]/d' "$server_profile")"
 
-  # Act & Assert: The server reads the exact state file without gaining state-directory write access.
-  jq -e '
-    .filesystem.read_file == ["@HOME@/.local/state/host-artifact/tailscale-address"]
-    and (.filesystem.bypass_protection | index("@HOME@/.local/state/host-artifact") == null)
-  ' <<<"$profile_json" >/dev/null || return 1
+  # Act & Assert: A loopback-only server needs no Tailscale state-file access.
+  jq -e '.filesystem | has("read_file") | not' <<<"$profile_json" >/dev/null || return 1
 }
 
 test_activation_installs_frozen_bun_dependencies_before_service_use() {
@@ -249,10 +242,10 @@ test_agent_cli_runs_typescript_through_a_fixed_bun_wrapper() {
   # Assert: The trusted wrapper runs only the installed CLI source with bounded public argv.
   rg -q 'writeShellScriptBin "host-artifact"' "$packages_module" || return 1
   rg -q 'src/cli\.ts' "$packages_module" || return 1
-  rg -q -- '--no-reload' "$packages_module" || return 1
+  if rg -q -- '--no-reload|--tailscale|host PATH|update ARTIFACT' "$packages_module"; then return 1; fi
   jq -e '
     .command_policies.commands["host-artifact"].can_use
-      == ["host-artifact-service"]
+      == ["host-artifact-service","host-artifact-tailscale","host-artifact-workspace"]
   ' <<<"$profile_json" >/dev/null
   jq -e '
     .command_policies.commands["host-artifact"].from.session.sandbox
@@ -273,8 +266,8 @@ test_agent_cli_runs_typescript_through_a_fixed_bun_wrapper() {
         "default":"deny",
         "allow":[
           {"argv":{"exact":["status"]}},
-          {"argv":{"prefix":["host"]}},
-          {"argv":{"prefix":["update"]}},
+          {"argv":{"exact":["setup"]}},
+          {"argv":{"prefix":["publish"]}},
           {"argv":{"prefix":["remove"]}}
         ]
       }
@@ -283,6 +276,79 @@ test_agent_cli_runs_typescript_through_a_fixed_bun_wrapper() {
     .command_policies.commands["host-artifact-service"]
       .from["host-artifact"].invocation_policy
       == {"default":"deny","allow":[{"argv":{"exact":["ensure"]}}]}
+  ' <<<"$profile_json" >/dev/null
+}
+
+test_agent_cli_grants_only_the_fixed_shlock_executable() {
+  local profile_json
+  profile_json="$(sed '/^[[:space:]]*[/][/]/d' "$profile")"
+
+  # Arrange: The publisher acquires PID locks with direct execFile of the system shlock binary.
+  # Act: Inspect executable and filesystem capabilities of the main CLI child sandbox.
+  # Assert: Only the exact binary is added; lock/temp mutations remain under the existing publish root.
+  jq -e '
+    .command_policies.commands["host-artifact"].from.session.sandbox as $sandbox
+    | ($sandbox.fs_read_file | index("/usr/bin/shlock")) != null
+    and ($sandbox.unsafe_macos_seatbelt_rules | index("(allow process-exec (literal \"/usr/bin/shlock\"))")) != null
+    and $sandbox.fs_write == ["$HOME/.local/share/host-artifact/public"]
+    and ($sandbox.fs_read_file | index("/usr/bin") == null)
+  ' <<<"$profile_json" >/dev/null
+}
+
+test_tailscale_helper_exposes_only_bounded_operations() {
+  local profile_json
+  profile_json="$(sed '/^[[:space:]]*[/][/]/d' "$profile")"
+
+  # Arrange: The helper owns all Tailscale and remote-network access.
+  # Act & Assert: Its caller policy accepts only inspect/setup and grammar-shaped verify.
+  rg -q 'writeShellScriptBin "host-artifact-tailscale"' "$packages_module" || return 1
+  rg -Fq '"/usr/local/bin/tailscale" "/Applications/Tailscale.app/Contents/MacOS/tailscale"' "$packages_module" || return 1
+  jq -e '
+    .command_policies.commands["host-artifact-tailscale"].from["host-artifact"].invocation_policy
+      == {"default":"deny","allow":[
+        {"argv":{"exact":["inspect"]}},
+        {"argv":{"exact":["setup"]}},
+        {"argv":{"prefix":["verify"]}}
+      ]}
+  ' <<<"$profile_json" >/dev/null
+  jq -e '
+    .command_policies.commands["host-artifact-tailscale"].from["host-artifact"].sandbox
+      .unsafe_macos_seatbelt_rules as $rules
+    | ($rules | index("(allow mach-lookup (global-name \"io.tailscale.ipn.macsys-spks\"))")) != null
+    and ($rules | index("(allow mach-lookup (global-name \"io.tailscale.ipn.macsys-spki\"))")) != null
+    and ($rules | index("(allow mach-lookup)")) == null
+  ' <<<"$profile_json" >/dev/null
+}
+
+test_workspace_helper_exposes_only_resolve_with_bounded_repository_read() {
+  local profile_json
+  profile_json="$(sed '/^[[:space:]]*[/][/]/d' "$profile")"
+
+  # Arrange: Workspace identity may need linked-worktree common metadata under ghq.
+  # Act & Assert: Only resolve is callable and only workdir/ghq roots are readable.
+  rg -q 'writeShellScriptBin "host-artifact-workspace"' "$packages_module" || return 1
+  jq -e '
+    .command_policies.commands["host-artifact-workspace"].from["host-artifact"].invocation_policy
+      == {"default":"deny","allow":[{"argv":{"exact":["resolve"]}}]}
+    and (.command_policies.commands["host-artifact-workspace"].from["host-artifact"].sandbox.fs_read
+      == ["$WORKDIR","$HOME/ghq","/nix/store"])
+  ' <<<"$profile_json" >/dev/null
+}
+
+test_helper_command_sandboxes_strip_shell_startup_environment() {
+  local profile_json
+  profile_json="$(sed '/^[[:space:]]*[/][/]/d' "$profile")"
+
+  # Arrange: Both trusted helpers start as Bash scripts before they validate public argv.
+  # Act: Inspect the environment inherited by each helper command sandbox.
+  # Assert: Attacker-controlled startup hook variables are removed before Bash starts.
+  jq -e '
+    ["HOME","WORKDIR","TMPDIR","PATH","LANG","LC_*"] as $safe
+    | .command_policies.commands["host-artifact-tailscale"].from["host-artifact"].sandbox.environment.allow_vars
+      == $safe
+    and .command_policies.commands["host-artifact-workspace"].from["host-artifact"].sandbox.environment.allow_vars
+      == $safe
+    and ($safe | index("BASH_ENV") == null and index("ENV") == null and index("*") == null)
   ' <<<"$profile_json" >/dev/null
 }
 
@@ -356,9 +422,15 @@ test_profile_grants_only_the_publish_root_and_exact_ensure_command
 test_ensure_command_sandbox_executes_only_its_fixed_dependencies
 test_server_profile_is_read_only_and_listens_only_on_the_service_port
 test_launch_agent_runs_typescript_with_bun_through_nono || exit 1
+test_server_wrapper_has_no_tailscale_listener_state || exit 1
 test_server_wrapper_recycles_stale_runtime_after_skill_update || exit 1
+test_server_profile_has_no_tailscale_state_grant || exit 1
 test_activation_installs_frozen_bun_dependencies_before_service_use || exit 1
 test_agent_cli_runs_typescript_through_a_fixed_bun_wrapper || exit 1
+test_agent_cli_grants_only_the_fixed_shlock_executable || exit 1
+test_tailscale_helper_exposes_only_bounded_operations || exit 1
+test_workspace_helper_exposes_only_resolve_with_bounded_repository_read || exit 1
+test_helper_command_sandboxes_strip_shell_startup_environment || exit 1
 test_server_profile_reads_published_content_but_not_its_neighbor
 test_server_profile_cannot_write_published_content
 test_server_profile_cannot_replace_the_publish_root

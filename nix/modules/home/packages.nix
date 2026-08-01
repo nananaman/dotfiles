@@ -193,7 +193,7 @@ let
     health_url="http://127.0.0.1:9417/.well-known/host-artifact/health"
     is_expected_health() {
       case "$1" in
-        '{"service":"host-artifact","version":1,"status":"ok"}'|'{"service":"host-artifact","version":1,"status":"ok",'*)
+        '{"service":"host-artifact","version":2,"status":"ok"}'|'{"service":"host-artifact","version":2,"status":"ok",'*)
           return 0
           ;;
         *)
@@ -219,51 +219,29 @@ let
     exit 1
   '';
 
-  host-artifact = pkgs.writeShellScriptBin "host-artifact" ''
-    case "''${1:-}" in
-      host)
-        if [ "$#" -lt 2 ] || [ "$#" -gt 4 ]; then
-          echo "usage: host-artifact host PATH [--tailscale] [--no-reload]" >&2
-          exit 64
-        fi
-        for flag in "''${@:3}"; do
-          if [ "$flag" != "--tailscale" ] && [ "$flag" != "--no-reload" ]; then
-            echo "usage: host-artifact host PATH [--tailscale] [--no-reload]" >&2
-            exit 64
-          fi
-        done
-        ;;
-      update)
-        if [ "$#" -ne 3 ]; then
-          echo "usage: host-artifact update ARTIFACT_ID PATH" >&2
-          exit 64
-        fi
-        ;;
-      remove)
-        if [ "$#" -ne 2 ]; then
-          echo "usage: host-artifact remove ARTIFACT_ID" >&2
-          exit 64
-        fi
-        ;;
-      status)
-        if [ "$#" -ne 1 ]; then
-          echo "usage: host-artifact status" >&2
-          exit 64
-        fi
-        ;;
-      *)
-        echo "usage: host-artifact <host PATH [--tailscale] [--no-reload] | update ARTIFACT_ID PATH | remove ARTIFACT_ID | status>" >&2
-        exit 64
-        ;;
-    esac
+  host-artifact = pkgs.writeShellScriptBin "host-artifact" (
+    builtins.replaceStrings
+      [ "@BUN@" "@CLI@" ]
+      [ "${pkgs.bun}/bin/bun" "$HOME/.agents/skills/host-artifact/src/cli.ts" ]
+      (builtins.readFile ./host-artifact.sh)
+  );
 
-    exec ${pkgs.bun}/bin/bun \
-      "$HOME/.agents/skills/host-artifact/src/cli.ts" "$@"
-  '';
+  host-artifact-tailscale = pkgs.writeShellScriptBin "host-artifact-tailscale" (
+    builtins.replaceStrings
+      [ "@TAILSCALE_WRAPPER@" "@TAILSCALE_APP@" "@CURL@" "@JQ@" "@GREP@" "@TR@" ]
+      [ "/usr/local/bin/tailscale" "/Applications/Tailscale.app/Contents/MacOS/tailscale" "/usr/bin/curl" "${pkgs.jq}/bin/jq" "/usr/bin/grep" "/usr/bin/tr" ]
+      (builtins.readFile ./host-artifact-tailscale.sh)
+  );
+
+  host-artifact-workspace = pkgs.writeShellScriptBin "host-artifact-workspace" (
+    builtins.replaceStrings
+      [ "@GIT@" "@JQ@" "@SHASUM@" "@SED@" "@TR@" "@CUT@" ]
+      [ "/usr/bin/git" "${pkgs.jq}/bin/jq" "/usr/bin/shasum" "/usr/bin/sed" "/usr/bin/tr" "/usr/bin/cut" ]
+      (builtins.readFile ./host-artifact-workspace.sh)
+  );
 
   host-artifact-server = pkgs.writeShellScriptBin "host-artifact-server" ''
     skill_root="$HOME/.agents/skills/host-artifact"
-    tailscale_address_file="$HOME/.local/state/host-artifact/tailscale-address"
     host_artifact_runtime_fingerprint() {
       {
         ${pkgs.findutils}/bin/find "$skill_root/src" -type f -exec ${pkgs.coreutils}/bin/sha256sum {} \;
@@ -274,23 +252,13 @@ let
         done
       } | ${pkgs.coreutils}/bin/sort | ${pkgs.coreutils}/bin/sha256sum
     }
-    update_tailscale_address() {
-      /usr/local/bin/tailscale ip -4 2>/dev/null | /usr/bin/head -n 1 >"$tailscale_address_file.tmp" || true
-      /bin/mv -f "$tailscale_address_file.tmp" "$tailscale_address_file"
-    }
     runtime_fingerprint="$(host_artifact_runtime_fingerprint)"
-    update_tailscale_address
-    while /bin/sleep 15; do
-      update_tailscale_address
-    done &
-    tailscale_updater_pid=$!
     ${nono-cli}/bin/nono run --silent \
       --profile "$HOME/.config/nono/profiles/host-artifact-server.jsonc" -- \
       ${pkgs.bun}/bin/bun \
       "$skill_root/src/server-main.ts" \
       --port 9417 \
-      --publish-root "$HOME/.local/share/host-artifact/public" \
-      --tailscale-address-file "$tailscale_address_file" &
+      --publish-root "$HOME/.local/share/host-artifact/public" &
     server_pid=$!
 
     while /bin/kill -0 "$server_pid" 2>/dev/null; do
@@ -298,14 +266,12 @@ let
       if [ "$(host_artifact_runtime_fingerprint)" != "$runtime_fingerprint" ]; then
         /bin/kill -TERM "$server_pid"
         wait "$server_pid" 2>/dev/null || true
-        /bin/kill -TERM "$tailscale_updater_pid" 2>/dev/null || true
         exit 75
       fi
     done
 
     wait "$server_pid"
     server_exit=$?
-    /bin/kill -TERM "$tailscale_updater_pid" 2>/dev/null || true
     exit "$server_exit"
   '';
 
@@ -316,6 +282,8 @@ let
       claude-sandboxed
       pi-sandboxed
       host-artifact
+      host-artifact-tailscale
+      host-artifact-workspace
       host-artifact-service
       host-artifact-server
     ]

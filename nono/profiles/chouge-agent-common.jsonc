@@ -157,7 +157,7 @@
       },
       "host-artifact": {
         "executable": "@HOME@/.local/share/nono-agent-wrappers/host-artifact",
-        "can_use": ["host-artifact-service"],
+        "can_use": ["host-artifact-service", "host-artifact-tailscale", "host-artifact-workspace"],
         "from": {
           "session": {
             "sandbox": {
@@ -167,9 +167,11 @@
                 "$WORKDIR",
                 "$TMPDIR"
               ],
+              "fs_read_file": ["/usr/bin/shlock"],
               "fs_write": ["$HOME/.local/share/host-artifact/public"],
               "unsafe_macos_seatbelt_rules": [
                 "(allow process-exec (literal \"@BUN@\"))",
+                "(allow process-exec (literal \"/usr/bin/shlock\"))",
                 "(allow network-outbound (remote tcp \"localhost:9417\"))"
               ]
             },
@@ -177,10 +179,74 @@
               "default": "deny",
               "allow": [
                 { "argv": { "exact": ["status"] } },
-                { "argv": { "prefix": ["host"] } },
-                { "argv": { "prefix": ["update"] } },
+                { "argv": { "exact": ["setup"] } },
+                { "argv": { "prefix": ["publish"] } },
                 { "argv": { "prefix": ["remove"] } }
               ]
+            }
+          }
+        }
+      },
+      "host-artifact-tailscale": {
+        "executable": "@HOME@/.local/share/nono-agent-wrappers/host-artifact-tailscale",
+        "from": {
+          "host-artifact": {
+            "sandbox": {
+              "environment": { "allow_vars": ["HOME", "WORKDIR", "TMPDIR", "PATH", "LANG", "LC_*"] },
+              "fs_read": ["/nix/store"],
+              "fs_read_file": [
+                "/bin/sh",
+                "/usr/local/bin/tailscale",
+                "/Applications/Tailscale.app/Contents/MacOS/tailscale",
+                "/usr/bin/curl",
+                "/usr/bin/grep",
+                "/usr/bin/tr"
+              ],
+              "unsafe_macos_seatbelt_rules": [
+                "(allow process-exec (subpath \"/nix/store\"))",
+                "(allow process-exec (literal \"/bin/sh\"))",
+                "(allow process-exec (literal \"/usr/local/bin/tailscale\"))",
+                "(allow process-exec (literal \"/Applications/Tailscale.app/Contents/MacOS/tailscale\"))",
+                "(allow process-exec (literal \"/usr/bin/curl\"))",
+                "(allow process-exec (literal \"/usr/bin/grep\"))",
+                "(allow process-exec (literal \"/usr/bin/tr\"))",
+                "(allow mach-lookup (global-name \"io.tailscale.ipn.macsys-spks\"))",
+                "(allow mach-lookup (global-name \"io.tailscale.ipn.macsys-spki\"))",
+                "(allow network-outbound (remote tcp \"localhost:*\"))",
+                "(allow network-outbound (remote tcp \"*:443\"))"
+              ]
+            },
+            "invocation_policy": {
+              "default": "deny",
+              "allow": [
+                { "argv": { "exact": ["inspect"] } },
+                { "argv": { "exact": ["setup"] } },
+                { "argv": { "prefix": ["verify"] } }
+              ]
+            }
+          }
+        }
+      },
+      "host-artifact-workspace": {
+        "executable": "@HOME@/.local/share/nono-agent-wrappers/host-artifact-workspace",
+        "from": {
+          "host-artifact": {
+            "sandbox": {
+              "environment": { "allow_vars": ["HOME", "WORKDIR", "TMPDIR", "PATH", "LANG", "LC_*"] },
+              "fs_read": ["$WORKDIR", "$HOME/ghq", "/nix/store"],
+              "fs_read_file": ["/usr/bin/git", "/usr/bin/shasum", "/usr/bin/sed", "/usr/bin/tr", "/usr/bin/cut"],
+              "unsafe_macos_seatbelt_rules": [
+                "(allow process-exec (subpath \"/nix/store\"))",
+                "(allow process-exec (literal \"/usr/bin/git\"))",
+                "(allow process-exec (literal \"/usr/bin/shasum\"))",
+                "(allow process-exec (literal \"/usr/bin/sed\"))",
+                "(allow process-exec (literal \"/usr/bin/tr\"))",
+                "(allow process-exec (literal \"/usr/bin/cut\"))"
+              ]
+            },
+            "invocation_policy": {
+              "default": "deny",
+              "allow": [{ "argv": { "exact": ["resolve"] } }]
             }
           }
         }
