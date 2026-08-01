@@ -362,6 +362,17 @@ test_host_artifact_service_policy_does_not_delegate_launchctl() {
     '1'
 }
 
+test_bun_uses_the_outer_sandbox_with_exact_ancestor_rules() {
+  # Arrange: Normalize the source profile before Home Manager substitutes the consumer home.
+  # Act & Assert: Bun stays outside Tool Sandbox and receives only the proven exact ancestor grants.
+  assert_profile_value \
+    '.command_policies.commands | has("bun")' \
+    'false'
+  assert_profile_value \
+    '[.unsafe_macos_seatbelt_rules[] | select(startswith("(allow file-read-"))] | tojson' \
+    '["(allow file-read-metadata (literal \"/\"))","(allow file-read-data (literal \"/Users\"))","(allow file-read-data (literal \"@HOME@\"))"]'
+}
+
 test_codex_allows_chatgpt_subscription_endpoint() {
   assert_agent_network_boundary codex chatgpt.com
 }
@@ -409,6 +420,7 @@ test_local_agent_tools_use_the_parent_sandbox
 test_host_artifact_publish_root_is_writable_without_broadening_its_parent
 test_host_artifact_service_policy_allows_only_exact_ensure
 test_host_artifact_service_policy_does_not_delegate_launchctl
+test_bun_uses_the_outer_sandbox_with_exact_ancestor_rules
 test_codex_allows_chatgpt_subscription_endpoint
 test_codex_allows_unrestricted_localhost_outbound_on_macos
 test_codex_localhost_access_does_not_grant_the_container_vm_address

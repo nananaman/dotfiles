@@ -387,6 +387,7 @@ in
     lazygit
 
     # Development
+    bun
     go
     deno
     stdenv.cc
