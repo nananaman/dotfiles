@@ -221,6 +221,28 @@ test_common_profile_keeps_sensitive_data_denied_by_group() {
   done
 }
 
+test_common_profile_keeps_chrome_data_outside_direct_agent_access() {
+  # Arrange: Chrome bridge traffic uses its socket and does not require direct browser-data reads.
+  # Act & Assert: No local agent receives a Chrome user-data read or protection bypass.
+  assert_profile_value \
+    '.platform_overrides.macos.filesystem.read | map(select(contains("Google/Chrome"))) | length' \
+    '0'
+  assert_profile_value \
+    '(.platform_overrides.macos.filesystem.bypass_protection // []) | map(select(contains("Google/Chrome"))) | length' \
+    '0'
+}
+
+test_common_profile_allows_only_the_chrome_bridge_socket_subtree() {
+  # Arrange: Chrome bridge socket names are generated beneath one canonical macOS directory.
+  # Act & Assert: All local agents may connect only within that browser bridge subtree.
+  assert_profile_value \
+    '[.unsafe_macos_seatbelt_rules[] | select(contains("codex-browser-use"))] | tojson' \
+    '["(allow network-outbound (subpath \"/private/tmp/codex-browser-use\"))"]'
+  assert_profile_value \
+    '.platform_overrides.macos.filesystem | has("unix_socket_subtree")' \
+    'false'
+}
+
 test_common_profile_uses_enterprise_network() {
   assert_profile_value \
     '.network.network_profile' \
@@ -406,6 +428,8 @@ test_github_cli_uses_the_parent_sandbox
 test_ssh_private_key_remains_unreadable
 test_common_profile_includes_general_development_groups
 test_common_profile_keeps_sensitive_data_denied_by_group
+test_common_profile_keeps_chrome_data_outside_direct_agent_access
+test_common_profile_allows_only_the_chrome_bridge_socket_subtree
 test_common_profile_uses_enterprise_network
 test_common_profile_allows_development_endpoints
 test_common_profile_denies_unconfigured_clouds

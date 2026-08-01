@@ -13,7 +13,9 @@
     "(allow file-read-metadata (literal \"/\"))",
     "(allow file-read-data (literal \"/Users\"))",
     "(allow file-read-data (literal \"@HOME@\"))",
-    "(allow network-outbound (path \"@HOME@/ghq/github.com/nananaman/dotfiles/herdr/herdr.sock\"))"
+    "(allow network-outbound (path \"@HOME@/ghq/github.com/nananaman/dotfiles/herdr/herdr.sock\"))",
+    // Chrome bridgeは起動ごとに生成されるnative host socketで通信する。
+    "(allow network-outbound (subpath \"/private/tmp/codex-browser-use\"))"
   ],
   "groups": {
     "include": [
