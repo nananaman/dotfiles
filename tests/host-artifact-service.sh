@@ -312,9 +312,13 @@ test_tailscale_helper_exposes_only_bounded_operations() {
       ]}
   ' <<<"$profile_json" >/dev/null
   jq -e '
-    .command_policies.commands["host-artifact-tailscale"].from["host-artifact"].sandbox
-      .unsafe_macos_seatbelt_rules as $rules
-    | ($rules | index("(allow mach-lookup (global-name \"io.tailscale.ipn.macsys-spks\"))")) != null
+    .command_policies.commands["host-artifact-tailscale"].from["host-artifact"].sandbox as $sandbox
+    | $sandbox.unsafe_macos_seatbelt_rules as $rules
+    | $sandbox.fs_read == ["/nix/store","/Applications/Tailscale.app"]
+    and ($sandbox.fs_read_file | index("$WORKDIR") != null)
+    and ($sandbox.fs_read_file | index("/bin/bash") != null)
+    and ($rules | index("(allow process-exec (literal \"/bin/bash\"))") != null)
+    and ($rules | index("(allow mach-lookup (global-name \"io.tailscale.ipn.macsys-spks\"))")) != null
     and ($rules | index("(allow mach-lookup (global-name \"io.tailscale.ipn.macsys-spki\"))")) != null
     and ($rules | index("(allow mach-lookup)")) == null
   ' <<<"$profile_json" >/dev/null
@@ -325,13 +329,17 @@ test_workspace_helper_exposes_only_resolve_with_bounded_repository_read() {
   profile_json="$(sed '/^[[:space:]]*[/][/]/d' "$profile")"
 
   # Arrange: Workspace identity may need linked-worktree common metadata under ghq.
-  # Act & Assert: Only resolve is callable and only workdir/ghq roots are readable.
+  # Act & Assert: Only resolve is callable, repository roots are readable, and shasum's fixed interpreter is executable.
   rg -q 'writeShellScriptBin "host-artifact-workspace"' "$packages_module" || return 1
   jq -e '
     .command_policies.commands["host-artifact-workspace"].from["host-artifact"].invocation_policy
       == {"default":"deny","allow":[{"argv":{"exact":["resolve"]}}]}
     and (.command_policies.commands["host-artifact-workspace"].from["host-artifact"].sandbox.fs_read
       == ["$WORKDIR","$HOME/ghq","/nix/store"])
+    and (.command_policies.commands["host-artifact-workspace"].from["host-artifact"].sandbox.fs_read_file
+      | index("/usr/bin/perl") != null)
+    and (.command_policies.commands["host-artifact-workspace"].from["host-artifact"].sandbox.unsafe_macos_seatbelt_rules
+      | index("(allow process-exec (literal \"/usr/bin/perl\"))") != null)
   ' <<<"$profile_json" >/dev/null
 }
 
