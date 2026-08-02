@@ -83,8 +83,19 @@ case "${1:-}" in
     url="$origin/a/$workspace/$artifact/"
     response="$($curl_bin --silent --show-error --max-time 3 --retry 2 --head \
       --write-out 'Host-Artifact-Status: %{http_code}\n' "$url" 2>/dev/null || true)"
+    revision_header_matches() {
+      shopt -s nocasematch
+      while IFS= read -r header_line; do
+        case "$header_line" in
+          X-Host-Artifact-Revision:\ *)
+            [ "${header_line#*: }" = "$revision" ] && return 0
+            ;;
+        esac
+      done
+      return 1
+    }
     if printf '%s\n' "$response" | "$tr_bin" -d '\r' | "$grep_bin" -Eq '^Host-Artifact-Status: 2[0-9][0-9]$' && \
-      printf '%s\n' "$response" | "$tr_bin" -d '\r' | "$grep_bin" -Fqx "X-Host-Artifact-Revision: $revision"; then
+      revision_header_matches <<<"$(printf '%s\n' "$response" | "$tr_bin" -d '\r')"; then
       "$jq_bin" -cn --arg url "$url" '{schemaVersion:1,verified:true,url:$url}'
     else
       "$jq_bin" -cn '{schemaVersion:1,verified:false,reason:"remote-verification-failed"}'

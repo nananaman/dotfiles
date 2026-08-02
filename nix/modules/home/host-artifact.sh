@@ -25,22 +25,7 @@ case "${1:-}" in
     ;;
 esac
 
-shim_dir="${NONO_TOOL_SANDBOX_SHIM_DIR:-}"
-case "$shim_dir" in
-  /*) ;;
-  *) echo "host-artifact: command-policy shim directory is unavailable" >&2; exit 69 ;;
-esac
-if [ ! -d "$shim_dir" ]; then
-  echo "host-artifact: command-policy shim directory is unavailable" >&2
-  exit 69
-fi
-for helper in host-artifact-service host-artifact-tailscale host-artifact-workspace; do
-  if [ ! -x "$shim_dir/$helper" ]; then
-    echo "host-artifact: required command-policy shim is unavailable: $helper" >&2
-    exit 69
-  fi
-done
-PATH="$shim_dir:$PATH"
+PATH="@HELPER_PATH@:$PATH"
 export PATH
 
 exec @BUN@ @CLI@ "$@"

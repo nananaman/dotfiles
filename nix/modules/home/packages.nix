@@ -221,15 +221,30 @@ let
 
   host-artifact = pkgs.writeShellScriptBin "host-artifact" (
     builtins.replaceStrings
-      [ "@BUN@" "@CLI@" ]
-      [ "${pkgs.bun}/bin/bun" "$HOME/.agents/skills/host-artifact/src/cli.ts" ]
+      [ "@BUN@" "@CLI@" "@HELPER_PATH@" ]
+      [
+        "${pkgs.bun}/bin/bun"
+        "$HOME/.agents/skills/host-artifact/src/cli.ts"
+        (pkgs.lib.makeBinPath [
+          host-artifact-service
+          host-artifact-tailscale
+          host-artifact-workspace
+        ])
+      ]
       (builtins.readFile ./host-artifact.sh)
   );
 
   host-artifact-tailscale = pkgs.writeShellScriptBin "host-artifact-tailscale" (
     builtins.replaceStrings
       [ "@TAILSCALE_WRAPPER@" "@TAILSCALE_APP@" "@CURL@" "@JQ@" "@GREP@" "@TR@" ]
-      [ "/usr/local/bin/tailscale" "/Applications/Tailscale.app/Contents/MacOS/tailscale" "/usr/bin/curl" "${pkgs.jq}/bin/jq" "/usr/bin/grep" "/usr/bin/tr" ]
+      [
+        "/usr/local/bin/tailscale"
+        "/Applications/Tailscale.app/Contents/MacOS/tailscale"
+        "/usr/bin/curl"
+        "${pkgs.jq}/bin/jq"
+        "/usr/bin/grep"
+        "/usr/bin/tr"
+      ]
       (builtins.readFile ./host-artifact-tailscale.sh)
   );
 
