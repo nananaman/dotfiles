@@ -27,6 +27,7 @@ dependencies:
     - path: ~/ghq/github.com/nananaman/skills/engineering/nono-sandbox-maintenance
     - path: ~/ghq/github.com/nananaman/skills/personal/chouge-git
     - path: ~/ghq/github.com/nananaman/skills/personal/chouge-changelog
+    - path: ~/ghq/github.com/nananaman/skills/personal/merge-closeout
     - path: ~/ghq/github.com/nananaman/skills/meta/skill-workbench
     - path: ~/ghq/github.com/nananaman/skills/writing/japanese-tech-writing
     - path: ~/ghq/github.com/nananaman/skills/productivity/grilling
