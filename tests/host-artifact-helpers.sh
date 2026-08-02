@@ -19,29 +19,33 @@ render_helpers() {
     nix/modules/home/host-artifact-workspace.sh >"$test_root/workspace-helper"
 }
 
-test_public_wrapper_prefers_command_policy_shims_for_every_operation() {
+test_public_wrapper_uses_fixed_helpers_without_command_policy_shims() {
   local operation
 
-  # Arrange: Trusted wrappers precede the broker shim directory in the inherited PATH.
+  # Arrange: A hostile inherited PATH and broker shim directory contain failing helpers.
   mkdir "$test_root/wrappers" "$test_root/shims"
   cp "$repository_root/tests/fixtures/fake-host-artifact-bun.sh" "$test_root/fake-bun"
   chmod +x "$test_root/fake-bun"
+  mkdir "$test_root/helpers"
   for helper in host-artifact-service host-artifact-tailscale host-artifact-workspace; do
     printf '#!/bin/sh\nexit 1\n' >"$test_root/wrappers/$helper"
     printf '#!/bin/sh\nexit 0\n' >"$test_root/shims/$helper"
-    chmod +x "$test_root/wrappers/$helper" "$test_root/shims/$helper"
+    printf '#!/bin/sh\nexit 0\n' >"$test_root/helpers/$helper"
+    chmod +x "$test_root/wrappers/$helper" "$test_root/shims/$helper" "$test_root/helpers/$helper"
   done
   sed -e "s|@BUN@|$test_root/fake-bun|g" -e "s|@CLI@|$test_root/cli.ts|g" \
+    -e "s|@HELPER_PATH@|$test_root/helpers|g" \
     nix/modules/home/host-artifact.sh >"$test_root/host-artifact"
   : >"$test_root/bun.log"
 
   # Act: Exercise every accepted public operation through the generated wrapper.
   for operation in 'publish report.html --name report' 'remove --name report' 'status' 'setup'; do
     PATH="$test_root/wrappers:/usr/bin:/bin" NONO_TOOL_SANDBOX_SHIM_DIR="$test_root/shims" \
+      HOST_ARTIFACT_EXPECTED_HELPER_DIR="$test_root/helpers" \
       HOST_ARTIFACT_FAKE_BUN_LOG="$test_root/bun.log" bash "$test_root/host-artifact" $operation
   done
 
-  # Assert: Bun observed all operations only after every helper resolved to a policy shim.
+  # Assert: Bun observed all operations with helpers pinned ahead of inherited paths and shims.
   [ "$(wc -l <"$test_root/bun.log" | tr -d ' ')" -eq 4 ]
 }
 
@@ -220,6 +224,36 @@ test_verify_constructs_the_only_remote_url_and_checks_revision() {
   jq -e '.verified and .url == "https://machine.tailnet.ts.net/a/owner-repo~012345abcdef/report/"' <<<"$output" >/dev/null
 }
 
+test_verify_accepts_lowercase_http2_revision_header() {
+  # Arrange: HTTP/2 normalizes the application response header name to lowercase.
+  write_online_status
+  printf '%s\n' '{"Web":{"machine.tailnet.ts.net:443":{"Handlers":{"/":{"Proxy":"http://127.0.0.1:9417"}}}}}' >"$test_root/serve.json"
+  revision="r-0123456789abcdef0123456789abcdef"
+
+  # Act: Verify the artifact against a lowercase revision header.
+  output="$(FAKE_TAILSCALE_STATUS="$test_root/status.json" FAKE_TAILSCALE_SERVE="$test_root/serve.json" \
+    FAKE_CURL_REVISION="$revision" FAKE_CURL_REVISION_HEADER="x-host-artifact-revision" \
+    bash "$test_root/tailscale-helper" verify owner-repo~012345abcdef report "$revision")"
+
+  # Assert: Header field names are matched case-insensitively as required by HTTP.
+  jq -e '.verified == true' <<<"$output" >/dev/null
+}
+
+test_verify_rejects_a_case_mismatched_revision_value() {
+  # Arrange: The header name is valid but the opaque revision value changes case.
+  write_online_status
+  printf '%s\n' '{"Web":{"machine.tailnet.ts.net:443":{"Handlers":{"/":{"Proxy":"http://127.0.0.1:9417"}}}}}' >"$test_root/serve.json"
+  revision="r-0123456789abcdef0123456789abcdef"
+
+  # Act: Verify against a response whose revision is not byte-for-byte equal.
+  output="$(FAKE_TAILSCALE_STATUS="$test_root/status.json" FAKE_TAILSCALE_SERVE="$test_root/serve.json" \
+    FAKE_CURL_REVISION="$revision" FAKE_CURL_RESPONSE_REVISION="R-0123456789ABCDEF0123456789ABCDEF" \
+    bash "$test_root/tailscale-helper" verify owner-repo~012345abcdef report "$revision")"
+
+  # Assert: Only the field name is case-insensitive; the opaque value remains exact.
+  jq -e '. == {schemaVersion:1,verified:false,reason:"remote-verification-failed"}' <<<"$output" >/dev/null
+}
+
 test_verify_rejects_a_non_success_response_with_matching_revision() {
   # Arrange: A redirect happens to echo the expected revision header.
   write_online_status
@@ -296,7 +330,7 @@ test_workspace_resolve_keeps_linked_worktree_identity() {
 }
 
 render_helpers
-test_public_wrapper_prefers_command_policy_shims_for_every_operation
+test_public_wrapper_uses_fixed_helpers_without_command_policy_shims
 test_inspect_reports_configured_serve_without_exposing_external_state
 test_inspect_rejects_conflicting_root_target
 test_inspect_fails_closed_when_serve_status_fails
@@ -310,6 +344,8 @@ test_inspect_falls_back_to_the_app_executable
 test_inspect_degrades_when_tailscale_is_offline
 test_setup_configures_only_an_empty_serve_root
 test_verify_constructs_the_only_remote_url_and_checks_revision
+test_verify_accepts_lowercase_http2_revision_header
+test_verify_rejects_a_case_mismatched_revision_value
 test_verify_rejects_a_non_success_response_with_matching_revision
 test_workspace_resolve_normalizes_a_remote_repository
 test_workspace_resolve_ignores_hostile_global_git_config

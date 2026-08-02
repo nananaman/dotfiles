@@ -263,6 +263,12 @@ test_common_profile_allows_development_endpoints() {
   done
 }
 
+test_common_profile_allows_tailscale_serve_origins() {
+  # Arrange & Act: Evaluate a representative MagicDNS HTTPS origin without connecting to it.
+  # Assert: Host-artifact can verify its Tailscale Serve URL through the parent sandbox.
+  assert_host_decision "ALLOWED" "machine.tailnet.ts.net"
+}
+
 test_common_profile_denies_unconfigured_clouds() {
   assert_host_decision "DENIED" management.azure.com
 }
@@ -359,29 +365,19 @@ test_host_artifact_publish_root_is_writable_without_broadening_its_parent() {
     "write"
 }
 
-test_host_artifact_service_policy_allows_only_exact_ensure() {
-  # Arrange: Service recovery is delegated through one canonical wrapper.
-  # Act & Assert: The policy defaults to deny and grants only the argument-free ensure operation.
-  assert_profile_value \
-    '.command_policies.commands["host-artifact-service"].executable' \
-    '@HOME@/.local/share/nono-agent-wrappers/host-artifact-service'
-  assert_profile_value \
-    '.command_policies.commands["host-artifact-service"].from.session.invocation_policy.default' \
-    'deny'
-  assert_profile_value \
-    '.command_policies.commands["host-artifact-service"].from.session.invocation_policy.allow | tojson' \
-    '[{"argv":{"exact":["ensure"]}}]'
-}
+test_host_artifact_uses_the_parent_sandbox_without_tool_policies() {
+  local command
 
-test_host_artifact_service_policy_does_not_delegate_launchctl() {
-  # Arrange: Agents receive a fixed recovery operation rather than general service control.
-  # Act & Assert: launchctl itself has no command policy and no other wrapper argv is allowed.
+  # Arrange: Host-artifact wrappers validate their own bounded public arguments.
+  for command in host-artifact host-artifact-service host-artifact-tailscale host-artifact-workspace; do
+    # Act & Assert: None of the wrappers creates a nested Tool Sandbox boundary.
+    assert_profile_value ".command_policies.commands | has(\"$command\")" 'false'
+  done
+
+  # Act & Assert: Parent capability remains limited to the fixed service and Tailscale daemon names.
   assert_profile_value \
-    '.command_policies.commands | has("launchctl")' \
-    'false'
-  assert_profile_value \
-    '.command_policies.commands["host-artifact-service"].from.session.invocation_policy.allow | length' \
-    '1'
+    '[.unsafe_macos_seatbelt_rules[] | select(test("host-artifact|tailscale|localhost:9417"; "i"))] | tojson' \
+    '["(allow network-outbound (remote tcp \"localhost:9417\"))","(allow mach-lookup (global-name \"io.tailscale.ipn.macsys-spks\"))","(allow mach-lookup (global-name \"io.tailscale.ipn.macsys-spki\"))"]'
 }
 
 test_bun_uses_the_outer_sandbox_with_exact_ancestor_rules() {
@@ -432,6 +428,7 @@ test_common_profile_keeps_chrome_data_outside_direct_agent_access
 test_common_profile_allows_only_the_chrome_bridge_socket_subtree
 test_common_profile_uses_enterprise_network
 test_common_profile_allows_development_endpoints
+test_common_profile_allows_tailscale_serve_origins
 test_common_profile_denies_unconfigured_clouds
 test_common_profile_allows_all_ghq_repositories
 test_common_profile_allows_new_ghq_clone_destinations
@@ -442,8 +439,7 @@ test_container_policy_keeps_destructive_cleanup_denied
 test_codex_wrapper_requires_the_parent_nono_capability
 test_local_agent_tools_use_the_parent_sandbox
 test_host_artifact_publish_root_is_writable_without_broadening_its_parent
-test_host_artifact_service_policy_allows_only_exact_ensure
-test_host_artifact_service_policy_does_not_delegate_launchctl
+test_host_artifact_uses_the_parent_sandbox_without_tool_policies
 test_bun_uses_the_outer_sandbox_with_exact_ancestor_rules
 test_codex_allows_chatgpt_subscription_endpoint
 test_codex_allows_unrestricted_localhost_outbound_on_macos

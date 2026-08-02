@@ -99,14 +99,14 @@ test_ensure_wrapper_requires_the_server_identity() {
   rg -q '\{"service":"host-artifact","version":2,"status":"ok",'\''\*' "$packages_module"
 }
 
-test_profile_grants_only_the_publish_root_and_exact_ensure_command() {
+test_profile_grants_only_the_publish_root_without_host_artifact_tool_policies() {
   local profile_json
 
   # Arrange: Strip JSONC comments so policy values can be queried structurally.
   profile_json="$(sed '/^[[:space:]]*[/][/]/d' "$profile")"
 
   # Act: Select the filesystem and command capabilities added for artifact hosting.
-  # Assert: The writable path and executable are exact, and every other argv is denied.
+  # Assert: The writable path is exact and host-artifact inherits the parent sandbox.
   jq -e '
     .filesystem.allow
     | index("$HOME/.local/share/host-artifact/public") != null
@@ -120,35 +120,9 @@ test_profile_grants_only_the_publish_root_and_exact_ensure_command() {
     | index("$HOME/.local/share/host-artifact") == null
   ' <<<"$profile_json" >/dev/null
   jq -e '
-    .command_policies.commands["host-artifact-service"]
-      .executable == "@HOME@/.local/share/nono-agent-wrappers/host-artifact-service"
-  ' <<<"$profile_json" >/dev/null
-  jq -e '
-    .command_policies.commands["host-artifact-service"].from.session.invocation_policy
-      == {"default":"deny","allow":[{"argv":{"exact":["ensure"]}}]}
-  ' <<<"$profile_json" >/dev/null
-}
-
-test_ensure_command_sandbox_executes_only_its_fixed_dependencies() {
-  local profile_json
-
-  # Arrange: Normalize the source profile without resolving it against host state.
-  profile_json="$(sed '/^[[:space:]]*[/][/]/d' "$profile")"
-
-  # Act: Select files executable by the fixed ensure implementation.
-  # Assert: The child sandbox exposes only launchctl and its bounded health helpers.
-  jq -e '
-    .command_policies.commands["host-artifact-service"].from.session.sandbox.fs_read_file
-      == ["/bin/launchctl", "/bin/sleep", "/usr/bin/curl", "/usr/bin/seq"]
-  ' <<<"$profile_json" >/dev/null
-  jq -e '
-    .command_policies.commands["host-artifact-service"].from.session.sandbox
-      | has("network") | not
-  ' <<<"$profile_json" >/dev/null
-  jq -e '
-    .command_policies.commands["host-artifact-service"].from.session.sandbox
-      .unsafe_macos_seatbelt_rules
-      | index("(allow network-outbound (remote tcp \"localhost:9417\"))") != null
+    . as $profile
+    | ["host-artifact","host-artifact-service","host-artifact-tailscale","host-artifact-workspace"]
+    | all(. as $command | $profile.command_policies.commands | has($command) | not)
   ' <<<"$profile_json" >/dev/null
 }
 
@@ -232,132 +206,31 @@ test_activation_installs_frozen_bun_dependencies_before_service_use() {
   rg -q 'bun\.lock' "$module" || return 1
 }
 
-test_agent_cli_runs_typescript_through_a_fixed_bun_wrapper() {
+test_agent_cli_runs_typescript_with_fixed_helpers_in_the_parent_sandbox() {
   local profile_json
 
   # Arrange: Direct bun invocation is unavailable in the parent agent sandbox.
   profile_json="$(sed '/^[[:space:]]*[/][/]/d' "$profile")"
 
   # Act: Inspect the wrapper and its command-policy boundary.
-  # Assert: The trusted wrapper runs only the installed CLI source with bounded public argv.
+  # Assert: The wrapper pins Bun, the CLI, and helper packages without broker shims.
   rg -q 'writeShellScriptBin "host-artifact"' "$packages_module" || return 1
   rg -q 'src/cli\.ts' "$packages_module" || return 1
   if rg -q -- '--no-reload|--tailscale|host PATH|update ARTIFACT' "$packages_module"; then return 1; fi
-  jq -e '
-    .command_policies.commands["host-artifact"].can_use
-      == ["host-artifact-service","host-artifact-tailscale","host-artifact-workspace"]
-  ' <<<"$profile_json" >/dev/null
-  jq -e '
-    .command_policies.commands["host-artifact"].from.session.sandbox
-      | has("network") | not
-  ' <<<"$profile_json" >/dev/null
-  jq -e '
-    .command_policies.commands["host-artifact"].from.session.sandbox.fs_read
-      | index("/nix/store") != null
-  ' <<<"$profile_json" >/dev/null || return 1
-  jq -e '
-    .command_policies.commands["host-artifact"].from.session.sandbox
-      .unsafe_macos_seatbelt_rules
-      | index("(allow network-outbound (remote tcp \"localhost:9417\"))") != null
-  ' <<<"$profile_json" >/dev/null
-  jq -e '
-    .command_policies.commands["host-artifact"].from.session.invocation_policy
-      == {
-        "default":"deny",
-        "allow":[
-          {"argv":{"exact":["status"]}},
-          {"argv":{"exact":["setup"]}},
-          {"argv":{"prefix":["publish"]}},
-          {"argv":{"prefix":["remove"]}}
-        ]
-      }
-  ' <<<"$profile_json" >/dev/null
-  jq -e '
-    .command_policies.commands["host-artifact-service"]
-      .from["host-artifact"].invocation_policy
-      == {"default":"deny","allow":[{"argv":{"exact":["ensure"]}}]}
-  ' <<<"$profile_json" >/dev/null
+  rg -q '"@HELPER_PATH@"' "$packages_module" || return 1
+  rg -q 'lib\.makeBinPath' "$packages_module" || return 1
+  rg -q 'PATH="@HELPER_PATH@:\$PATH"' nix/modules/home/host-artifact.sh || return 1
+  if rg -q 'NONO_TOOL_SANDBOX_SHIM_DIR' nix/modules/home/host-artifact.sh; then return 1; fi
+  jq -e '.command_policies.commands | has("host-artifact") | not' <<<"$profile_json" >/dev/null
 }
 
-test_agent_cli_grants_only_the_fixed_shlock_executable() {
+test_agent_cli_does_not_add_a_shlock_tool_sandbox() {
   local profile_json
   profile_json="$(sed '/^[[:space:]]*[/][/]/d' "$profile")"
 
-  # Arrange: The publisher acquires PID locks with direct execFile of the system shlock binary.
-  # Act: Inspect executable and filesystem capabilities of the main CLI child sandbox.
-  # Assert: Only the exact binary is added; lock/temp mutations remain under the existing publish root.
-  jq -e '
-    .command_policies.commands["host-artifact"].from.session.sandbox as $sandbox
-    | ($sandbox.fs_read_file | index("/usr/bin/shlock")) != null
-    and ($sandbox.unsafe_macos_seatbelt_rules | index("(allow process-exec (literal \"/usr/bin/shlock\"))")) != null
-    and $sandbox.fs_write == ["$HOME/.local/share/host-artifact/public"]
-    and ($sandbox.fs_read_file | index("/usr/bin") == null)
-  ' <<<"$profile_json" >/dev/null
-}
-
-test_tailscale_helper_exposes_only_bounded_operations() {
-  local profile_json
-  profile_json="$(sed '/^[[:space:]]*[/][/]/d' "$profile")"
-
-  # Arrange: The helper owns all Tailscale and remote-network access.
-  # Act & Assert: Its caller policy accepts only inspect/setup and grammar-shaped verify.
-  rg -q 'writeShellScriptBin "host-artifact-tailscale"' "$packages_module" || return 1
-  rg -Fq '"/usr/local/bin/tailscale" "/Applications/Tailscale.app/Contents/MacOS/tailscale"' "$packages_module" || return 1
-  jq -e '
-    .command_policies.commands["host-artifact-tailscale"].from["host-artifact"].invocation_policy
-      == {"default":"deny","allow":[
-        {"argv":{"exact":["inspect"]}},
-        {"argv":{"exact":["setup"]}},
-        {"argv":{"prefix":["verify"]}}
-      ]}
-  ' <<<"$profile_json" >/dev/null
-  jq -e '
-    .command_policies.commands["host-artifact-tailscale"].from["host-artifact"].sandbox as $sandbox
-    | $sandbox.unsafe_macos_seatbelt_rules as $rules
-    | $sandbox.fs_read == ["/nix/store","/Applications/Tailscale.app"]
-    and ($sandbox.fs_read_file | index("$WORKDIR") != null)
-    and ($sandbox.fs_read_file | index("/bin/bash") != null)
-    and ($rules | index("(allow process-exec (literal \"/bin/bash\"))") != null)
-    and ($rules | index("(allow mach-lookup (global-name \"io.tailscale.ipn.macsys-spks\"))")) != null
-    and ($rules | index("(allow mach-lookup (global-name \"io.tailscale.ipn.macsys-spki\"))")) != null
-    and ($rules | index("(allow mach-lookup)")) == null
-  ' <<<"$profile_json" >/dev/null
-}
-
-test_workspace_helper_exposes_only_resolve_with_bounded_repository_read() {
-  local profile_json
-  profile_json="$(sed '/^[[:space:]]*[/][/]/d' "$profile")"
-
-  # Arrange: Workspace identity may need linked-worktree common metadata under ghq.
-  # Act & Assert: Only resolve is callable, repository roots are readable, and shasum's fixed interpreter is executable.
-  rg -q 'writeShellScriptBin "host-artifact-workspace"' "$packages_module" || return 1
-  jq -e '
-    .command_policies.commands["host-artifact-workspace"].from["host-artifact"].invocation_policy
-      == {"default":"deny","allow":[{"argv":{"exact":["resolve"]}}]}
-    and (.command_policies.commands["host-artifact-workspace"].from["host-artifact"].sandbox.fs_read
-      == ["$WORKDIR","$HOME/ghq","/nix/store"])
-    and (.command_policies.commands["host-artifact-workspace"].from["host-artifact"].sandbox.fs_read_file
-      | index("/usr/bin/perl") != null)
-    and (.command_policies.commands["host-artifact-workspace"].from["host-artifact"].sandbox.unsafe_macos_seatbelt_rules
-      | index("(allow process-exec (literal \"/usr/bin/perl\"))") != null)
-  ' <<<"$profile_json" >/dev/null
-}
-
-test_helper_command_sandboxes_strip_shell_startup_environment() {
-  local profile_json
-  profile_json="$(sed '/^[[:space:]]*[/][/]/d' "$profile")"
-
-  # Arrange: Both trusted helpers start as Bash scripts before they validate public argv.
-  # Act: Inspect the environment inherited by each helper command sandbox.
-  # Assert: Attacker-controlled startup hook variables are removed before Bash starts.
-  jq -e '
-    ["HOME","WORKDIR","TMPDIR","PATH","LANG","LC_*"] as $safe
-    | .command_policies.commands["host-artifact-tailscale"].from["host-artifact"].sandbox.environment.allow_vars
-      == $safe
-    and .command_policies.commands["host-artifact-workspace"].from["host-artifact"].sandbox.environment.allow_vars
-      == $safe
-    and ($safe | index("BASH_ENV") == null and index("ENV") == null and index("*") == null)
-  ' <<<"$profile_json" >/dev/null
+  # Arrange: The publisher acquires PID locks inside the existing parent sandbox.
+  # Act & Assert: No host-artifact-specific executable grant remains in the profile.
+  jq -e '.command_policies.commands | has("host-artifact") | not' <<<"$profile_json" >/dev/null
 }
 
 test_server_profile_reads_published_content_but_not_its_neighbor() {
@@ -426,19 +299,15 @@ test_activation_restarts_the_service_after_preparing_the_runtime || exit 1
 test_ensure_wrapper_exposes_only_the_ensure_operation
 test_ensure_wrapper_uses_a_finite_health_check
 test_ensure_wrapper_requires_the_server_identity
-test_profile_grants_only_the_publish_root_and_exact_ensure_command
-test_ensure_command_sandbox_executes_only_its_fixed_dependencies
+test_profile_grants_only_the_publish_root_without_host_artifact_tool_policies
 test_server_profile_is_read_only_and_listens_only_on_the_service_port
 test_launch_agent_runs_typescript_with_bun_through_nono || exit 1
 test_server_wrapper_has_no_tailscale_listener_state || exit 1
 test_server_wrapper_recycles_stale_runtime_after_skill_update || exit 1
 test_server_profile_has_no_tailscale_state_grant || exit 1
 test_activation_installs_frozen_bun_dependencies_before_service_use || exit 1
-test_agent_cli_runs_typescript_through_a_fixed_bun_wrapper || exit 1
-test_agent_cli_grants_only_the_fixed_shlock_executable || exit 1
-test_tailscale_helper_exposes_only_bounded_operations || exit 1
-test_workspace_helper_exposes_only_resolve_with_bounded_repository_read || exit 1
-test_helper_command_sandboxes_strip_shell_startup_environment || exit 1
+test_agent_cli_runs_typescript_with_fixed_helpers_in_the_parent_sandbox || exit 1
+test_agent_cli_does_not_add_a_shlock_tool_sandbox || exit 1
 test_server_profile_reads_published_content_but_not_its_neighbor
 test_server_profile_cannot_write_published_content
 test_server_profile_cannot_replace_the_publish_root
