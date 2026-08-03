@@ -20,6 +20,7 @@ dependencies:
     - path: ~/ghq/github.com/nananaman/skills/engineering/review-diff-code
     - path: ~/ghq/github.com/nananaman/skills/engineering/explain-diff
     - path: ~/ghq/github.com/nananaman/skills/engineering/implement
+    - path: ~/ghq/github.com/nananaman/skills/engineering/simplify-code
     - path: ~/ghq/github.com/nananaman/skills/engineering/tdd
     - path: ~/ghq/github.com/nananaman/skills/engineering/test-writing-style
     - path: ~/ghq/github.com/nananaman/skills/engineering/sandbox-runtime
