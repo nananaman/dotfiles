@@ -377,6 +377,7 @@ in
     nixfmt
     neovim
     tree-sitter
+    ast-grep
     secretlint
     apm-cli
     omp-cli
