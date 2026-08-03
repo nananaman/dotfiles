@@ -6,7 +6,7 @@ export PATH="$HOME/bin:$PATH"
 export PATH="$HOME/go/bin:$PATH"
 export PATH="/opt/homebrew/bin:$PATH"
 export PATH="/usr/local/go/bin:$PATH"
-export PATH="$HOME/.cargo/bin:$PATH"
+path=(${path:#$HOME/.cargo/bin} "$HOME/.cargo/bin")
 export PATH="$HOME/.local/bin:$PATH"
 
 eval "$(sheldon source)"
