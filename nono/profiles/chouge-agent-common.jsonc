@@ -1,0 +1,415 @@
+{
+  // すべてのlocal coding agentで共有するcapabilityを定義する。
+  "extends": "default",
+  "meta": {
+    "name": "chouge-agent-common",
+    "version": "0.1.0",
+    "description": "Shared runtime access for local coding agents"
+  },
+  "unsafe_macos_seatbelt_rules": [
+    // Bun 1.3.13/1.3.14はpackage script解決時にCWDのancestor directoryを開く。
+    // oven-sh/bun#28220またはnolabs-ai/nono#457の解決後に削除を再検討する。
+    // WSLでは安全なtraverse grantがないため、修正までは`bun <file>`形式を使う。
+    "(allow file-read-metadata (literal \"/\"))",
+    "(allow file-read-data (literal \"/Users\"))",
+    "(allow file-read-data (literal \"@HOME@\"))",
+    "(allow network-outbound (path \"@HOME@/ghq/github.com/nananaman/dotfiles/herdr/herdr.sock\"))",
+    // Chrome bridgeは起動ごとに生成されるnative host socketで通信する。
+    "(allow network-outbound (subpath \"/private/tmp/codex-browser-use\"))",
+    // host-artifactは親sandboxから固定serviceとTailscale daemonだけを利用する。
+    "(allow network-outbound (remote tcp \"localhost:9417\"))",
+    "(allow mach-lookup (global-name \"io.tailscale.ipn.macsys-spks\"))",
+    "(allow mach-lookup (global-name \"io.tailscale.ipn.macsys-spki\"))"
+  ],
+  "groups": {
+    "include": [
+      // 一般的な開発で利用するtoolchainとpackage managerを許可する。
+      "bun_runtime",
+      "go_runtime",
+      "go_runtime_linux",
+      "go_runtime_macos",
+      "java_runtime",
+      "mise_manager",
+      "nix_runtime",
+      "node_runtime",
+      "python_runtime",
+      "rust_runtime",
+      // default profileの変更後も、危険なcommandの実行防止を維持する。
+      "dangerous_commands",
+      "dangerous_commands_macos",
+      "dangerous_commands_linux",
+      // credential、個人情報、shellに保存されたsecretへのaccessを拒否する。
+      "deny_credentials",
+      "deny_keychains_macos",
+      "deny_keychains_linux",
+      "deny_browser_data_macos",
+      "deny_browser_data_linux",
+      "deny_macos_private",
+      "deny_shell_history",
+      "deny_shell_configs"
+    ]
+  },
+  "network": {
+    // 一般的な開発、package取得、LLM API、Google Cloud APIへの接続を許可する。
+    "network_profile": "enterprise",
+    // enterprise profileに含まれないが、日常的な開発で利用するdomainを追加する。
+    "allow_domain": [
+      "api.github.com",
+      "chatgpt.com",
+      "*.openai.com",
+      "proxy.golang.org",
+      "sum.golang.org",
+      // OpenAIの開発者向け文書とGitHub Releasesの成果物取得で利用する。
+      "developers.openai.com",
+      "release-assets.githubusercontent.com",
+      // Google認証とcontainer registryで利用する。
+      "accounts.google.com",
+      "gcr.io",
+      "*.pkg.dev",
+      // host-artifactが検証済みTailscale Serve URLを返すために利用する。
+      "*.ts.net"
+    ]
+  },
+  "filesystem": {
+    "allow": [
+      "$HOME/.agents",
+      "$HOME/.claude",
+      "$HOME/.codex",
+      "$HOME/.pi",
+      "$HOME/.local/state/mise",
+      "$HOME/.local/share/host-artifact/public",
+      "$HOME/go/pkg/mod",
+      // ghq管理のrepositoryを調査、clone、修正できるようにする。
+      "$HOME/ghq"
+    ],
+    "allow_file": [
+      "$HOME/.claude.json",
+      "$HOME/.claude.json.lock",
+      "$HOME/.claude.lock"
+    ],
+    "bypass_protection": [
+      "$HOME/.config/gh",
+      "$HOME/.local/share/host-artifact/public",
+      "$HOME/ghq/github.com/nananaman/dotfiles/zsh/zshrc"
+    ],
+    "read": [
+      // ghはgitと同じ親sandboxで認証設定を読み、host側の設定変更は許可しない。
+      "$HOME/.config/gh",
+      "$HOME/.local/share/nono-agent-wrappers"
+    ]
+  },
+  "platform_overrides": {
+    "macos": {
+      "filesystem": {
+        "read": [
+          "$HOME/.vite-plus"
+        ],
+        "write_file": [
+          "$HOME/.vite-plus/cache/resolve_cache.json",
+          "$HOME/.vite-plus/js_runtime/node/index_cache.json"
+        ]
+      }
+    }
+  },
+  "command_policies": {
+    "commands": {
+      "container": {
+        "executable": "/opt/homebrew/opt/container/libexec/container",
+        "from": {
+          "session": {
+            "sandbox": {
+              "fs_read": [
+                "/opt/homebrew/opt/container",
+                "$WORKDIR",
+                "$HOME/Library/Application Support/com.apple.container"
+              ],
+              "fs_read_file": [
+                "/bin/launchctl"
+              ],
+              "fs_write": [
+                "$WORKDIR",
+                "$HOME/Library/Application Support/com.apple.container"
+              ],
+              "environment": {
+                "set_vars": {
+                  "CONTAINER_INSTALL_ROOT": "/opt/homebrew/opt/container"
+                }
+              },
+              "unsafe_macos_seatbelt_rules": [
+                "(allow process-exec (literal \"/bin/launchctl\"))"
+              ]
+            },
+            "invocation_policy": {
+              "default": "deny",
+              "deny": [
+                {
+                  "argv": {
+                    "prefix": [
+                      "registry",
+                      "login"
+                    ]
+                  },
+                  "reason": "registry credential changes stay outside agent sessions"
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "registry",
+                      "logout"
+                    ]
+                  },
+                  "reason": "registry credential changes stay outside agent sessions"
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "system",
+                      "dns",
+                      "create"
+                    ]
+                  },
+                  "reason": "host DNS and packet-filter changes are not delegated to agents"
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "system",
+                      "dns",
+                      "delete"
+                    ]
+                  },
+                  "reason": "host DNS and packet-filter changes are not delegated to agents"
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "system",
+                      "kernel",
+                      "set"
+                    ]
+                  },
+                  "reason": "system kernel changes are not delegated to agents"
+                }
+              ],
+              "allow": [
+                {
+                  "argv": {
+                    "exact": []
+                  }
+                },
+                {
+                  "argv": {
+                    "exact": [
+                      "--help"
+                    ]
+                  }
+                },
+                {
+                  "argv": {
+                    "exact": [
+                      "--version"
+                    ]
+                  }
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "list"
+                    ]
+                  }
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "inspect"
+                    ]
+                  }
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "logs"
+                    ]
+                  }
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "stats"
+                    ]
+                  }
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "builder",
+                      "status"
+                    ]
+                  }
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "image",
+                      "list"
+                    ]
+                  }
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "image",
+                      "inspect"
+                    ]
+                  }
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "registry",
+                      "list"
+                    ]
+                  }
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "network",
+                      "list"
+                    ]
+                  }
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "network",
+                      "inspect"
+                    ]
+                  }
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "volume",
+                      "list"
+                    ]
+                  }
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "volume",
+                      "inspect"
+                    ]
+                  }
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "machine",
+                      "list"
+                    ]
+                  }
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "machine",
+                      "inspect"
+                    ]
+                  }
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "machine",
+                      "logs"
+                    ]
+                  }
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "system",
+                      "version"
+                    ]
+                  }
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "system",
+                      "df"
+                    ]
+                  }
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "system",
+                      "property",
+                      "list"
+                    ]
+                  }
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "system",
+                      "dns",
+                      "list"
+                    ]
+                  }
+                },
+                // Local integration tests may manage and inspect their container lifecycle.
+                {
+                  "argv": {
+                    "prefix": [
+                      "image",
+                      "pull"
+                    ]
+                  }
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "run"
+                    ]
+                  }
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "start"
+                    ]
+                  }
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "exec"
+                    ]
+                  }
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "copy"
+                    ]
+                  }
+                },
+                {
+                  "argv": {
+                    "prefix": [
+                      "stop"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -51,7 +51,7 @@ nix/
 nvim/                      # Neovim configuration
 zsh/                       # Zsh configuration
 ghostty/                   # Ghostty terminal configuration
-tmux/                      # tmux configuration
+herdr/                     # Herdr terminal multiplexer configuration
 aerospace/                 # AeroSpace window manager
 lazygit/                   # Lazygit configuration
 git/                       # Git config & ignore

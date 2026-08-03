@@ -1,0 +1,5 @@
+herdr*.log
+session*.json
+plugins.json
+.plugins.lock
+plugins/

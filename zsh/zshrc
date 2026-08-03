@@ -6,7 +6,7 @@ export PATH="$HOME/bin:$PATH"
 export PATH="$HOME/go/bin:$PATH"
 export PATH="/opt/homebrew/bin:$PATH"
 export PATH="/usr/local/go/bin:$PATH"
-export PATH="$HOME/.cargo/bin:$PATH"
+path=(${path:#$HOME/.cargo/bin} "$HOME/.cargo/bin")
 export PATH="$HOME/.local/bin:$PATH"
 
 eval "$(sheldon source)"
@@ -60,16 +60,20 @@ eval "$(atuin init zsh)"
 
 eval "$(mise activate zsh)"
 
+if command -v tirith >/dev/null 2>&1; then
+  eval "$(tirith init --shell zsh)"
+fi
+
 # Vite+ bin (https://viteplus.dev)
 [ -f "$HOME/.vite-plus/env" ] && . "$HOME/.vite-plus/env"
 
-export PATH=/Users/juntawatanabe/.ticloud/bin:$PATH
+export PATH="$HOME/.ticloud/bin:$PATH"
 
 # Added by cua-driver installer — see https://github.com/trycua/cua
 export PATH="$HOME/.local/bin:$PATH"
 
 # pnpm
-export PNPM_HOME="/home/chouge/.local/share/pnpm"
+export PNPM_HOME="$HOME/.local/share/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME/bin:"*) ;;
   *) export PATH="$PNPM_HOME/bin:$PATH" ;;
@@ -77,8 +81,14 @@ esac
 # pnpm end
 
 # bun completions
-[ -s "/home/chouge/.bun/_bun" ] && source "/home/chouge/.bun/_bun"
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+# Keep the default agent commands behind the common nono boundary.
+NONO_AGENT_WRAPPER_BIN="$HOME/.local/share/nono-agent-wrappers"
+if [[ -d "$NONO_AGENT_WRAPPER_BIN" ]]; then
+  export PATH="$NONO_AGENT_WRAPPER_BIN:$PATH"
+fi

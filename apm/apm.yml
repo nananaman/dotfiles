@@ -4,30 +4,37 @@ target: claude,agent-skills
 
 dependencies:
   apm:
-    - nananaman/skills/meta/retrospective-codify#3707ec33425ea3f3a64528981d6951baf6d97171
-    - nananaman/skills/engineering/create-pr#3707ec33425ea3f3a64528981d6951baf6d97171
-    - nananaman/skills/engineering/ast-grep-practice#3707ec33425ea3f3a64528981d6951baf6d97171
-    - nananaman/skills/engineering/setup-engineering-flow#3707ec33425ea3f3a64528981d6951baf6d97171
-    - nananaman/skills/engineering/draft-prd#3707ec33425ea3f3a64528981d6951baf6d97171
-    - nananaman/skills/engineering/polish-prd#3707ec33425ea3f3a64528981d6951baf6d97171
-    - nananaman/skills/engineering/draft-design-doc#3707ec33425ea3f3a64528981d6951baf6d97171
-    - nananaman/skills/engineering/polish-design-doc#3707ec33425ea3f3a64528981d6951baf6d97171
-    - nananaman/skills/engineering/draft-issue#3707ec33425ea3f3a64528981d6951baf6d97171
-    - nananaman/skills/engineering/polish-issue#3707ec33425ea3f3a64528981d6951baf6d97171
-    - nananaman/skills/meta/apm-usage#3707ec33425ea3f3a64528981d6951baf6d97171
-    - nananaman/skills/engineering/review-diff-code#3707ec33425ea3f3a64528981d6951baf6d97171
-    - nananaman/skills/engineering/tdd#3707ec33425ea3f3a64528981d6951baf6d97171
-    - nananaman/skills/engineering/test-writing-style#3707ec33425ea3f3a64528981d6951baf6d97171
-    - nananaman/skills/engineering/sandbox-runtime#3707ec33425ea3f3a64528981d6951baf6d97171
-    - nananaman/skills/personal/chouge-git#3707ec33425ea3f3a64528981d6951baf6d97171
-    - nananaman/skills/personal/chouge-changelog#3707ec33425ea3f3a64528981d6951baf6d97171
-    - nananaman/skills/meta/create-skill#3707ec33425ea3f3a64528981d6951baf6d97171
-    - nananaman/skills/meta/reviewing-skills#3707ec33425ea3f3a64528981d6951baf6d97171
-    - nananaman/skills/meta/review-diff-skill#3707ec33425ea3f3a64528981d6951baf6d97171
-    - nananaman/skills/meta/review-skill#3707ec33425ea3f3a64528981d6951baf6d97171
-    - nananaman/skills/meta/update-skills#3707ec33425ea3f3a64528981d6951baf6d97171
-    - nananaman/skills/writing/japanese-tech-writing#3707ec33425ea3f3a64528981d6951baf6d97171
-    - nananaman/skills/productivity/grilling#3707ec33425ea3f3a64528981d6951baf6d97171
-    - nananaman/skills/productivity/grill-me#3707ec33425ea3f3a64528981d6951baf6d97171
-    - nananaman/skills/productivity/teach#3707ec33425ea3f3a64528981d6951baf6d97171
-    - nananaman/skills/productivity/handoff#3707ec33425ea3f3a64528981d6951baf6d97171
+    - path: ~/ghq/github.com/nananaman/skills/meta/retrospective-codify
+    - path: ~/ghq/github.com/nananaman/skills/engineering/create-pr
+    - path: ~/ghq/github.com/nananaman/skills/engineering/ast-grep-practice
+    - path: ~/ghq/github.com/nananaman/skills/engineering/setup-engineering-flow
+    - path: ~/ghq/github.com/nananaman/skills/engineering/draft-prd
+    - path: ~/ghq/github.com/nananaman/skills/engineering/polish-prd
+    - path: ~/ghq/github.com/nananaman/skills/engineering/draft-design-doc
+    - path: ~/ghq/github.com/nananaman/skills/engineering/polish-design-doc
+    - path: ~/ghq/github.com/nananaman/skills/engineering/task-breakdown
+    - path: ~/ghq/github.com/nananaman/skills/engineering/create-plan
+    - path: ~/ghq/github.com/nananaman/skills/engineering/review-plan
+    - path: ~/ghq/github.com/nananaman/skills/meta/apm-usage
+    - path: ~/ghq/github.com/nananaman/skills/meta/update-skills
+    - path: ~/ghq/github.com/nananaman/skills/engineering/review-diff-code
+    - path: ~/ghq/github.com/nananaman/skills/engineering/explain-diff
+    - path: ~/ghq/github.com/nananaman/skills/engineering/implement
+    - path: ~/ghq/github.com/nananaman/skills/engineering/simplify-code
+    - path: ~/ghq/github.com/nananaman/skills/engineering/tdd
+    - path: ~/ghq/github.com/nananaman/skills/engineering/test-writing-style
+    - path: ~/ghq/github.com/nananaman/skills/engineering/sandbox-runtime
+    - path: ~/ghq/github.com/nananaman/skills/engineering/apple-container
+    - path: ~/ghq/github.com/nananaman/skills/engineering/nono-sandbox-maintenance
+    - path: ~/ghq/github.com/nananaman/skills/personal/chouge-git
+    - path: ~/ghq/github.com/nananaman/skills/personal/chouge-changelog
+    - path: ~/ghq/github.com/nananaman/skills/personal/merge-closeout
+    - path: ~/ghq/github.com/nananaman/skills/meta/skill-workbench
+    - path: ~/ghq/github.com/nananaman/skills/writing/japanese-tech-writing
+    - path: ~/ghq/github.com/nananaman/skills/productivity/grilling
+    - path: ~/ghq/github.com/nananaman/skills/productivity/grill-me
+    - path: ~/ghq/github.com/nananaman/skills/productivity/teach
+    - path: ~/ghq/github.com/nananaman/skills/productivity/handoff
+    - path: ~/ghq/github.com/nananaman/skills/productivity/herdr
+    - path: ~/ghq/github.com/nananaman/skills/productivity/host-artifact
+    - path: ~/ghq/github.com/nananaman/skills/productivity/improve-agent-prompt

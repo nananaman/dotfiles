@@ -4,11 +4,27 @@
   config,
   dotfilesDir,
   helpers,
+  herdrPackage,
   ...
 }:
 let
   inherit (config.home) homeDirectory;
   inherit (config.xdg) configHome;
+  agentCommonProfile = pkgs.writeText "chouge-agent-common.jsonc" (
+    builtins.replaceStrings [ "@HOME@" "@BUN@" ] [ homeDirectory "${pkgs.bun}/bin/bun" ] (
+      builtins.readFile ../../../nono/profiles/chouge-agent-common.jsonc
+    )
+  );
+  agentPiProfile = pkgs.writeText "chouge-pi.jsonc" (
+    builtins.replaceStrings [ "@PACKAGE_MANAGER@" ] [ "${pkgs.bun}/bin/bun" ] (
+      builtins.readFile ../../../nono/profiles/chouge-pi.jsonc
+    )
+  );
+  hostArtifactServerProfile = pkgs.writeText "host-artifact-server.jsonc" (
+    builtins.replaceStrings [ "@HOME@" ] [ homeDirectory ] (
+      builtins.readFile ../../../nono/profiles/host-artifact-server.jsonc
+    )
+  );
 in
 {
   home.activation.linkDotfiles = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
@@ -30,7 +46,10 @@ in
     if [ "$(readlink "${configHome}/zellij" 2>/dev/null || true)" = "${dotfilesDir}/zellij" ]; then
       $DRY_RUN_CMD rm -f "${configHome}/zellij"
     fi
-    link_force "${dotfilesDir}/tmux" "${configHome}/tmux"
+    if [ "$(readlink "${configHome}/tmux" 2>/dev/null || true)" = "${dotfilesDir}/tmux" ]; then
+      $DRY_RUN_CMD rm -f "${configHome}/tmux"
+    fi
+    link_force "${dotfilesDir}/herdr" "${configHome}/herdr"
 
     ${lib.optionalString pkgs.stdenv.isDarwin ''
       link_force "${dotfilesDir}/aerospace/aerospace.toml" "${homeDirectory}/.aerospace.toml"
@@ -43,6 +62,21 @@ in
     link_force "${dotfilesDir}/stylua.toml" "${configHome}/stylua.toml"
     link_force "${dotfilesDir}/srt" "${configHome}/srt"
 
+    $DRY_RUN_CMD mkdir -p "${configHome}/nono/profiles"
+    for legacy_profile in chouge-agent-common chouge-codex chouge-claude chouge-pi; do
+      legacy_path="${configHome}/nono/profiles/$legacy_profile.json"
+      legacy_target="$(readlink "$legacy_path" 2>/dev/null || true)"
+      case "$legacy_target" in
+        "${dotfilesDir}/nono/profiles/"*.json | /nix/store/*)
+          $DRY_RUN_CMD rm -f "$legacy_path"
+          ;;
+      esac
+    done
+    link_force "${agentCommonProfile}" "${configHome}/nono/profiles/chouge-agent-common.jsonc"
+    link_force "${dotfilesDir}/nono/profiles/chouge-codex.jsonc" "${configHome}/nono/profiles/chouge-codex.jsonc"
+    link_force "${dotfilesDir}/nono/profiles/chouge-claude.jsonc" "${configHome}/nono/profiles/chouge-claude.jsonc"
+    link_force "${agentPiProfile}" "${configHome}/nono/profiles/chouge-pi.jsonc"
+    link_force "${hostArtifactServerProfile}" "${configHome}/nono/profiles/host-artifact-server.jsonc"
     link_force "${dotfilesDir}/apm" "${homeDirectory}/.apm"
 
     ${lib.optionalString pkgs.stdenv.isLinux ''
@@ -95,5 +129,26 @@ in
     $DRY_RUN_CMD mkdir -p "${configHome}/git"
     link_force "${dotfilesDir}/git/ignore" "${configHome}/git/ignore"
     link_force "${dotfilesDir}/git/hooks" "${configHome}/git/hooks"
+  '';
+
+  home.activation.linkHerdrPlugins = lib.hm.dag.entryAfter [ "linkDotfiles" ] ''
+    if [ -z "''${DRY_RUN_CMD:-}" ]; then
+      plugin_path="${dotfilesDir}/herdr-plugins/hunk-review"
+      plugin_manifest="$plugin_path/herdr-plugin.toml"
+      if plugin_json="$(${herdrPackage}/bin/herdr plugin list --plugin hunk-review --json 2>/dev/null)"; then
+        registered_manifest="$(printf '%s\n' "$plugin_json" \
+          | ${pkgs.jq}/bin/jq -r '.result.plugins[]? | select(.plugin_id == "hunk-review") | .manifest_path')"
+        registered_enabled="$(printf '%s\n' "$plugin_json" \
+          | ${pkgs.jq}/bin/jq -r '.result.plugins[]? | select(.plugin_id == "hunk-review") | .enabled')"
+
+        if [ "$registered_manifest" != "$plugin_manifest" ]; then
+          if [ "$registered_enabled" = "false" ]; then
+            ${herdrPackage}/bin/herdr plugin link "$plugin_path" --disabled
+          else
+            ${herdrPackage}/bin/herdr plugin link "$plugin_path"
+          fi
+        fi
+      fi
+    fi
   '';
 }

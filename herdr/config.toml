@@ -1,0 +1,106 @@
+onboarding = false
+
+[update]
+channel = "stable"
+version_check = true
+manifest_check = true
+
+[terminal]
+default_shell = "zsh"
+shell_mode = "auto"
+new_cwd = "follow"
+
+[worktrees]
+directory = "~/ghq/worktrees"
+
+[theme]
+name = "kanagawa"
+
+auto_switch = false
+[ui]
+sidebar_width = 32
+sidebar_min_width = 20
+sidebar_max_width = 40
+mouse_capture = true
+confirm_close = true
+prompt_new_tab_name = false
+pane_borders = true
+pane_gaps = true
+agent_panel_sort = "priority"
+accent = "cyan"
+
+show_agent_labels_on_pane_borders = false
+[ui.toast]
+delivery = "herdr"
+delay_seconds = 1
+
+[ui.toast.herdr]
+position = "bottom-left"
+
+[ui.sound]
+enabled = true
+
+[session]
+resume_agents_on_restore = true
+
+[keys]
+prefix = "ctrl+g"
+
+detach = "prefix+q"
+workspace_picker = "prefix+w"
+goto = "prefix+g"
+toggle_sidebar = "prefix+b"
+
+new_workspace = "prefix+shift+n"
+rename_workspace = "prefix+shift+w"
+close_workspace = "prefix+shift+d"
+
+new_tab = "prefix+c"
+previous_tab = "prefix+p"
+next_tab = "prefix+n"
+switch_tab = "prefix+1..9"
+rename_tab = "prefix+shift+t"
+close_tab = "prefix+shift+x"
+
+copy_mode = "prefix+["
+focus_pane_left = "shift+left"
+focus_pane_down = "shift+down"
+focus_pane_up = "shift+up"
+focus_pane_right = "shift+right"
+swap_pane_left = "prefix+shift+h"
+swap_pane_down = "prefix+shift+j"
+swap_pane_up = "prefix+shift+k"
+swap_pane_right = "prefix+shift+l"
+
+split_vertical = "prefix+|"
+split_horizontal = "prefix+minus"
+close_pane = "prefix+x"
+zoom = "prefix+z"
+resize_mode = "prefix+r"
+
+new_worktree = "prefix+shift+g"
+open_worktree = "prefix+shift+o"
+remove_worktree = "prefix+alt+d"
+previous_workspace = "ctrl+k"
+next_workspace = "ctrl+j"
+previous_agent = "prefix+k"
+next_agent = "prefix+j"
+
+[[keys.command]]
+key = "prefix+f"
+type = "pane"
+command = "zsh -ic herdr-ghq-workspace"
+description = "open ghq project as workspace"
+
+[[keys.command]]
+key = "prefix+d"
+type = "plugin_action"
+command = "hunk-review.worktree-split"
+description = "open Hunk worktree review"
+
+[experimental]
+reveal_hidden_cursor_for_cjk_ime = true
+cjk_ime_agents = ["pi", "claude", "codex"]
+switch_ascii_input_source_in_prefix = true
+pane_history = false
+allow_nested = false

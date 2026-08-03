@@ -69,7 +69,12 @@
       "nikitabobko/tap"
     ];
 
+    brews = [
+      "container"
+    ];
+
     casks = [
+      "1password-cli"
       "ghostty"
       "nikitabobko/tap/aerospace"
     ];

@@ -4,11 +4,20 @@
   lib,
   helpers,
   dotfilesDir,
+  herdrPackage,
+  hunkInput,
+  codexCliPackage,
   ...
 }:
 {
   imports = [
-    ./packages.nix
+    (import ./packages.nix {
+      inherit
+        pkgs
+        herdrPackage
+        codexCliPackage
+        ;
+    })
 
     (import ./programs {
       inherit
@@ -17,6 +26,7 @@
         config
         dotfilesDir
         helpers
+        hunkInput
         ;
     })
 
@@ -27,6 +37,15 @@
         config
         dotfilesDir
         helpers
+        herdrPackage
+        ;
+    })
+
+    (import ./host-artifact.nix {
+      inherit
+        pkgs
+        lib
+        config
         ;
     })
   ];
