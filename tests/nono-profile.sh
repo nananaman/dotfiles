@@ -7,8 +7,14 @@ source_profile_dir="$(dirname "$source_profile")"
 source_profile_json="$(sed '/^[[:space:]]*[/][/]/d' "$source_profile")"
 test_config_root="$(mktemp -d "${TMPDIR:-/tmp}/nono-profile-test.XXXXXX")"
 test_publish_root="$test_config_root/host-artifact/public"
+test_neovim_root="$test_config_root/neovim"
 profile_dir="$test_config_root/nono/profiles"
-mkdir -p "$profile_dir" "$test_publish_root/example"
+mkdir -p \
+  "$profile_dir" \
+  "$test_publish_root/example" \
+  "$test_neovim_root/config" \
+  "$test_neovim_root/share" \
+  "$test_neovim_root/state"
 for source in "$source_profile_dir"/*.jsonc; do
   cp "$source" "$profile_dir/$(basename "$source")"
 done
@@ -17,6 +23,9 @@ for copied_profile in "$profile_dir"/*.jsonc; do
   sed \
     -e "s|@HOME@|$HOME|g" \
     -e 's|$HOME/.local/share/host-artifact/public|'"$test_publish_root"'|g' \
+    -e 's|$HOME/.config/nvim|'"$test_neovim_root/config"'|g' \
+    -e 's|$HOME/.local/share/nvim|'"$test_neovim_root/share"'|g' \
+    -e 's|$HOME/.local/state/nvim|'"$test_neovim_root/state"'|g' \
     "$copied_profile" >"$rendered_profile"
   mv "$rendered_profile" "$copied_profile"
 done
@@ -221,6 +230,17 @@ test_common_profile_keeps_sensitive_data_denied_by_group() {
   done
 }
 
+test_common_profile_allows_neovim_external_editor_state() {
+  # Arrange: Codexのexternal editorはuser設定を読み、Neovim専用data/stateへ書き込む。
+  # Act & Assert: 必要な3 subtreeだけを宣言し、親directoryへ権限を広げない。
+  assert_profile_array_contains '.filesystem.read' '$HOME/.config/nvim'
+  assert_profile_array_contains '.filesystem.allow' '$HOME/.local/share/nvim'
+  assert_profile_array_contains '.filesystem.allow' '$HOME/.local/state/nvim'
+  assert_profile_value '.filesystem.read | index("$HOME/.config") == null' 'true'
+  assert_profile_value '.filesystem.allow | index("$HOME/.local/share") == null' 'true'
+  assert_profile_value '.filesystem.allow | index("$HOME/.local/state") == null' 'true'
+}
+
 test_common_profile_keeps_chrome_data_outside_direct_agent_access() {
   # Arrange: Chrome bridge traffic uses its socket and does not require direct browser-data reads.
   # Act & Assert: No local agent receives a Chrome user-data read or protection bypass.
@@ -241,6 +261,19 @@ test_common_profile_allows_only_the_chrome_bridge_socket_subtree() {
   assert_profile_value \
     '.platform_overrides.macos.filesystem | has("unix_socket_subtree")' \
     'false'
+}
+
+test_common_profile_allows_only_the_nix_daemon_socket() {
+  # Arrange: macOSのmulti-user Nix buildは、symlink解決後の固定daemon socketへ接続する。
+  # Act & Assert: 親sandboxには解決後のNix daemon exact socketだけを追加する。
+  assert_profile_value \
+    '[.unsafe_macos_seatbelt_rules[] | select(contains("nix-daemon.socket"))] | tojson' \
+    '["(allow network-outbound (path \"/private/var/run/nix-daemon.socket\"))"]'
+
+  # Act & Assert: system適用に必要なsudoは引き続きcommand policyで拒否する。
+  local output
+  output="$(nono why --profile "$profile" --command sudo -- -H nix run nix-darwin -- switch)"
+  [[ "${output%%$'\n'*}" == "DENIED" ]] || return 1
 }
 
 test_common_profile_uses_enterprise_network() {
@@ -424,8 +457,10 @@ test_github_cli_uses_the_parent_sandbox
 test_ssh_private_key_remains_unreadable
 test_common_profile_includes_general_development_groups
 test_common_profile_keeps_sensitive_data_denied_by_group
+test_common_profile_allows_neovim_external_editor_state
 test_common_profile_keeps_chrome_data_outside_direct_agent_access
 test_common_profile_allows_only_the_chrome_bridge_socket_subtree
+test_common_profile_allows_only_the_nix_daemon_socket
 test_common_profile_uses_enterprise_network
 test_common_profile_allows_development_endpoints
 test_common_profile_allows_tailscale_serve_origins

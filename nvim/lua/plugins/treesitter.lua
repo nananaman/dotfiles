@@ -22,6 +22,11 @@ local function ensure_parser(treesitter, lang, bufnr)
     return
   end
 
+  -- Agent sandboxではdownloader subprocessを起動できない。通常のNeovim起動時にinstallする。
+  if vim.env.NONO_CAP_FILE then
+    return
+  end
+
   if not has_value(treesitter.get_available(), lang) or installing[lang] then
     return
   end

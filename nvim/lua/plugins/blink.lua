@@ -102,7 +102,9 @@ return {
     -- when the Rust fuzzy matcher is not available, by using `implementation = "prefer_rust"`
     --
     -- See the fuzzy documentation for more information
-    fuzzy = { implementation = "prefer_rust_with_warning" },
+    fuzzy = {
+      implementation = vim.env.NONO_CAP_FILE and "lua" or "prefer_rust_with_warning",
+    },
   },
   opts_extend = { "sources.default" },
 }

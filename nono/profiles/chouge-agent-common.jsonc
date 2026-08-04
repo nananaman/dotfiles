@@ -13,6 +13,8 @@
     "(allow file-read-metadata (literal \"/\"))",
     "(allow file-read-data (literal \"/Users\"))",
     "(allow file-read-data (literal \"@HOME@\"))",
+    // /nix/var/nix/daemon-socket/socketのsymlink解決後にあるdaemon socketだけへ接続する。
+    "(allow network-outbound (path \"/private/var/run/nix-daemon.socket\"))",
     "(allow network-outbound (path \"@HOME@/ghq/github.com/nananaman/dotfiles/herdr/herdr.sock\"))",
     // Chrome bridgeは起動ごとに生成されるnative host socketで通信する。
     "(allow network-outbound (subpath \"/private/tmp/codex-browser-use\"))",
@@ -76,6 +78,9 @@
       "$HOME/.claude",
       "$HOME/.codex",
       "$HOME/.pi",
+      // Codexのexternal editorとして起動するNeovimのplugin dataとruntime state。
+      "$HOME/.local/share/nvim",
+      "$HOME/.local/state/nvim",
       "$HOME/.local/state/mise",
       "$HOME/.local/share/host-artifact/public",
       "$HOME/go/pkg/mod",
@@ -93,6 +98,8 @@
       "$HOME/ghq/github.com/nananaman/dotfiles/zsh/zshrc"
     ],
     "read": [
+      // Neovim設定本体はrepositoryへのsymlinkだが、入口もread可能にする。
+      "$HOME/.config/nvim",
       // ghはgitと同じ親sandboxで認証設定を読み、host側の設定変更は許可しない。
       "$HOME/.config/gh",
       "$HOME/.local/share/nono-agent-wrappers"
