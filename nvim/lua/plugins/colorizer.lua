@@ -1,7 +1,7 @@
 return {
-  "norcalli/nvim-colorizer.lua",
-  config = function()
-    require("colorizer").setup({
+  "catgoose/nvim-colorizer.lua",
+  opts = {
+    filetypes = {
       "css",
       "javascript",
       "html",
@@ -10,6 +10,6 @@ return {
       "lua",
       "vim",
       "toml",
-    })
-  end,
+    },
+  },
 }
