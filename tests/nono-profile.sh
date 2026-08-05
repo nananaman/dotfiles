@@ -503,6 +503,28 @@ test_claude_allows_login_endpoints_and_launch_services() {
   rg -q -- '--allow-launch-services' nix/modules/home/packages.nix
 }
 
+test_claude_wrapper_runs_self_update_outside_the_sandbox() {
+  local packages_module='nix/modules/home/packages.nix'
+
+  # Arrange: `claude update`のsymlink置き換えは$HOME/.local/bin全体へのwriteを要求し、
+  # 通常sessionのfilesystem境界では表現できない。
+  # Act & Assert: update/upgradeはnono runへ渡す前にraw binaryを直接execする分岐を持つ。
+  rg -q 'update \| upgrade\)' "$packages_module"
+  rg -q -F 'Run it outside the sandbox' "$packages_module"
+}
+
+test_claude_wrapper_self_update_bypass_requires_exactly_one_argument() {
+  local packages_module='nix/modules/home/packages.nix'
+
+  # Arrange: claudeの`prompt`は位置引数のため、`claude update the readme`のような
+  # 未クォートの自然文プロンプトも$1="update"になり得る。
+  # Act & Assert: `update | upgrade)`のcase分岐が、単独の文字列一致ではなく
+  # 引数個数1個のif guardの内側に入れ子になっていることを確認する。
+  rg -U -q -- \
+    'if \[ "\$#" -eq 1 \]; then\n\s*case "\$1" in\n\s*update \| upgrade\)' \
+    "$packages_module"
+}
+
 test_pi_allows_configured_openai_codex_endpoint() {
   assert_agent_network_boundary pi chatgpt.com
 }
@@ -536,4 +558,6 @@ test_codex_allows_unrestricted_localhost_outbound_on_macos
 test_codex_localhost_access_does_not_grant_the_container_vm_address
 test_claude_allows_anthropic_api_endpoint
 test_claude_allows_login_endpoints_and_launch_services
+test_claude_wrapper_runs_self_update_outside_the_sandbox
+test_claude_wrapper_self_update_bypass_requires_exactly_one_argument
 test_pi_allows_configured_openai_codex_endpoint
