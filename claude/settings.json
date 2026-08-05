@@ -39,5 +39,6 @@
   "remoteControlAtStartup": true,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
+  "skipDangerousModePermissionPrompt": true,
   "useAutoModeDuringPlan": true
 }
