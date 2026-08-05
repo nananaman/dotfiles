@@ -4,25 +4,61 @@ set -euo pipefail
 
 source_profile="${1:-nono/profiles/chouge-agent-common.jsonc}"
 source_profile_dir="$(dirname "$source_profile")"
-source_profile_json="$(sed '/^[[:space:]]*[/][/]/d' "$source_profile")"
+normalize_jsonc_for_jq() {
+  sed '/^[[:space:]]*[/][/]/d' "$1" | perl -0pe 's/,\s*([}\]])/$1/g'
+}
+
+source_profile_json="$(normalize_jsonc_for_jq "$source_profile")"
 test_config_root="$(mktemp -d "${TMPDIR:-/tmp}/nono-profile-test.XXXXXX")"
 test_publish_root="$test_config_root/host-artifact/public"
+test_claude_state_root="$test_config_root/claude-state"
 test_neovim_root="$test_config_root/neovim"
 profile_dir="$test_config_root/nono/profiles"
 mkdir -p \
   "$profile_dir" \
   "$test_publish_root/example" \
+  "$test_claude_state_root/locks" \
   "$test_neovim_root/config" \
   "$test_neovim_root/share" \
   "$test_neovim_root/state"
 for source in "$source_profile_dir"/*.jsonc; do
   cp "$source" "$profile_dir/$(basename "$source")"
 done
+cat >"$profile_dir/claude-code.jsonc" <<EOF
+{
+  "meta": {
+    "name": "claude-code",
+    "description": "Test-local Claude Code profile stub"
+  },
+  "filesystem": {
+    "allow": ["$test_claude_state_root/locks"]
+  },
+  "open_urls": {
+    "allow_origins": [
+      "https://claude.ai",
+      "https://claude.com",
+      "https://api.anthropic.com",
+      "https://platform.claude.com"
+    ],
+    "allow_localhost": true
+  },
+  "allow_launch_services": true
+}
+EOF
+cat >"$profile_dir/pi.jsonc" <<'EOF'
+{
+  "meta": {
+    "name": "pi",
+    "description": "Test-local Pi profile stub"
+  }
+}
+EOF
 for copied_profile in "$profile_dir"/*.jsonc; do
   rendered_profile="$copied_profile.rendered"
   sed \
     -e "s|@HOME@|$HOME|g" \
     -e 's|$HOME/.local/share/host-artifact/public|'"$test_publish_root"'|g' \
+    -e 's|$HOME/.local/state/claude/locks|'"$test_claude_state_root/locks"'|g' \
     -e 's|$HOME/.config/nvim|'"$test_neovim_root/config"'|g' \
     -e 's|$HOME/.local/share/nvim|'"$test_neovim_root/share"'|g' \
     -e 's|$HOME/.local/state/nvim|'"$test_neovim_root/state"'|g' \
@@ -141,7 +177,7 @@ assert_agent_profile_value() {
   local actual
 
   # Arrange: Normalize the checked-in agent profile while retaining it as the source of truth.
-  agent_source_json="$(sed '/^[[:space:]]*[/][/]/d' "$source_profile_dir/chouge-$agent.jsonc")"
+  agent_source_json="$(normalize_jsonc_for_jq "$source_profile_dir/chouge-$agent.jsonc")"
 
   # Act: Select the exact agent-specific capability under review.
   actual="$(jq -r "$jq_filter" <<<"$agent_source_json")"
@@ -238,6 +274,14 @@ test_common_profile_allows_neovim_external_editor_state() {
   assert_profile_array_contains '.filesystem.allow' '$HOME/.local/state/nvim'
   assert_profile_value '.filesystem.read | index("$HOME/.config") == null' 'true'
   assert_profile_value '.filesystem.allow | index("$HOME/.local/share") == null' 'true'
+  assert_profile_value '.filesystem.allow | index("$HOME/.local/state") == null' 'true'
+}
+
+test_common_profile_allows_claude_lock_state_without_broad_state_access() {
+  # Arrange: Nested Claude Code launches resolve the registry profile lock directory.
+  # Act & Assert: Only the Claude lock subtree is shared; broader state remains denied.
+  assert_profile_array_contains '.filesystem.allow' '$HOME/.local/state/claude/locks'
+  assert_profile_value '.filesystem.allow | index("$HOME/.local/state/claude") == null' 'true'
   assert_profile_value '.filesystem.allow | index("$HOME/.local/state") == null' 'true'
 }
 
@@ -434,7 +478,7 @@ test_codex_allows_unrestricted_localhost_outbound_on_macos() {
   assert_agent_profile_value \
     codex \
     '.network.allow_domain | tojson' \
-    '["chatgpt.com","localhost","127.0.0.1"]'
+    '["chatgpt.com","*.katohome.jp","*.nananaman.com","localhost","127.0.0.1"]'
 }
 
 test_codex_localhost_access_does_not_grant_the_container_vm_address() {
@@ -449,6 +493,16 @@ test_claude_allows_anthropic_api_endpoint() {
   assert_agent_network_boundary claude api.anthropic.com
 }
 
+test_claude_allows_login_endpoints_and_launch_services() {
+  assert_agent_profile_value \
+    claude \
+    '.network.allow_domain | tojson' \
+    '["claude.com"]'
+  assert_agent_profile_value claude '.network.open_port | tojson' '[0]'
+  assert_agent_profile_value claude '.allow_launch_services' 'null'
+  rg -q -- '--allow-launch-services' nix/modules/home/packages.nix
+}
+
 test_pi_allows_configured_openai_codex_endpoint() {
   assert_agent_network_boundary pi chatgpt.com
 }
@@ -458,6 +512,7 @@ test_ssh_private_key_remains_unreadable
 test_common_profile_includes_general_development_groups
 test_common_profile_keeps_sensitive_data_denied_by_group
 test_common_profile_allows_neovim_external_editor_state
+test_common_profile_allows_claude_lock_state_without_broad_state_access
 test_common_profile_keeps_chrome_data_outside_direct_agent_access
 test_common_profile_allows_only_the_chrome_bridge_socket_subtree
 test_common_profile_allows_only_the_nix_daemon_socket
@@ -480,4 +535,5 @@ test_codex_allows_chatgpt_subscription_endpoint
 test_codex_allows_unrestricted_localhost_outbound_on_macos
 test_codex_localhost_access_does_not_grant_the_container_vm_address
 test_claude_allows_anthropic_api_endpoint
+test_claude_allows_login_endpoints_and_launch_services
 test_pi_allows_configured_openai_codex_endpoint

@@ -155,7 +155,7 @@ let
       exec "$claude_bin" "$@"
     fi
     HERDR_AGENT=claude exec ${nono-cli}/bin/nono run --silent \
-      --profile "$HOME/.config/nono/profiles/chouge-claude.jsonc" --allow-cwd -- \
+      --profile "$HOME/.config/nono/profiles/chouge-claude.jsonc" --allow-cwd --allow-launch-services -- \
       "$claude_bin" --dangerously-skip-permissions "$@"
   '';
 

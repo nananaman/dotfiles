@@ -59,6 +59,8 @@
       "api.github.com",
       "chatgpt.com",
       "*.openai.com",
+      "claude.ai",
+      "*.anthropic.com",
       "proxy.golang.org",
       "sum.golang.org",
       // OpenAIの開発者向け文書とGitHub Releasesの成果物取得で利用する。
@@ -78,6 +80,8 @@
       "$HOME/.claude",
       "$HOME/.codex",
       "$HOME/.pi",
+      // Nested Claude Code launches need the registry profile's lock directory to be canonicalizable.
+      "$HOME/.local/state/claude/locks",
       // Codexのexternal editorとして起動するNeovimのplugin dataとruntime state。
       "$HOME/.local/share/nvim",
       "$HOME/.local/state/nvim",
