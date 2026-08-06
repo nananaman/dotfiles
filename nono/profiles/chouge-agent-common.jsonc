@@ -18,6 +18,10 @@
     "(allow network-outbound (path \"@HOME@/ghq/github.com/nananaman/dotfiles/herdr/herdr.sock\"))",
     // Chrome bridgeは起動ごとに生成されるnative host socketで通信する。
     "(allow network-outbound (subpath \"/private/tmp/codex-browser-use\"))",
+    // terraform providerなどgo-pluginベースのツールは起動ごとにTMPDIR配下へ
+    // ランダムな名前のunix domain socketを作りRPC通信する(例: /var/folders/.../T/pluginNNNNNN)。
+    // socket名が実行ごとに変わり個別に許可できないため、TMPDIR配下への接続を広めに許可する。
+    "(allow network-outbound (subpath \"/var/folders/8j/pnlb6lnn6wg7dm420zyv5wj80000gp/T\"))",
     // host-artifactは親sandboxから固定serviceとTailscale daemonだけを利用する。
     "(allow network-outbound (remote tcp \"localhost:9417\"))",
     "(allow mach-lookup (global-name \"io.tailscale.ipn.macsys-spks\"))",
@@ -92,10 +96,15 @@
       "$HOME/go/pkg/mod",
       // ghq管理のrepositoryを調査、clone、修正できるようにする。
       "$HOME/ghq",
+      // gcloudはauth listのような読み取り系コマンドでもcredentials.db(sqlite)やlogsへの
+      // 書き込みを行うため、read-onlyでは機能しない。loginなどの新規発行はsandbox外で行う運用は維持する。
+      "$HOME/.config/gcloud",
     ],
     "allow_file": ["$HOME/.claude.json", "$HOME/.claude.json.lock", "$HOME/.claude.lock"],
     "bypass_protection": [
       "$HOME/.config/gh",
+      "$HOME/.config/gcloud",
+      "$HOME/.terraform.d",
       "$HOME/.local/share/host-artifact/public",
       "$HOME/ghq/github.com/nananaman/dotfiles/zsh/zshrc",
     ],
@@ -104,6 +113,8 @@
       "$HOME/.config/nvim",
       // ghはgitと同じ親sandboxで認証設定を読み、host側の設定変更は許可しない。
       "$HOME/.config/gh",
+      // terraformのcredentials.tfrc.json等は読み取りのみ許可し、書き込みはsandbox外で行う。
+      "$HOME/.terraform.d",
       "$HOME/.local/share/nono-agent-wrappers",
     ],
   },
