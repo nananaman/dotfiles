@@ -6,9 +6,13 @@
 - 設計や方針についての質問は変更承認と解釈しない。選択肢と推奨案を示し、方向性の合意後に変更する。
 - 結果や変更範囲を大きく左右する不明点は確認する。それ以外は、安全な仮定を明示して進める。
 
+## Git 作業
+
+- ファイルを変更する前に、必ず `chouge-git-wt` skill に従う。
+- commit、branch 命名、PR 運用などのその他の Git 規約は `chouge-git` skill に従う。
+
 ## 開発と検証
 
-- ファイルを変更する前に、現在の branch と working tree を確認し、default branch や別目的の branch に変更を混ぜない。（理由: commit や PR の分離が困難になるのを防ぐ）
 - 実行可能な振る舞いを変更するときは `tdd` skill に従う。
 - テストを追加・変更・レビューするときは `test-writing-style` skill に従う。
 - KPI やカバレッジ目標が指定された場合は、達成するまで検証と改善を続ける。
@@ -26,7 +30,6 @@
 
 ## Workflows
 
-- Git 操作では `chouge-git` skill に従う。
 - `CHANGES.md` の変更履歴では `chouge-changelog` skill に従う。
 - agent skill の作成・改善では `skill-workbench` skill に従う。
 - APM の設定や運用では `apm-usage` skill に従う。

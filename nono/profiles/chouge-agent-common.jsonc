@@ -83,8 +83,11 @@
   "filesystem": {
     "allow": [
       "$HOME/.agents",
+      "$HOME/.apm",
       "$HOME/.claude",
       "$HOME/.codex",
+      // apm install -g がローカルに入っている gemini CLI のホームディレクトリを無条件に触るため許可する。
+      "$HOME/.gemini",
       "$HOME/.pi",
       // Nested Claude Code launches need the registry profile's lock directory to be canonicalizable.
       "$HOME/.local/state/claude/locks",
