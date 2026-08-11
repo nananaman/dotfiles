@@ -6,6 +6,18 @@
     "version": "0.1.0",
     "description": "Shared runtime access for local coding agents",
   },
+  "environment": {
+    "set_vars": {
+      // pnpmのlifecycle runnerがproject-local executableを直接spawnするとmacOS Seatbeltに拒否されるため、
+      // 既に許可されたsystem shellを明示して同じsandbox境界内で実行する。
+      "npm_config_script_shell": "/bin/sh",
+      // Wranglerのglobal configにはcredentialを含み得るためwrite grantを広げず、
+      // development logとprocess間で共有するdev registryだけを専用state directoryへ分離する。
+      "WRANGLER_LOG_PATH": "$HOME/.local/state/nono-agent-tools/wrangler/logs",
+      "WRANGLER_REGISTRY_PATH": "$HOME/.local/state/nono-agent-tools/wrangler/registry",
+      "MINIFLARE_REGISTRY_PATH": "$HOME/.local/state/nono-agent-tools/wrangler/registry",
+    },
+  },
   "unsafe_macos_seatbelt_rules": [
     // Bun 1.3.13/1.3.14はpackage script解決時にCWDのancestor directoryを開く。
     // oven-sh/bun#28220またはnolabs-ai/nono#457の解決後に削除を再検討する。
@@ -102,6 +114,7 @@
       // gcloudはauth listのような読み取り系コマンドでもcredentials.db(sqlite)やlogsへの
       // 書き込みを行うため、read-onlyでは機能しない。loginなどの新規発行はsandbox外で行う運用は維持する。
       "$HOME/.config/gcloud",
+      "$HOME/.local/state/nono-agent-tools/wrangler",
     ],
     "allow_file": ["$HOME/.claude.json", "$HOME/.claude.json.lock", "$HOME/.claude.lock"],
     "bypass_protection": [
