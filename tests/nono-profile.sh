@@ -383,6 +383,24 @@ test_common_profile_does_not_allow_all_github_actions_hosts() {
   assert_host_decision "DENIED" unrelated.actions.githubusercontent.com
 }
 
+test_common_profile_allows_github_actions_blob_log_endpoint() {
+  # Arrange & Act: GitHub Actionsのlog archiveがredirectされるshard付きAzure Blob hostを評価する。
+  # Assert: shard名が変わっても公式のlog配信suffix配下なら取得できる。
+  assert_host_decision "ALLOWED" productionresultssa5.blob.core.windows.net
+}
+
+test_common_profile_does_not_allow_azure_blob_apex() {
+  # Arrange & Act: wildcard対象外のAzure Blob apexを評価する。
+  # Assert: subdomain用wildcardがapex自体へ権限を広げない。
+  assert_host_decision "DENIED" blob.core.windows.net
+}
+
+test_common_profile_does_not_allow_adjacent_azure_storage_suffix() {
+  # Arrange & Act: GitHub公式allowlistとは異なるAzure Storage suffixを評価する。
+  # Assert: Azure Storage全体ではなくBlob endpointだけを許可する。
+  assert_host_decision "DENIED" productionresultssa5.file.core.windows.net
+}
+
 test_common_profile_allows_tailscale_serve_origins() {
   # Arrange & Act: Evaluate a representative MagicDNS HTTPS origin without connecting to it.
   # Assert: Host-artifact can verify its Tailscale Serve URL through the parent sandbox.
@@ -679,6 +697,9 @@ test_common_profile_uses_enterprise_network
 test_common_profile_allows_development_endpoints
 test_common_profile_allows_github_actions_log_endpoint
 test_common_profile_does_not_allow_all_github_actions_hosts
+test_common_profile_allows_github_actions_blob_log_endpoint
+test_common_profile_does_not_allow_azure_blob_apex
+test_common_profile_does_not_allow_adjacent_azure_storage_suffix
 test_common_profile_allows_tailscale_serve_origins
 test_common_profile_denies_unconfigured_clouds
 test_common_profile_allows_all_ghq_repositories

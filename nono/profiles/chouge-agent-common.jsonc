@@ -83,10 +83,12 @@
       "sum.golang.org",
       // Dart/Flutter dependency resolution。
       "pub.dev",
-      // OpenAIの開発者向け文書、GitHub Releases、GitHub Actionsのlog取得で利用する。
+      // OpenAIの開発者向け文書とGitHub Releasesの成果物取得で利用する。
       "developers.openai.com",
       "release-assets.githubusercontent.com",
+      // GitHub Actionsのlog取得に必要な公式の通信先。Blob側はshardが変わるためsuffixで許可する。
       "results-receiver.actions.githubusercontent.com",
+      "*.blob.core.windows.net",
       // Google認証とcontainer registryで利用する。
       "accounts.google.com",
       "gcr.io",
