@@ -14,6 +14,7 @@ test_publish_root="$test_config_root/host-artifact/public"
 test_claude_state_root="$test_config_root/claude-state"
 test_neovim_root="$test_config_root/neovim"
 test_agent_tool_state_root="$test_config_root/agent-tool-state"
+test_flutter_dart_root="$test_config_root/flutter-dart"
 profile_dir="$test_config_root/nono/profiles"
 mkdir -p \
   "$profile_dir" \
@@ -22,7 +23,11 @@ mkdir -p \
   "$test_neovim_root/config" \
   "$test_neovim_root/share" \
   "$test_neovim_root/state" \
-  "$test_agent_tool_state_root/wrangler"
+  "$test_agent_tool_state_root/wrangler" \
+  "$test_agent_tool_state_root/pub-cache" \
+  "$test_flutter_dart_root/dart-tool" \
+  "$test_flutter_dart_root/dart-server" \
+  "$test_flutter_dart_root/flutter-config"
 for source in "$source_profile_dir"/*.jsonc; do
   cp "$source" "$profile_dir/$(basename "$source")"
 done
@@ -65,6 +70,10 @@ for copied_profile in "$profile_dir"/*.jsonc; do
     -e 's|$HOME/.local/share/nvim|'"$test_neovim_root/share"'|g' \
     -e 's|$HOME/.local/state/nvim|'"$test_neovim_root/state"'|g' \
     -e 's|$HOME/.local/state/nono-agent-tools|'"$test_agent_tool_state_root"'|g' \
+    -e 's|$HOME/.dart-tool|'"$test_flutter_dart_root/dart-tool"'|g' \
+    -e 's|$HOME/.dartServer|'"$test_flutter_dart_root/dart-server"'|g' \
+    -e 's|$HOME/.config/flutter|'"$test_flutter_dart_root/flutter-config"'|g' \
+    -e 's|$HOME/.local/share/mise/installs/flutter/3.35.4-stable/bin/cache|'"$test_flutter_dart_root/flutter-sdk-cache"'|g' \
     "$copied_profile" >"$rendered_profile"
   mv "$rendered_profile" "$copied_profile"
 done
@@ -420,6 +429,66 @@ test_common_profile_configures_sandbox_compatible_javascript_tools() {
     nix/modules/home/dotfiles.nix
 }
 
+test_common_profile_allows_flutter_and_dart_runtime_state_without_home_wide_access() {
+  local agent
+
+  # Arrange: Flutter 3.35.4 and Dart use shared package data plus three product-specific state roots.
+  # Act & Assert: Grant each runtime path only the mode required by standard generation, lint, and test commands.
+  assert_profile_value '.environment.set_vars.PUB_CACHE' '$HOME/.local/state/nono-agent-tools/pub-cache'
+  assert_profile_array_contains '.filesystem.allow' '$HOME/.local/state/nono-agent-tools/pub-cache'
+  assert_profile_array_contains '.filesystem.allow' '$HOME/.dart-tool'
+  assert_profile_array_contains '.filesystem.allow' '$HOME/.dartServer'
+  assert_profile_array_contains '.filesystem.allow' '$HOME/.config/flutter'
+  assert_profile_array_contains \
+    '.filesystem.allow_file' \
+    '$HOME/.local/share/mise/installs/flutter/3.35.4-stable/bin/cache/engine.stamp'
+  assert_profile_array_contains \
+    '.filesystem.allow_file' \
+    '$HOME/.local/share/mise/installs/flutter/3.35.4-stable/bin/cache/engine.realm'
+  assert_profile_array_contains \
+    '.filesystem.allow_file' \
+    '$HOME/.local/share/mise/installs/flutter/3.35.4-stable/bin/cache/lockfile'
+  assert_profile_array_contains \
+    '.filesystem.allow_file' \
+    '$HOME/.local/share/mise/installs/flutter/3.35.4-stable/bin/cache/flutter_version_check.stamp'
+
+  for agent in codex claude pi; do
+    assert_agent_path_decision \
+      "$agent" "ALLOWED" "$test_flutter_dart_root/dart-tool/dart-flutter-telemetry.log" "readwrite"
+    assert_agent_path_decision \
+      "$agent" "ALLOWED" "$test_agent_tool_state_root/pub-cache/hosted/pub.dev/example/package.dart" "readwrite"
+    assert_agent_path_decision \
+      "$agent" "ALLOWED" "$test_flutter_dart_root/dart-server/.analysis-driver" "readwrite"
+    assert_agent_path_decision \
+      "$agent" "ALLOWED" "$test_flutter_dart_root/flutter-config/tool_state" "readwrite"
+    assert_agent_path_decision \
+      "$agent" "ALLOWED" "$test_flutter_dart_root/flutter-sdk-cache/engine.stamp" "readwrite"
+    assert_agent_path_decision \
+      "$agent" "ALLOWED" "$test_flutter_dart_root/flutter-sdk-cache/engine.realm" "readwrite"
+    assert_agent_path_decision \
+      "$agent" "DENIED" "$HOME/.local/share/mise/installs/flutter/3.35.4-stable/bin/cache/flutter_tools.snapshot" "write"
+    assert_agent_path_decision \
+      "$agent" "DENIED" "$HOME/.local/share/mise/installs/flutter/3.35.4-stable/bin/cache/dart-sdk/bin/dart" "write"
+    assert_agent_path_decision \
+      "$agent" "DENIED" "$HOME/.local/share/mise/installs/flutter/3.32.6-stable/bin/cache/engine.stamp" "write"
+  done
+
+  # Assert: No parent directory broadens access to unrelated package, config, or mise installation data.
+  assert_profile_value '.filesystem.allow | index("$HOME") == null' 'true'
+  assert_profile_value '.filesystem.allow | index("$HOME/.config") == null' 'true'
+  assert_profile_value '.filesystem.allow | index("$HOME/.local/share/mise") == null' 'true'
+  assert_profile_value '.filesystem.read | index("$HOME/.pub-cache") == null' 'true'
+  assert_profile_value '.filesystem.allow_file | any(contains("/.git/FETCH_HEAD"))' 'false'
+
+  # Assert: Home Manager creates roots that nono must canonicalize before either tool can initialize them.
+  rg -q -F \
+    '$DRY_RUN_CMD mkdir -p "${homeDirectory}/.dart-tool" "${homeDirectory}/.dartServer" "${configHome}/flutter"' \
+    nix/modules/home/dotfiles.nix
+  rg -q -F \
+    '$DRY_RUN_CMD mkdir -p "${homeDirectory}/.local/state/nono-agent-tools/wrangler" "${homeDirectory}/.local/state/nono-agent-tools/pub-cache"' \
+    nix/modules/home/dotfiles.nix
+}
+
 test_command_policies_never_require_human_approval() {
   # Arrange: agent commandは対話待ちを発生させず、allowまたはdenyで即時決定する。
   # Act & Assert: approval backend、approve decision、default approveを一切持たない。
@@ -601,6 +670,7 @@ test_common_profile_denies_unconfigured_clouds
 test_common_profile_allows_all_ghq_repositories
 test_common_profile_allows_new_ghq_clone_destinations
 test_common_profile_configures_sandbox_compatible_javascript_tools
+test_common_profile_allows_flutter_and_dart_runtime_state_without_home_wide_access
 test_command_policies_never_require_human_approval
 test_container_wrapper_prefers_the_tool_sandbox_shim
 test_container_policy_allows_mysql_integration_test_lifecycle

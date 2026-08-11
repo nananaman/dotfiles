@@ -8,6 +8,8 @@
   },
   "environment": {
     "set_vars": {
+      // credentialを含み得る既存cacheへwriteを広げず、agent専用のDart package cacheを使う。
+      "PUB_CACHE": "$HOME/.local/state/nono-agent-tools/pub-cache",
       // pnpmのlifecycle runnerがproject-local executableを直接spawnするとmacOS Seatbeltに拒否されるため、
       // 既に許可されたsystem shellを明示して同じsandbox境界内で実行する。
       "npm_config_script_shell": "/bin/sh",
@@ -79,6 +81,8 @@
       "*.anthropic.com",
       "proxy.golang.org",
       "sum.golang.org",
+      // Dart/Flutter dependency resolution。
+      "pub.dev",
       // OpenAIの開発者向け文書とGitHub Releasesの成果物取得で利用する。
       "developers.openai.com",
       "release-assets.githubusercontent.com",
@@ -107,6 +111,10 @@
       "$HOME/.local/share/nvim",
       "$HOME/.local/state/nvim",
       "$HOME/.local/state/mise",
+      // Dart CLIとFlutter toolが保持するtelemetry/tool state。credentialは含まない。
+      "$HOME/.dart-tool",
+      "$HOME/.dartServer",
+      "$HOME/.config/flutter",
       "$HOME/.local/share/host-artifact/public",
       "$HOME/go/pkg/mod",
       // ghq管理のrepositoryを調査、clone、修正できるようにする。
@@ -115,8 +123,19 @@
       // 書き込みを行うため、read-onlyでは機能しない。loginなどの新規発行はsandbox外で行う運用は維持する。
       "$HOME/.config/gcloud",
       "$HOME/.local/state/nono-agent-tools/wrangler",
+      "$HOME/.local/state/nono-agent-tools/pub-cache",
     ],
-    "allow_file": ["$HOME/.claude.json", "$HOME/.claude.json.lock", "$HOME/.claude.lock"],
+    "allow_file": [
+      "$HOME/.claude.json",
+      "$HOME/.claude.json.lock",
+      "$HOME/.claude.lock",
+      // katohome-monorepo/mobileがpinするFlutter SDKで観測済みの更新対象だけを許可する。
+      // 同じcache内のdart binaryやflutter_tools.snapshotはread-onlyのまま維持する。
+      "$HOME/.local/share/mise/installs/flutter/3.35.4-stable/bin/cache/engine.stamp",
+      "$HOME/.local/share/mise/installs/flutter/3.35.4-stable/bin/cache/engine.realm",
+      "$HOME/.local/share/mise/installs/flutter/3.35.4-stable/bin/cache/lockfile",
+      "$HOME/.local/share/mise/installs/flutter/3.35.4-stable/bin/cache/flutter_version_check.stamp",
+    ],
     "bypass_protection": [
       "$HOME/.config/gh",
       "$HOME/.config/gcloud",
