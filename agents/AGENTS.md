@@ -21,6 +21,7 @@
 
 ## Workflows
 
+- セッションの最初の実質的なタスクに着手する前に `HERDR_ENV` を確認する。値が `1` なら `herdr` skill に従い、現在 agent の初回命名を判定する。
 - `CHANGES.md` の変更履歴では `chouge-changelog` skill に従う。
 - テストをレビューする場合は `test-writing-style` skill に従う。
 - agent skill の作成・改善を実装するときは `implement` skill を入口にし、その中で `skill-workbench` skill に従う。レビューだけを行う場合は `skill-workbench` skill を入口にする。
