@@ -83,9 +83,10 @@
       "sum.golang.org",
       // Dart/Flutter dependency resolution。
       "pub.dev",
-      // OpenAIの開発者向け文書とGitHub Releasesの成果物取得で利用する。
+      // OpenAIの開発者向け文書、GitHub Releases、GitHub Actionsのlog取得で利用する。
       "developers.openai.com",
       "release-assets.githubusercontent.com",
+      "results-receiver.actions.githubusercontent.com",
       // Google認証とcontainer registryで利用する。
       "accounts.google.com",
       "gcr.io",

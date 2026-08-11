@@ -371,6 +371,18 @@ test_common_profile_allows_development_endpoints() {
   done
 }
 
+test_common_profile_allows_github_actions_log_endpoint() {
+  # Arrange & Act: GitHub CLIがActionsのjob log取得でredirectされるHTTPS hostを評価する。
+  # Assert: 認証済みのgh run viewがlog archiveを取得できる。
+  assert_host_decision "ALLOWED" results-receiver.actions.githubusercontent.com
+}
+
+test_common_profile_does_not_allow_all_github_actions_hosts() {
+  # Arrange & Act: 許可したlog配信hostと同じ親domainの未設定hostを評価する。
+  # Assert: GitHub Actions配下をwildcardで許可せず、exact hostの境界を保つ。
+  assert_host_decision "DENIED" unrelated.actions.githubusercontent.com
+}
+
 test_common_profile_allows_tailscale_serve_origins() {
   # Arrange & Act: Evaluate a representative MagicDNS HTTPS origin without connecting to it.
   # Assert: Host-artifact can verify its Tailscale Serve URL through the parent sandbox.
@@ -665,6 +677,8 @@ test_common_profile_allows_only_the_chrome_bridge_socket_subtree
 test_common_profile_allows_only_the_nix_daemon_socket
 test_common_profile_uses_enterprise_network
 test_common_profile_allows_development_endpoints
+test_common_profile_allows_github_actions_log_endpoint
+test_common_profile_does_not_allow_all_github_actions_hosts
 test_common_profile_allows_tailscale_serve_origins
 test_common_profile_denies_unconfigured_clouds
 test_common_profile_allows_all_ghq_repositories
