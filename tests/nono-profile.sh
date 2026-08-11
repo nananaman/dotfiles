@@ -13,6 +13,7 @@ test_config_root="$(mktemp -d "${TMPDIR:-/tmp}/nono-profile-test.XXXXXX")"
 test_publish_root="$test_config_root/host-artifact/public"
 test_claude_state_root="$test_config_root/claude-state"
 test_neovim_root="$test_config_root/neovim"
+test_agent_tool_state_root="$test_config_root/agent-tool-state"
 profile_dir="$test_config_root/nono/profiles"
 mkdir -p \
   "$profile_dir" \
@@ -20,7 +21,8 @@ mkdir -p \
   "$test_claude_state_root/locks" \
   "$test_neovim_root/config" \
   "$test_neovim_root/share" \
-  "$test_neovim_root/state"
+  "$test_neovim_root/state" \
+  "$test_agent_tool_state_root/wrangler"
 for source in "$source_profile_dir"/*.jsonc; do
   cp "$source" "$profile_dir/$(basename "$source")"
 done
@@ -62,6 +64,7 @@ for copied_profile in "$profile_dir"/*.jsonc; do
     -e 's|$HOME/.config/nvim|'"$test_neovim_root/config"'|g' \
     -e 's|$HOME/.local/share/nvim|'"$test_neovim_root/share"'|g' \
     -e 's|$HOME/.local/state/nvim|'"$test_neovim_root/state"'|g' \
+    -e 's|$HOME/.local/state/nono-agent-tools|'"$test_agent_tool_state_root"'|g' \
     "$copied_profile" >"$rendered_profile"
   mv "$rendered_profile" "$copied_profile"
 done
@@ -167,6 +170,25 @@ assert_agent_network_boundary() {
   # Assert: The agent-specific provider endpoint is reachable.
   [[ "${output%%$'\n'*}" == "ALLOWED" ]] || return 1
 
+}
+
+assert_agent_path_decision() {
+  local agent="$1"
+  local expected="$2"
+  local target_path="$3"
+  local operation="$4"
+  local output
+
+  # Arrange: Evaluate the shared setting through an actual inherited agent profile.
+  # Act: Ask nono for the effective filesystem decision after profile composition.
+  output="$(nono why --profile "$profile_dir/chouge-$agent.jsonc" --path "$target_path" --op "$operation")"
+
+  # Assert: Every agent keeps the same cache and credential boundary.
+  if [[ "${output%%$'\n'*}" != "$expected" ]]; then
+    printf 'expected %s for chouge-%s %s access to %s, got:\n%s\n' \
+      "$expected" "$agent" "$operation" "$target_path" "$output" >&2
+    return 1
+  fi
 }
 
 assert_agent_profile_value() {
@@ -364,6 +386,40 @@ test_common_profile_allows_new_ghq_clone_destinations() {
     "readwrite"
 }
 
+test_common_profile_configures_sandbox_compatible_javascript_tools() {
+  local agent
+
+  # Arrange: pnpm lifecycle scripts and Wrangler state must stay inside existing sandbox grants.
+  # Act & Assert: Use the allowed system shell and dedicated Wrangler-only state paths.
+  assert_profile_value '.environment.set_vars.npm_config_script_shell' '/bin/sh'
+  assert_profile_value \
+    '.environment.set_vars.WRANGLER_LOG_PATH' \
+    '$HOME/.local/state/nono-agent-tools/wrangler/logs'
+  assert_profile_value \
+    '.environment.set_vars.WRANGLER_REGISTRY_PATH' \
+    '$HOME/.local/state/nono-agent-tools/wrangler/registry'
+  assert_profile_value \
+    '.environment.set_vars.MINIFLARE_REGISTRY_PATH' \
+    '$HOME/.local/state/nono-agent-tools/wrangler/registry'
+
+  # Act & Assert: Dedicated state is reusable while global credential files remain non-writable.
+  for agent in codex claude pi; do
+    assert_agent_path_decision \
+      "$agent" "ALLOWED" "$test_agent_tool_state_root/wrangler/logs/session.log" "readwrite"
+    assert_agent_path_decision \
+      "$agent" "ALLOWED" "$test_agent_tool_state_root/wrangler/registry/dev.json" "readwrite"
+    assert_agent_path_decision \
+      "$agent" "DENIED" "$HOME/.config/.wrangler/config/default.toml" "write"
+    assert_agent_path_decision \
+      "$agent" "DENIED" "$HOME/Library/Preferences/.wrangler/config/default.toml" "write"
+  done
+
+  # Assert: Home Manager creates the grant root before nono resolves filesystem capabilities.
+  rg -q -F \
+    '$DRY_RUN_CMD mkdir -p "${homeDirectory}/.local/state/nono-agent-tools/wrangler"' \
+    nix/modules/home/dotfiles.nix
+}
+
 test_command_policies_never_require_human_approval() {
   # Arrange: agent commandは対話待ちを発生させず、allowまたはdenyで即時決定する。
   # Act & Assert: approval backend、approve decision、default approveを一切持たない。
@@ -544,6 +600,7 @@ test_common_profile_allows_tailscale_serve_origins
 test_common_profile_denies_unconfigured_clouds
 test_common_profile_allows_all_ghq_repositories
 test_common_profile_allows_new_ghq_clone_destinations
+test_common_profile_configures_sandbox_compatible_javascript_tools
 test_command_policies_never_require_human_approval
 test_container_wrapper_prefers_the_tool_sandbox_shim
 test_container_policy_allows_mysql_integration_test_lifecycle
