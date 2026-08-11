@@ -63,7 +63,8 @@ in
     link_force "${dotfilesDir}/srt" "${configHome}/srt"
 
     $DRY_RUN_CMD mkdir -p "${configHome}/nono/profiles"
-    $DRY_RUN_CMD mkdir -p "${homeDirectory}/.local/state/nono-agent-tools/wrangler"
+    $DRY_RUN_CMD mkdir -p "${homeDirectory}/.local/state/nono-agent-tools/wrangler" "${homeDirectory}/.local/state/nono-agent-tools/pub-cache"
+    $DRY_RUN_CMD mkdir -p "${homeDirectory}/.dart-tool" "${homeDirectory}/.dartServer" "${configHome}/flutter"
     for legacy_profile in chouge-agent-common chouge-codex chouge-claude chouge-pi; do
       legacy_path="${configHome}/nono/profiles/$legacy_profile.json"
       legacy_target="$(readlink "$legacy_path" 2>/dev/null || true)"
