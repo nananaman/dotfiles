@@ -71,6 +71,11 @@
 
     brews = [
       "container"
+      "docker"
+      "docker-compose"
+      # credsStore = osxkeychain を解決する docker-credential-osxkeychain を提供する
+      "docker-credential-helper"
+      "docker-buildx"
     ];
 
     casks = [

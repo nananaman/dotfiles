@@ -62,6 +62,12 @@ in
     link_force "${dotfilesDir}/stylua.toml" "${configHome}/stylua.toml"
     link_force "${dotfilesDir}/srt" "${configHome}/srt"
 
+    ${lib.optionalString pkgs.stdenv.isDarwin ''
+      # Homebrew の docker-buildx は cli-plugins へ自分で配置する必要がある
+      $DRY_RUN_CMD mkdir -p "${homeDirectory}/.docker/cli-plugins"
+      link_force "/opt/homebrew/opt/docker-buildx/bin/docker-buildx" "${homeDirectory}/.docker/cli-plugins/docker-buildx"
+    ''}
+
     $DRY_RUN_CMD mkdir -p "${configHome}/nono/profiles"
     $DRY_RUN_CMD mkdir -p "${homeDirectory}/.local/state/nono-agent-tools/wrangler" "${homeDirectory}/.local/state/nono-agent-tools/pub-cache"
     $DRY_RUN_CMD mkdir -p "${homeDirectory}/.dart-tool" "${homeDirectory}/.dartServer" "${configHome}/flutter"
