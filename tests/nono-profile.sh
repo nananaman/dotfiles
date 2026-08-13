@@ -371,6 +371,34 @@ test_common_profile_allows_development_endpoints() {
   done
 }
 
+test_common_profile_allows_only_the_terraform_provider_distribution_endpoints() {
+  # Arrange & Act: Terraform providerのservice discovery先、配布先、隣接hostを評価する。
+  # Assert: 公式配布のexact hostだけを共通profileから利用できる。
+  assert_host_decision "ALLOWED" registry.terraform.io
+  assert_host_decision "ALLOWED" releases.hashicorp.com
+  assert_host_decision "DENIED" attacker.registry.terraform.io
+  assert_host_decision "DENIED" unrelated.terraform.io
+  assert_host_decision "DENIED" attacker.releases.hashicorp.com
+  assert_host_decision "DENIED" unrelated.hashicorp.com
+}
+
+test_agent_profiles_inherit_terraform_provider_distribution_endpoints() {
+  local agent
+  local host
+  local output
+
+  # Arrange: 共通network policyを継承し、固有domainも追加する全agent profileを使う。
+  for agent in codex claude pi; do
+    for host in registry.terraform.io releases.hashicorp.com; do
+      # Act: 合成後のprofileでTerraform provider配布hostを評価する。
+      output="$(nono why --profile "$profile_dir/chouge-$agent.jsonc" --host "$host" --port 443)"
+
+      # Assert: agent固有のnetwork設定が共通の配布許可を上書きしない。
+      [[ "${output%%$'\n'*}" == "ALLOWED" ]] || return 1
+    done
+  done
+}
+
 test_common_profile_allows_github_actions_log_endpoint() {
   # Arrange & Act: GitHub CLIがActionsのjob log取得でredirectされるHTTPS hostを評価する。
   # Assert: 認証済みのgh run viewがlog archiveを取得できる。
@@ -695,6 +723,8 @@ test_common_profile_allows_only_the_chrome_bridge_socket_subtree
 test_common_profile_allows_only_the_nix_daemon_socket
 test_common_profile_uses_enterprise_network
 test_common_profile_allows_development_endpoints
+test_common_profile_allows_only_the_terraform_provider_distribution_endpoints
+test_agent_profiles_inherit_terraform_provider_distribution_endpoints
 test_common_profile_allows_github_actions_log_endpoint
 test_common_profile_does_not_allow_all_github_actions_hosts
 test_common_profile_allows_github_actions_blob_log_endpoint

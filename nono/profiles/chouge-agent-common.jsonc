@@ -81,6 +81,10 @@
       "*.anthropic.com",
       "proxy.golang.org",
       "sum.golang.org",
+      // Terraform providerのservice discoveryとregistry protocol API。
+      "registry.terraform.io",
+      // HashiCorp providerのarchive、checksum、signature配布先。
+      "releases.hashicorp.com",
       // Dart/Flutter dependency resolution。
       "pub.dev",
       // OpenAIの開発者向け文書とGitHub Releasesの成果物取得で利用する。
