@@ -35,7 +35,8 @@
     // terraform providerなどgo-pluginベースのツールは起動ごとにTMPDIR配下へ
     // ランダムな名前のunix domain socketを作りRPC通信する(例: /var/folders/.../T/pluginNNNNNN)。
     // socket名が実行ごとに変わり個別に許可できないため、TMPDIR配下への接続を広めに許可する。
-    "(allow network-outbound (subpath \"/var/folders/8j/pnlb6lnn6wg7dm420zyv5wj80000gp/T\"))",
+    // /varは/private/varへのsymlinkで、Seatbeltは解決後の物理パスで照合するため/private付きで書く。
+    "(allow network-outbound (subpath \"/private/var/folders/8j/pnlb6lnn6wg7dm420zyv5wj80000gp/T\"))",
     // host-artifactは親sandboxから固定serviceとTailscale daemonだけを利用する。
     "(allow network-outbound (remote tcp \"localhost:9417\"))",
     "(allow mach-lookup (global-name \"io.tailscale.ipn.macsys-spks\"))",
