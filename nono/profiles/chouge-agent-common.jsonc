@@ -32,11 +32,10 @@
     "(allow network-outbound (path \"@HOME@/ghq/github.com/nananaman/dotfiles/herdr/herdr.sock\"))",
     // Chrome bridgeは起動ごとに生成されるnative host socketで通信する。
     "(allow network-outbound (subpath \"/private/tmp/codex-browser-use\"))",
-    // terraform providerなどgo-pluginベースのツールは起動ごとにTMPDIR配下へ
-    // ランダムな名前のunix domain socketを作りRPC通信する(例: /var/folders/.../T/pluginNNNNNN)。
-    // socket名が実行ごとに変わり個別に許可できないため、TMPDIR配下への接続を広めに許可する。
-    // /varは/private/varへのsymlinkで、Seatbeltは解決後の物理パスで照合するため/private付きで書く。
-    "(allow network-outbound (subpath \"/private/var/folders/8j/pnlb6lnn6wg7dm420zyv5wj80000gp/T\"))",
+    // terraform providerなどgo-pluginベースのツールが作るランダム名のUnix socketは、
+    // agent専用TMPDIRの内側だけでbindと接続を許可する。
+    "(allow network-bind (subpath \"@HOME@/.local/state/nono-agent-tools/tmp\"))",
+    "(allow network-outbound (subpath \"@HOME@/.local/state/nono-agent-tools/tmp\"))",
     // host-artifactは親sandboxから固定serviceとTailscale daemonだけを利用する。
     "(allow network-outbound (remote tcp \"localhost:9417\"))",
     "(allow mach-lookup (global-name \"io.tailscale.ipn.macsys-spks\"))",
@@ -163,7 +162,14 @@
   },
   "platform_overrides": {
     "macos": {
+      "environment": {
+        "set_vars": {
+          // go-pluginなどが作るUnix socketをuser/session固有のmacOS TMPDIRから分離する。
+          "TMPDIR": "$HOME/.local/state/nono-agent-tools/tmp",
+        },
+      },
       "filesystem": {
+        "allow": ["$HOME/.local/state/nono-agent-tools/tmp"],
         "read": ["$HOME/.vite-plus"],
         "write_file": [
           "$HOME/.vite-plus/cache/resolve_cache.json",

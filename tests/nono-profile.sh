@@ -351,6 +351,26 @@ test_common_profile_allows_only_the_nix_daemon_socket() {
   [[ "${output%%$'\n'*}" == "DENIED" ]] || return 1
 }
 
+test_common_profile_uses_a_dedicated_agent_tmpdir_for_unix_sockets() {
+  # Arrange: go-pluginはTMPDIR直下にランダム名のUnix socketを作る。
+  # Act & Assert: agent専用TMPDIRだけを使い、macOSのuser/session固有pathへ依存しない。
+  assert_profile_value \
+    '.platform_overrides.macos.environment.set_vars.TMPDIR' \
+    '$HOME/.local/state/nono-agent-tools/tmp'
+  assert_profile_value \
+    '.platform_overrides.macos.filesystem.allow | index("$HOME/.local/state/nono-agent-tools/tmp") != null' \
+    'true'
+  assert_profile_value \
+    '.environment.set_vars | has("TMPDIR")' \
+    'false'
+  assert_profile_value \
+    '[.unsafe_macos_seatbelt_rules[] | select(contains("nono-agent-tools/tmp"))] | tojson' \
+    '["(allow network-bind (subpath \"@HOME@/.local/state/nono-agent-tools/tmp\"))","(allow network-outbound (subpath \"@HOME@/.local/state/nono-agent-tools/tmp\"))"]'
+  assert_profile_value \
+    '[.unsafe_macos_seatbelt_rules[] | select(contains("/private/var/folders"))] | length' \
+    '0'
+}
+
 test_common_profile_uses_enterprise_network() {
   assert_profile_value \
     '.network.network_profile' \
@@ -721,6 +741,7 @@ test_common_profile_allows_claude_lock_state_without_broad_state_access
 test_common_profile_keeps_chrome_data_outside_direct_agent_access
 test_common_profile_allows_only_the_chrome_bridge_socket_subtree
 test_common_profile_allows_only_the_nix_daemon_socket
+test_common_profile_uses_a_dedicated_agent_tmpdir_for_unix_sockets
 test_common_profile_uses_enterprise_network
 test_common_profile_allows_development_endpoints
 test_common_profile_allows_only_the_terraform_provider_distribution_endpoints
