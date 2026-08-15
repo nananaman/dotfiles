@@ -20,6 +20,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    herdr-auto-title = {
+      url = "github:sh1ma/herdr-auto-title/7e5aeebadac9f04f4b343d206af8f406249c124d";
+      flake = false;
+    };
+
     hunk = {
       url = "github:modem-dev/hunk";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -184,6 +189,7 @@
                               dotfilesDir
                               ;
                             herdrPackage = herdr.packages.${pkgs.system}.default;
+                            herdrAutoTitleInput = inputs.herdr-auto-title;
                             hunkInput = hunk;
                             codexCliPackage = codex-cli-nix.packages.${pkgs.system}.codex;
                           })
@@ -222,6 +228,7 @@
                         dotfilesDir
                         ;
                       herdrPackage = herdr.packages.${pkgs.system}.default;
+                      herdrAutoTitleInput = inputs.herdr-auto-title;
                       hunkInput = hunk;
                       codexCliPackage = codex-cli-nix.packages.${pkgs.system}.codex;
                     })

@@ -120,6 +120,23 @@
         "type": "github"
       }
     },
+    "herdr-auto-title": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1786590199,
+        "narHash": "sha256-XeH09xrbgPfR2RiWGbVtu1G55gkE/k+L6PFwvQIZTsg=",
+        "owner": "sh1ma",
+        "repo": "herdr-auto-title",
+        "rev": "7e5aeebadac9f04f4b343d206af8f406249c124d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "sh1ma",
+        "repo": "herdr-auto-title",
+        "rev": "7e5aeebadac9f04f4b343d206af8f406249c124d",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -263,6 +280,7 @@
         "codex-cli-nix": "codex-cli-nix",
         "flake-parts": "flake-parts",
         "herdr": "herdr",
+        "herdr-auto-title": "herdr-auto-title",
         "home-manager": "home-manager",
         "hunk": "hunk",
         "nix-darwin": "nix-darwin",
