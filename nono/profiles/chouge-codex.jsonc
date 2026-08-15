@@ -10,6 +10,14 @@
     // Local development services, including container-published MySQL, use loopback.
     "allow_domain": [
       "chatgpt.com",
+      {
+        "domain": "sentry.io",
+        "endpoints": [{ "method": "GET", "path": "/api/0/**" }]
+      },
+      {
+        "domain": "api.cloudflare.com",
+        "endpoints": [{ "method": "GET", "path": "/client/v4/**" }]
+      },
       "*.katohome.jp",
       "*.nananaman.com",
       "localhost",
@@ -17,6 +25,11 @@
     ],
 
     // On macOS, port 0 is nono's canonical localhost:* outbound grant.
-    "open_port": [0]
+    "open_port": [0],
+
+    // Python requests does not use the system trust store for nono's session CA by default.
+    "tls_intercept": {
+      "ca_env_vars": ["REQUESTS_CA_BUNDLE"]
+    }
   }
 }

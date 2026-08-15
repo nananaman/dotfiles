@@ -181,6 +181,26 @@ assert_agent_network_boundary() {
 
 }
 
+assert_agent_host_decision() {
+  local agent="$1"
+  local expected="$2"
+  local host="$3"
+  local port="$4"
+  local source_profile="$profile_dir/chouge-$agent.jsonc"
+  local output
+
+  # Arrange: 外部接続せず、agent固有profileのhost/port境界を評価する。
+  # Act: nonoに観測先endpointの判定を問い合わせる。
+  output="$(nono why --profile "$source_profile" --host "$host" --port "$port")"
+
+  # Assert: read-only observabilityに必要なexact endpointだけが許可される。
+  if [[ "${output%%$'\n'*}" != "$expected" ]]; then
+    printf 'expected %s for %s:%s in %s, got:\n%s\n' \
+      "$expected" "$host" "$port" "$agent" "$output" >&2
+    return 1
+  fi
+}
+
 assert_agent_path_decision() {
   local agent="$1"
   local expected="$2"
@@ -681,7 +701,7 @@ test_codex_allows_unrestricted_localhost_outbound_on_macos() {
   assert_agent_profile_value \
     codex \
     '.network.allow_domain | tojson' \
-    '["chatgpt.com","*.katohome.jp","*.nananaman.com","localhost","127.0.0.1"]'
+    '["chatgpt.com",{"domain":"sentry.io","endpoints":[{"method":"GET","path":"/api/0/**"}]},{"domain":"api.cloudflare.com","endpoints":[{"method":"GET","path":"/client/v4/**"}]},"*.katohome.jp","*.nananaman.com","localhost","127.0.0.1"]'
 }
 
 test_codex_localhost_access_does_not_grant_the_container_vm_address() {
@@ -690,6 +710,31 @@ test_codex_localhost_access_does_not_grant_the_container_vm_address() {
     codex \
     '.network.allow_domain | index("192.168.65.2") == null' \
     'true'
+}
+
+test_codex_allows_read_only_observability_endpoints() {
+  # Arrange, Act & Assert: Observability uses exact hosts with GET-only API paths.
+  assert_agent_host_decision \
+    codex ALLOWED https://sentry.io/api/0/organizations/example 443
+  assert_agent_host_decision \
+    codex ALLOWED https://api.cloudflare.com/client/v4/zones 443
+}
+
+test_codex_injects_the_session_ca_for_python_https_clients() {
+  # Arrange, Act & Assert: Python requests verifies intercepted TLS with nono's generated CA.
+  assert_agent_profile_value \
+    codex \
+    '.network.tls_intercept.ca_env_vars | tojson' \
+    '["REQUESTS_CA_BUNDLE"]'
+}
+
+test_codex_observability_does_not_allow_adjacent_hosts() {
+  # Arrange, Act & Assert: Exact host grants do not expand to provider-wide suffixes.
+  assert_agent_host_decision codex DENIED attacker.sentry.io 443
+  assert_agent_host_decision codex DENIED https://sentry.io/not-api 443
+  assert_agent_host_decision codex DENIED dash.cloudflare.com 443
+  assert_agent_host_decision codex DENIED sparrow.cloudflare.com 443
+  assert_agent_host_decision codex DENIED https://api.cloudflare.com/not-api 443
 }
 
 test_claude_allows_anthropic_api_endpoint() {
@@ -769,6 +814,9 @@ test_bun_uses_the_outer_sandbox_with_exact_ancestor_rules
 test_codex_allows_chatgpt_subscription_endpoint
 test_codex_allows_unrestricted_localhost_outbound_on_macos
 test_codex_localhost_access_does_not_grant_the_container_vm_address
+test_codex_allows_read_only_observability_endpoints
+test_codex_injects_the_session_ca_for_python_https_clients
+test_codex_observability_does_not_allow_adjacent_hosts
 test_claude_allows_anthropic_api_endpoint
 test_claude_allows_login_endpoints_and_launch_services
 test_claude_wrapper_runs_self_update_outside_the_sandbox
