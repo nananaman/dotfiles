@@ -7,7 +7,13 @@
     "description": "Local Claude Code profile"
   },
   "network": {
-    "allow_domain": ["claude.com"],
+    "allow_domain": [
+      "claude.com",
+      // Langfuse Cloudのトレース・スコア参照と評価者定義の同期。regionごとにhostが分かれる。
+      "*.cloud.langfuse.com",
+      // EU regionだけsubdomainが無くwildcardで拾えないため個別に許可する。
+      "cloud.langfuse.com",
+    ],
     // Claude OAuth login starts a localhost callback server on an ephemeral port.
     "open_port": [0]
   }
