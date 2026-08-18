@@ -13,6 +13,9 @@
       "*.cloud.langfuse.com",
       // EU regionだけsubdomainが無くwildcardで拾えないため個別に許可する。
       "cloud.langfuse.com",
+      // Claude in Chrome拡張とのMCP通信は、wss://bridge.claudeusercontent.com/chrome/への
+      // relay接続だけで成立する。staging bridgeや同apexの他serviceへは広げない。
+      "bridge.claudeusercontent.com",
     ],
     // Claude OAuth login starts a localhost callback server on an ephemeral port.
     "open_port": [0]
