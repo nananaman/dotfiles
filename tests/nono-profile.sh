@@ -745,10 +745,19 @@ test_claude_allows_login_endpoints_and_launch_services() {
   assert_agent_profile_value \
     claude \
     '.network.allow_domain | tojson' \
-    '["claude.com"]'
+    '["claude.com","*.cloud.langfuse.com","cloud.langfuse.com","bridge.claudeusercontent.com"]'
   assert_agent_profile_value claude '.network.open_port | tojson' '[0]'
   assert_agent_profile_value claude '.allow_launch_services' 'null'
   rg -q -- '--allow-launch-services' nix/modules/home/packages.nix
+}
+
+test_claude_allows_only_the_chrome_extension_bridge_host() {
+  # Arrange: claude-in-chromeのMCP toolは、wss://bridge.claudeusercontent.com/chrome/への
+  # relay接続だけでChrome拡張と通信する。
+  # Act & Assert: exact hostだけを許可し、staging bridgeや同apexの他serviceへは広げない。
+  assert_agent_host_decision claude ALLOWED bridge.claudeusercontent.com 443
+  assert_agent_host_decision claude DENIED bridge-staging.claudeusercontent.com 443
+  assert_agent_host_decision claude DENIED claudeusercontent.com 443
 }
 
 test_claude_wrapper_runs_self_update_outside_the_sandbox() {
@@ -819,6 +828,7 @@ test_codex_injects_the_session_ca_for_python_https_clients
 test_codex_observability_does_not_allow_adjacent_hosts
 test_claude_allows_anthropic_api_endpoint
 test_claude_allows_login_endpoints_and_launch_services
+test_claude_allows_only_the_chrome_extension_bridge_host
 test_claude_wrapper_runs_self_update_outside_the_sandbox
 test_claude_wrapper_self_update_bypass_requires_exactly_one_argument
 test_pi_allows_configured_openai_codex_endpoint
