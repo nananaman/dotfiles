@@ -9,10 +9,6 @@
   "network": {
     "allow_domain": [
       "claude.com",
-      // Langfuse Cloudのトレース・スコア参照と評価者定義の同期。regionごとにhostが分かれる。
-      "*.cloud.langfuse.com",
-      // EU regionだけsubdomainが無くwildcardで拾えないため個別に許可する。
-      "cloud.langfuse.com",
       // Claude in Chrome拡張とのMCP通信は、wss://bridge.claudeusercontent.com/chrome/への
       // relay接続だけで成立する。staging bridgeや同apexの他serviceへは広げない。
       "bridge.claudeusercontent.com",

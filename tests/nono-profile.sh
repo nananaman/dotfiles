@@ -411,6 +411,21 @@ test_common_profile_allows_development_endpoints() {
   done
 }
 
+test_agent_profiles_inherit_langfuse_cloud_endpoints() {
+  local agent
+
+  # Arrange: Langfuse integration is available to every local coding agent through the common profile.
+  for agent in codex claude pi; do
+    # Act & Assert: Regional subdomains and the EU apex are allowed after profile composition.
+    assert_agent_host_decision "$agent" "ALLOWED" "us.cloud.langfuse.com" 443
+    assert_agent_host_decision "$agent" "ALLOWED" "cloud.langfuse.com" 443
+
+    # Act & Assert: The grant does not extend to adjacent Langfuse domains.
+    assert_agent_host_decision "$agent" "DENIED" "langfuse.com" 443
+    assert_agent_host_decision "$agent" "DENIED" "attacker.langfuse.com" 443
+  done
+}
+
 test_common_profile_allows_only_the_terraform_provider_distribution_endpoints() {
   # Arrange & Act: Terraform providerのservice discovery先、配布先、隣接hostを評価する。
   # Assert: 公式配布のexact hostだけを共通profileから利用できる。
@@ -745,7 +760,7 @@ test_claude_allows_login_endpoints_and_launch_services() {
   assert_agent_profile_value \
     claude \
     '.network.allow_domain | tojson' \
-    '["claude.com","*.cloud.langfuse.com","cloud.langfuse.com","bridge.claudeusercontent.com"]'
+    '["claude.com","bridge.claudeusercontent.com"]'
   assert_agent_profile_value claude '.network.open_port | tojson' '[0]'
   assert_agent_profile_value claude '.allow_launch_services' 'null'
   rg -q -- '--allow-launch-services' nix/modules/home/packages.nix
@@ -798,6 +813,7 @@ test_common_profile_allows_only_the_nix_daemon_socket
 test_common_profile_uses_a_dedicated_agent_tmpdir_for_unix_sockets
 test_common_profile_uses_enterprise_network
 test_common_profile_allows_development_endpoints
+test_agent_profiles_inherit_langfuse_cloud_endpoints
 test_common_profile_allows_only_the_terraform_provider_distribution_endpoints
 test_agent_profiles_inherit_terraform_provider_distribution_endpoints
 test_common_profile_allows_github_actions_log_endpoint

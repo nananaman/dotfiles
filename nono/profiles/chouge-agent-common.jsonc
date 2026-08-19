@@ -97,6 +97,10 @@
       "accounts.google.com",
       "gcr.io",
       "*.pkg.dev",
+      // Langfuse Cloudのトレース・スコア参照と評価者定義の同期。regionごとにhostが分かれる。
+      "*.cloud.langfuse.com",
+      // EU regionだけsubdomainが無くwildcardで拾えないため個別に許可する。
+      "cloud.langfuse.com",
       // host-artifactが検証済みTailscale Serve URLを返すために利用する。
       "*.ts.net",
       // hatena
