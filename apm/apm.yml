@@ -1,6 +1,8 @@
 name: chouge-agent-context
 version: 0.1.0
-target: claude,agent-skills
+targets:
+  - claude
+  - agent-skills
 
 dependencies:
   apm:
