@@ -18,6 +18,8 @@
       "WRANGLER_LOG_PATH": "$HOME/.local/state/nono-agent-tools/wrangler/logs",
       "WRANGLER_REGISTRY_PATH": "$HOME/.local/state/nono-agent-tools/wrangler/registry",
       "MINIFLARE_REGISTRY_PATH": "$HOME/.local/state/nono-agent-tools/wrangler/registry",
+      // az CLIはcommandごとにtelemetryをuploadするが、送信先は許可対象ではないため既定で無効にする。
+      "AZURE_CORE_COLLECT_TELEMETRY": "0",
     },
   },
   "unsafe_macos_seatbelt_rules": [
@@ -105,6 +107,13 @@
       "*.ts.net",
       // hatena
       "*.hatena.sh",
+      // Azure CLIの認証とtoken更新、ARM control plane、Log Analytics/Application Insightsのquery data plane。
+      // ARMはresource削除を含む書き込みも同じhostで行うため、リソース操作を委譲する判断としてhost単位で許可する。
+      // query data planeを使うlog-analytics/application-insights extensionの導入はsandbox外で行う。
+      "login.microsoftonline.com",
+      "management.azure.com",
+      "api.loganalytics.io",
+      "api.applicationinsights.io",
     ],
   },
   "filesystem": {
@@ -173,7 +182,12 @@
         },
       },
       "filesystem": {
-        "allow": ["$HOME/.local/state/nono-agent-tools/tmp"],
+        // az CLIはaccount showのような読み取り系コマンドでもtoken cacheとlogを更新するため、
+        // read-onlyでは機能しない。az loginによる新規発行はsandbox外で行う運用は維持する。
+        // bypass_protectionは同じsubtree内のfilesystem.denyを無効化するため、config directory配下は
+        // token cacheを含めて読み書きできる。azure-cliを導入するmacOSだけに解除範囲を閉じる。
+        "allow": ["$HOME/.local/state/nono-agent-tools/tmp", "$HOME/.azure"],
+        "bypass_protection": ["$HOME/.azure"],
         "read": ["$HOME/.vite-plus"],
         "write_file": [
           "$HOME/.vite-plus/cache/resolve_cache.json",

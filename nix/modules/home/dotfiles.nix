@@ -72,6 +72,7 @@ in
     $DRY_RUN_CMD mkdir -p "${homeDirectory}/.local/state/nono-agent-tools/wrangler" "${homeDirectory}/.local/state/nono-agent-tools/pub-cache"
     ${lib.optionalString pkgs.stdenv.isDarwin ''
       $DRY_RUN_CMD mkdir -p "${homeDirectory}/.local/state/nono-agent-tools/tmp"
+      $DRY_RUN_CMD mkdir -p "${homeDirectory}/.azure"
     ''}
     $DRY_RUN_CMD mkdir -p "${homeDirectory}/.dart-tool" "${homeDirectory}/.dartServer" "${configHome}/flutter"
     for legacy_profile in chouge-agent-common chouge-codex chouge-claude chouge-pi; do
