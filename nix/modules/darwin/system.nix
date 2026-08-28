@@ -70,6 +70,7 @@
     ];
 
     brews = [
+      "azure-cli"
       "container"
       "docker"
       "docker-compose"

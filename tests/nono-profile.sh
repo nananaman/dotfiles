@@ -142,6 +142,21 @@ assert_path_read_is_denied() {
   fi
 }
 
+assert_path_is_exempt_from_credential_deny() {
+  local path="$1"
+  local output
+
+  # Arrange: grant rootはactivationが作るため、grantの有無ではなくgroup由来のdenyだけを見る。
+  # Act: nonoにcredential pathの判定理由を問い合わせる。
+  output="$(nono why --profile "$profile" --path "$path" --op readwrite)"
+
+  # Assert: bypass_protectionがdeny_credentialsを解除している。
+  if [[ "$output" == *"Reason: sensitive_path"* ]]; then
+    printf 'expected %s to be exempt from deny_credentials, got:\n%s\n' "$path" "$output" >&2
+    return 1
+  fi
+}
+
 assert_path_decision() {
   local expected="$1"
   local target_path="$2"
@@ -490,8 +505,84 @@ test_common_profile_allows_tailscale_serve_origins() {
   assert_host_decision "ALLOWED" "machine.tailnet.ts.net"
 }
 
-test_common_profile_denies_unconfigured_clouds() {
-  assert_host_decision "DENIED" management.azure.com
+test_common_profile_does_not_add_aws_control_plane_endpoints() {
+  # Arrange & Act: 共通profileが宣言していないAWSのcontrol plane hostを評価する。
+  # Assert: enterprise profileがLLM API向けに許可するsuffix以外へは広がっていない。
+  assert_host_decision "DENIED" sts.amazonaws.com
+  assert_host_decision "DENIED" ec2.amazonaws.com
+}
+
+test_common_profile_allows_only_the_azure_cli_control_and_query_endpoints() {
+  # Arrange & Act: Azure CLIの認証、ARM、log query先と、その隣接hostを評価する。
+  # Assert: azure-cliの正常系に必要なexact hostだけを共通profileから利用できる。
+  assert_host_decision "ALLOWED" login.microsoftonline.com
+  assert_host_decision "ALLOWED" management.azure.com
+  assert_host_decision "ALLOWED" api.loganalytics.io
+  assert_host_decision "ALLOWED" api.applicationinsights.io
+  assert_host_decision "DENIED" attacker.login.microsoftonline.com
+  assert_host_decision "DENIED" attacker.management.azure.com
+  assert_host_decision "DENIED" attacker.api.loganalytics.io
+  assert_host_decision "DENIED" unrelated.azure.com
+  # Assert: directoryのAPIはリソース操作とlog調査に不要なため許可しない。
+  assert_host_decision "DENIED" graph.microsoft.com
+}
+
+test_agent_profiles_inherit_azure_cli_endpoints() {
+  local agent
+
+  # Arrange: azure-cliは共通profile経由で全agentから使う。
+  for agent in codex claude pi; do
+    # Act & Assert: profile合成後もexact hostだけが許可される。
+    assert_agent_host_decision "$agent" "ALLOWED" "login.microsoftonline.com" 443
+    assert_agent_host_decision "$agent" "ALLOWED" "management.azure.com" 443
+    assert_agent_host_decision "$agent" "ALLOWED" "api.loganalytics.io" 443
+
+    # Act & Assert: 隣接domainへは grant が広がらない。
+    assert_agent_host_decision "$agent" "DENIED" "attacker.management.azure.com" 443
+    assert_agent_host_decision "$agent" "DENIED" "unrelated.azure.com" 443
+  done
+}
+
+test_common_profile_allows_azure_cli_state_without_broadening_credential_access() {
+  local agent
+
+  # Arrange: azure-cliはread-onlyのsubcommandでもtoken cacheをconfig directoryへ書くため、
+  # deny_credentialsの解除が要る。解除範囲はazure-cliを導入するmacOSだけに閉じる。
+  # Act & Assert: 解除もgrantも、cross-platformセクションには置かない。
+  assert_profile_value '.filesystem.allow | index("$HOME/.azure") == null' 'true'
+  assert_profile_value '.filesystem.bypass_protection | index("$HOME/.azure") == null' 'true'
+  assert_profile_array_contains '.platform_overrides.macos.filesystem.allow' '$HOME/.azure'
+  assert_profile_array_contains '.platform_overrides.macos.filesystem.bypass_protection' '$HOME/.azure'
+  assert_profile_value \
+    '(.platform_overrides.linux.filesystem.allow // []) | index("$HOME/.azure") == null' \
+    'true'
+  assert_profile_value \
+    '(.platform_overrides.linux.filesystem.bypass_protection // []) | index("$HOME/.azure") == null' \
+    'true'
+
+  # Assert: az CLIのtelemetryは許可対象外のendpointへ送るため、既定で無効にする。
+  assert_profile_value '.environment.set_vars.AZURE_CORE_COLLECT_TELEMETRY' '0'
+
+  # Assert: 他のcloudのcredentialはprotectionを解除しない。
+  for agent in codex claude pi; do
+    assert_agent_path_decision "$agent" "DENIED" "$HOME/.aws/credentials" "read"
+  done
+
+  # Assert: macOSでは合成後のprofileでcredential denyが実際に外れている。
+  if [[ "$OSTYPE" == darwin* ]]; then
+    assert_path_is_exempt_from_credential_deny "$HOME/.azure/msal_token_cache.json"
+  fi
+}
+
+test_azure_cli_installation_matches_its_sandbox_grants() {
+  # Arrange: profileはazure-cliがhostに導入済みで、grant rootが作成済みであることを前提にする。
+  # Act & Assert: grant rootの作成は、profileが解除を行うmacOSと同じ条件の内側に置く。
+  sed -n "/isDarwin ''/,/^    ''}/p" nix/modules/home/dotfiles.nix \
+    | rg -q -F '$DRY_RUN_CMD mkdir -p "${homeDirectory}/.azure"'
+
+  # Assert: onActivation.cleanupでuninstallされないよう、brewsの内側に宣言する。
+  rg -U -q -- 'brews = \[\n(\s+("[^"]+"|#.*)\n)*\s+"azure-cli"' \
+    nix/modules/darwin/system.nix
 }
 
 test_common_profile_allows_all_ghq_repositories() {
@@ -822,7 +913,11 @@ test_common_profile_allows_github_actions_blob_log_endpoint
 test_common_profile_does_not_allow_azure_blob_apex
 test_common_profile_does_not_allow_adjacent_azure_storage_suffix
 test_common_profile_allows_tailscale_serve_origins
-test_common_profile_denies_unconfigured_clouds
+test_common_profile_does_not_add_aws_control_plane_endpoints
+test_common_profile_allows_only_the_azure_cli_control_and_query_endpoints
+test_agent_profiles_inherit_azure_cli_endpoints
+test_common_profile_allows_azure_cli_state_without_broadening_credential_access
+test_azure_cli_installation_matches_its_sandbox_grants
 test_common_profile_allows_all_ghq_repositories
 test_common_profile_allows_new_ghq_clone_destinations
 test_common_profile_configures_sandbox_compatible_javascript_tools
