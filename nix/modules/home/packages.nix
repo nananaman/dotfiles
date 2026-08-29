@@ -136,12 +136,12 @@ let
     export CODEX_EXECUTABLE_PATH="$HOME/${agent-wrapper-dir}/codex"
     export DISABLE_AUTOUPDATER=1
     if [ -n "''${NONO_CAP_FILE:-}" ]; then
-      exec ${codexCliPackage}/bin/codex-raw --sandbox danger-full-access --ask-for-approval never "$@"
+      exec ${codexCliPackage}/bin/codex --sandbox danger-full-access --ask-for-approval never "$@"
     fi
     HERDR_AGENT=codex exec ${nono-cli}/bin/nono run --silent \
       --profile "$HOME/.config/nono/profiles/chouge-codex.jsonc" --allow-cwd -- \
       ${codex-nono-guard} \
-      ${codexCliPackage}/bin/codex-raw --sandbox danger-full-access --ask-for-approval never "$@"
+      ${codexCliPackage}/bin/codex --sandbox danger-full-access --ask-for-approval never "$@"
   '';
 
   claude-sandboxed = pkgs.writeShellScriptBin "claude" ''
