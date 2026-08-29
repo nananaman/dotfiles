@@ -741,6 +741,16 @@ test_codex_wrapper_requires_the_parent_nono_capability() {
   rg -q 'codex: nono capability was not injected' "$packages_module"
 }
 
+test_codex_wrapper_uses_the_packaged_entrypoint() {
+  local packages_module='nix/modules/home/packages.nix'
+
+  # Arrange: Codexのpackageは実バイナリをlibexec/codexとして提供する。
+  # Act: sandbox wrapperが起動するpackage内commandをsourceから確認する。
+  # Assert: 廃止されたcodex-rawではなく、packageの実バイナリへ委譲する。
+  rg -q -F '${codexCliPackage}/libexec/codex --sandbox' "$packages_module"
+  ! rg -q -F '${codexCliPackage}/bin/codex-raw' "$packages_module"
+}
+
 test_local_agent_tools_use_the_parent_sandbox() {
   local command
 
@@ -927,6 +937,7 @@ test_container_wrapper_prefers_the_tool_sandbox_shim
 test_container_policy_allows_mysql_integration_test_lifecycle
 test_container_policy_keeps_destructive_cleanup_denied
 test_codex_wrapper_requires_the_parent_nono_capability
+test_codex_wrapper_uses_the_packaged_entrypoint
 test_local_agent_tools_use_the_parent_sandbox
 test_host_artifact_publish_root_is_writable_without_broadening_its_parent
 test_host_artifact_uses_the_parent_sandbox_without_tool_policies
