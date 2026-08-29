@@ -2,3 +2,5 @@
 
 # Pi / spiw worktrees
 .pi/worktrees/
+
+**/.claude/settings.local.json

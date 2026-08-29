@@ -136,12 +136,12 @@ let
     export CODEX_EXECUTABLE_PATH="$HOME/${agent-wrapper-dir}/codex"
     export DISABLE_AUTOUPDATER=1
     if [ -n "''${NONO_CAP_FILE:-}" ]; then
-      exec ${codexCliPackage}/bin/codex --sandbox danger-full-access --ask-for-approval never "$@"
+      exec ${codexCliPackage}/libexec/codex --sandbox danger-full-access --ask-for-approval never "$@"
     fi
     HERDR_AGENT=codex exec ${nono-cli}/bin/nono run --silent \
       --profile "$HOME/.config/nono/profiles/chouge-codex.jsonc" --allow-cwd -- \
       ${codex-nono-guard} \
-      ${codexCliPackage}/bin/codex --sandbox danger-full-access --ask-for-approval never "$@"
+      ${codexCliPackage}/libexec/codex --sandbox danger-full-access --ask-for-approval never "$@"
   '';
 
   claude-sandboxed = pkgs.writeShellScriptBin "claude" ''
@@ -319,13 +319,13 @@ let
 
   apm-cli = python.buildPythonApplication rec {
     pname = "apm-cli";
-    version = "0.14.2";
+    version = "0.28.0";
     pyproject = true;
 
     src = python.fetchPypi {
       pname = "apm_cli";
       inherit version;
-      hash = "sha256-VuuhiLhsfOe8eqkzJ4YNLRFvZUAygYZ/HmU2Vhhif+E=";
+      hash = "sha256-82JToQeMU3B82MIagQb3x/LRV5x7cYWE22G9o1P3RSE=";
     };
 
     build-system = [ python.setuptools ];
@@ -344,6 +344,8 @@ let
       rich-click
       ruamel-yaml
       toml
+      tomlkit
+      truststore
       watchdog
       websockets
     ];
