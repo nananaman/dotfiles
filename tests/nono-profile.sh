@@ -655,6 +655,9 @@ test_common_profile_allows_flutter_and_dart_runtime_state_without_home_wide_acce
   assert_profile_array_contains \
     '.filesystem.allow_file' \
     '$HOME/.local/share/mise/installs/flutter/3.35.4-stable/bin/cache/flutter_version_check.stamp'
+  assert_profile_array_contains \
+    '.filesystem.read' \
+    '$HOME/.pub-cache/hosted/pub.dev'
 
   for agent in codex claude pi; do
     assert_agent_path_decision \
@@ -682,6 +685,7 @@ test_common_profile_allows_flutter_and_dart_runtime_state_without_home_wide_acce
   assert_profile_value '.filesystem.allow | index("$HOME/.config") == null' 'true'
   assert_profile_value '.filesystem.allow | index("$HOME/.local/share/mise") == null' 'true'
   assert_profile_value '.filesystem.read | index("$HOME/.pub-cache") == null' 'true'
+  assert_profile_value '.filesystem.allow | index("$HOME/.pub-cache/hosted/pub.dev") == null' 'true'
   assert_profile_value '.filesystem.allow_file | any(contains("/.git/FETCH_HEAD"))' 'false'
 
   # Assert: Home Manager creates roots that nono must canonicalize before either tool can initialize them.

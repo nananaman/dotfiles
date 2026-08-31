@@ -171,6 +171,8 @@
       // terraformのcredentials.tfrc.json等は読み取りのみ許可し、書き込みはsandbox外で行う。
       "$HOME/.terraform.d",
       "$HOME/.local/share/nono-agent-wrappers",
+      // --no-pubで既存package_configが参照するDart package sourceだけをread-onlyで許可する。
+      "$HOME/.pub-cache/hosted/pub.dev",
     ],
   },
   "platform_overrides": {
