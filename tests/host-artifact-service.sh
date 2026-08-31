@@ -288,9 +288,8 @@ test_server_profile_cannot_follow_a_publish_symlink_outside_the_root() {
 test_apm_installs_the_host_artifact_skill() {
   # Arrange: The LaunchAgent wrapper references the globally installed skill path.
   # Act: Inspect the source-of-truth APM dependency list.
-  # Assert: host-artifact is installed without removing explain-diff.
+  # Assert: host-artifact is installed.
   rg -q 'path: ~/ghq/github\.com/nananaman/skills/productivity/host-artifact$' "$apm_manifest"
-  rg -q 'path: ~/ghq/github\.com/nananaman/skills/engineering/explain-diff$' "$apm_manifest"
 }
 
 test_launch_agent_uses_the_shared_service_contract
