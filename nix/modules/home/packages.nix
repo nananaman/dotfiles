@@ -113,6 +113,57 @@ let
       };
     };
 
+  agent-browser-package =
+    let
+      version = "0.35.2";
+      artifacts = {
+        aarch64-darwin = "agent-browser-darwin-arm64";
+        x86_64-linux = "agent-browser-linux-musl-x64";
+      };
+      artifact = artifacts.${pkgs.stdenv.hostPlatform.system};
+    in
+    pkgs.stdenvNoCC.mkDerivation {
+      pname = "agent-browser";
+      inherit version;
+
+      src = pkgs.fetchurl {
+        url = "https://registry.npmjs.org/agent-browser/-/agent-browser-${version}.tgz";
+        hash = "sha256-2FtnQn51E7GzD7+Na34Ksto3ssEmYhNOTgfxLm2SjvU=";
+      };
+
+      sourceRoot = "package";
+
+      installPhase = ''
+        runHook preInstall
+
+        install -Dm755 "bin/${artifact}" "$out/bin/agent-browser"
+        mkdir -p "$out/share/agent-browser"
+        cp -R skills skill-data "$out/share/agent-browser/"
+
+        runHook postInstall
+      '';
+
+      meta = {
+        description = "Browser automation CLI for AI agents";
+        homepage = "https://github.com/vercel-labs/agent-browser";
+        license = pkgs.lib.licenses.asl20;
+        mainProgram = "agent-browser";
+        platforms = builtins.attrNames artifacts;
+      };
+    };
+  agent-browser = pkgs.writeShellApplication {
+    name = "agent-browser";
+    runtimeInputs = pkgs.lib.optionals pkgs.stdenv.isLinux [ pkgs.chromium ];
+    text = ''
+      export AGENT_BROWSER_SKILLS_DIR=${agent-browser-package}/share/agent-browser/skill-data
+      ${pkgs.lib.optionalString pkgs.stdenv.isDarwin ''
+        export CFFIXED_USER_HOME="$HOME/.local/state/nono-agent-tools/agent-browser"
+        export AGENT_BROWSER_ARGS="''${AGENT_BROWSER_ARGS:+$AGENT_BROWSER_ARGS,}--no-sandbox"
+      ''}
+      exec ${agent-browser-package}/bin/agent-browser "$@"
+    '';
+  };
+
   canonicalize-herdr-socket = ''
     if [ -n "''${HERDR_SOCKET_PATH:-}" ]; then
       herdr_socket_dir="''${HERDR_SOCKET_PATH%/*}"
@@ -399,6 +450,7 @@ in
     rtk
     sandbox-runtime
     nono-cli
+    agent-browser
     agent-wrappers
     tirith
 

@@ -69,7 +69,7 @@ in
     ''}
 
     $DRY_RUN_CMD mkdir -p "${configHome}/nono/profiles"
-    $DRY_RUN_CMD mkdir -p "${homeDirectory}/.local/state/nono-agent-tools/wrangler" "${homeDirectory}/.local/state/nono-agent-tools/pub-cache"
+    $DRY_RUN_CMD mkdir -p "${homeDirectory}/.local/state/nono-agent-tools/wrangler" "${homeDirectory}/.local/state/nono-agent-tools/pub-cache" "${homeDirectory}/.local/state/nono-agent-tools/agent-browser/sockets"
     ${lib.optionalString pkgs.stdenv.isDarwin ''
       $DRY_RUN_CMD mkdir -p "${homeDirectory}/.local/state/nono-agent-tools/tmp"
       $DRY_RUN_CMD mkdir -p "${homeDirectory}/.azure"
