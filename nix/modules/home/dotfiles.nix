@@ -66,6 +66,11 @@ in
       # Homebrew の docker-buildx は cli-plugins へ自分で配置する必要がある
       $DRY_RUN_CMD mkdir -p "${homeDirectory}/.docker/cli-plugins"
       link_force "/opt/homebrew/opt/docker-buildx/bin/docker-buildx" "${homeDirectory}/.docker/cli-plugins/docker-buildx"
+
+      # colima のプロファイル本体 (~/.colima/<profile>/colima.yaml) は colima 自身が
+      # 起動のたびに書き換えるため、新規プロファイル作成時に読まれるテンプレートだけを管理する
+      $DRY_RUN_CMD mkdir -p "${homeDirectory}/.colima/_templates"
+      link_force "${dotfilesDir}/colima/default.yaml" "${homeDirectory}/.colima/_templates/default.yaml"
     ''}
 
     $DRY_RUN_CMD mkdir -p "${configHome}/nono/profiles"

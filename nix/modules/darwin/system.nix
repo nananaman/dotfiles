@@ -71,6 +71,8 @@
 
     brews = [
       "azure-cli"
+      # docker daemon を提供する Linux VM。設定は colima/default.yaml で管理する
+      "colima"
       "container"
       "docker"
       "docker-compose"

@@ -53,6 +53,7 @@ zsh/                       # Zsh configuration
 ghostty/                   # Ghostty terminal configuration
 herdr/                     # Herdr terminal multiplexer configuration
 aerospace/                 # AeroSpace window manager
+colima/                    # Colima VM config template for new profiles
 lazygit/                   # Lazygit configuration
 git/                       # Git config & ignore
 apm/                       # Global agent skills managed by APM
