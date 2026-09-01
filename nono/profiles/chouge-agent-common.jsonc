@@ -18,6 +18,8 @@
       "WRANGLER_LOG_PATH": "$HOME/.local/state/nono-agent-tools/wrangler/logs",
       "WRANGLER_REGISTRY_PATH": "$HOME/.local/state/nono-agent-tools/wrangler/registry",
       "MINIFLARE_REGISTRY_PATH": "$HOME/.local/state/nono-agent-tools/wrangler/registry",
+      // agent-browserのdaemon socketをcredentialを含み得るuser configから分離する。
+      "AGENT_BROWSER_SOCKET_DIR": "$HOME/.local/state/nono-agent-tools/agent-browser/sockets",
       // az CLIはcommandごとにtelemetryをuploadするが、送信先は許可対象ではないため既定で無効にする。
       "AZURE_CORE_COLLECT_TELEMETRY": "0",
     },
@@ -38,6 +40,33 @@
     // agent専用TMPDIRの内側だけでbindと接続を許可する。
     "(allow network-bind (subpath \"@HOME@/.local/state/nono-agent-tools/tmp\"))",
     "(allow network-outbound (subpath \"@HOME@/.local/state/nono-agent-tools/tmp\"))",
+    //////////////////////////
+    // agent-browser
+    //////////////////////////
+    // agent-browserのCLIとdaemonはsessionごとに生成されるUnix socketで通信する。
+    "(allow network-bind (regex \"^@HOME@/.local/state/nono-agent-tools/agent-browser/sockets/[^/]+$\"))",
+    "(allow network-outbound (regex \"^@HOME@/.local/state/nono-agent-tools/agent-browser/sockets/[^/]+$\"))",
+    // Chrome DevToolsはOS割当のlocalhost portをbindする。
+    // macOS Seatbeltはbind/inboundをportで絞れないため、outbound proxyは維持してlocalhost IPCに必要な2操作を許可する。
+    "(allow network-bind)",
+    "(allow network-inbound)",
+    // agent-browserがChromeのOS割当CDP portへ接続するlocalhost通信だけを許可する。
+    "(allow network-outbound (remote tcp \"localhost:*\"))",
+    // Chromeは起動時にmacOSの既定値を読み取る。writeは専用CFFIXED_USER_HOMEへ隔離したまま許可しない。
+    "(allow user-preference-read)",
+    // Chromeが自身のapp bundleをhelper processへread extensionとして渡す操作だけを許可する。
+    "(allow file-issue-extension (require-all (extension-class \"com.apple.app-sandbox.read\") (subpath \"/Applications/Google Chrome.app\")))",
+    // Chromeのheadless起動時に電源状態を参照するuser clientだけを許可する。
+    "(allow iokit-open (iokit-user-client-class \"RootDomainUserClient\"))",
+    // ChromeのProcessSingletonはmacOSの一時領域にランダム名のdirectoryとsocketを作る。
+    // Chrome自身のdirectory prefixだけにfilesystemとUnix socketの権限を限定する。
+    "(allow file-read* file-write* (regex \"^(/private)?/var/folders/[^/]+/[^/]+/T/com\\.google\\.Chrome\\.[^/]+(/.*)?$\"))",
+    "(allow network-bind (regex \"^(/private)?/var/folders/[^/]+/[^/]+/T/com\\.google\\.Chrome\\.[^/]+(/.*)?$\"))",
+    "(allow network-outbound (regex \"^(/private)?/var/folders/[^/]+/[^/]+/T/com\\.google\\.Chrome\\.[^/]+(/.*)?$\"))",
+    // ChromeのCrashpadが起動時に登録する一時handshake serviceだけを許可する。
+    "(allow mach-register (global-name-regex #\"^org\\.chromium\\.crashpad\\.child_port_handshake\\.\"))",
+    // Chromeがbrowser processとhelper processのMach port交換に登録するPID付きserviceだけを許可する。
+    "(allow mach-register (global-name-regex #\"^com\\.google\\.Chrome\\.MachPortRendezvousServer\\.[0-9]+$\"))",
     // host-artifactは親sandboxから固定serviceとTailscale daemonだけを利用する。
     "(allow network-outbound (remote tcp \"localhost:9417\"))",
     "(allow mach-lookup (global-name \"io.tailscale.ipn.macsys-spks\"))",
@@ -144,6 +173,7 @@
       "$HOME/.config/gcloud",
       "$HOME/.local/state/nono-agent-tools/wrangler",
       "$HOME/.local/state/nono-agent-tools/pub-cache",
+      "$HOME/.local/state/nono-agent-tools/agent-browser",
     ],
     "allow_file": [
       "$HOME/.claude.json",

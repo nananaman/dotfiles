@@ -402,8 +402,78 @@ test_common_profile_uses_a_dedicated_agent_tmpdir_for_unix_sockets() {
     '[.unsafe_macos_seatbelt_rules[] | select(contains("nono-agent-tools/tmp"))] | tojson' \
     '["(allow network-bind (subpath \"@HOME@/.local/state/nono-agent-tools/tmp\"))","(allow network-outbound (subpath \"@HOME@/.local/state/nono-agent-tools/tmp\"))"]'
   assert_profile_value \
-    '[.unsafe_macos_seatbelt_rules[] | select(contains("/private/var/folders"))] | length' \
+    '[.unsafe_macos_seatbelt_rules[] | select(contains("(subpath \"/private/var/folders"))] | length' \
     '0'
+}
+
+test_common_profile_isolates_agent_browser_runtime_state() {
+  # Arrange: agent-browserのdaemonはCLI間通信にruntime socketを作成する。
+  # Act & Assert: 専用stateだけを共有し、親state directoryや通常のbrowser dataへ権限を広げない。
+  assert_profile_value \
+    '.environment.set_vars.AGENT_BROWSER_SOCKET_DIR' \
+    '$HOME/.local/state/nono-agent-tools/agent-browser/sockets'
+  assert_profile_array_contains \
+    '.filesystem.allow' \
+    '$HOME/.local/state/nono-agent-tools/agent-browser'
+  assert_profile_value \
+    '.filesystem.allow | index("$HOME/.local/state/nono-agent-tools") == null' \
+    'true'
+  assert_profile_value \
+    '[.unsafe_macos_seatbelt_rules[] | select(contains("nono-agent-tools/agent-browser/sockets"))] | tojson' \
+    '["(allow network-bind (regex \"^@HOME@/.local/state/nono-agent-tools/agent-browser/sockets/[^/]+$\"))","(allow network-outbound (regex \"^@HOME@/.local/state/nono-agent-tools/agent-browser/sockets/[^/]+$\"))"]'
+  assert_profile_value \
+    '[.unsafe_macos_seatbelt_rules[] | select(. == "(allow network-bind)")] | length' \
+    '1'
+  assert_profile_value \
+    '[.unsafe_macos_seatbelt_rules[] | select(. == "(allow network-inbound)")] | length' \
+    '1'
+  assert_profile_value \
+    '[.unsafe_macos_seatbelt_rules[] | select(. == "(allow network-outbound (remote tcp \"localhost:*\"))")] | length' \
+    '1'
+  assert_profile_value \
+    '[.unsafe_macos_seatbelt_rules[] | select(. == "(allow user-preference-read)")] | length' \
+    '1'
+  assert_profile_value \
+    '[.unsafe_macos_seatbelt_rules[] | select(contains("file-issue-extension") and contains("com.apple.app-sandbox.read") and contains("/Applications/Google Chrome.app"))] | length' \
+    '1'
+  assert_profile_value \
+    '[.unsafe_macos_seatbelt_rules[] | select(. == "(allow iokit-open (iokit-user-client-class \"RootDomainUserClient\"))")] | length' \
+    '1'
+  assert_profile_value \
+    '[.unsafe_macos_seatbelt_rules[] | select(contains("com\\.google\\.Chrome\\.MachPortRendezvousServer"))] | length' \
+    '1'
+  assert_profile_value \
+    '[.unsafe_macos_seatbelt_rules[] | select(contains("com\\.google\\.Chrome") and contains("/var/folders/"))] | length' \
+    '3'
+  assert_profile_value \
+    '[.unsafe_macos_seatbelt_rules[] | select(contains("^(/private)?/var/folders/"))] | length' \
+    '3'
+  assert_profile_value \
+    '[.unsafe_macos_seatbelt_rules[] | select(contains("com\\.google\\.Chrome") and contains("(regex #"))] | length' \
+    '0'
+  assert_profile_value \
+    '[.unsafe_macos_seatbelt_rules[] | select(contains("org\\.chromium\\.crashpad\\.child_port_handshake"))] | tojson' \
+    '["(allow mach-register (global-name-regex #\"^org\\.chromium\\.crashpad\\.child_port_handshake\\.\"))"]'
+}
+
+test_agent_browser_wrapper_isolates_chrome_application_state() {
+  local packages_module='nix/modules/home/packages.nix'
+
+  # Arrange: macOS Chrome derives Crashpad storage from the Core Foundation home.
+  # Act & Assert: Only the agent-browser wrapper redirects it into the granted agent state.
+  rg -q -F 'CFFIXED_USER_HOME="$HOME/.local/state/nono-agent-tools/agent-browser"' \
+    "$packages_module"
+  rg -q -F 'export AGENT_BROWSER_ARGS=' \
+    "$packages_module"
+  rg -q -F -- '--no-sandbox' \
+    "$packages_module"
+  ! rg -q -F -- '--disable-gpu' "$packages_module"
+  rg -q -F 'exec ${agent-browser-package}/bin/agent-browser "$@"' \
+    "$packages_module"
+  rg -q -F 'cp -R skills skill-data "$out/share/agent-browser/"' \
+    "$packages_module"
+  rg -q -F 'AGENT_BROWSER_SKILLS_DIR=${agent-browser-package}/share/agent-browser/skill-data' \
+    "$packages_module"
 }
 
 test_common_profile_uses_enterprise_network() {
@@ -916,6 +986,8 @@ test_common_profile_keeps_chrome_data_outside_direct_agent_access
 test_common_profile_allows_only_the_chrome_bridge_socket_subtree
 test_common_profile_allows_only_the_nix_daemon_socket
 test_common_profile_uses_a_dedicated_agent_tmpdir_for_unix_sockets
+test_common_profile_isolates_agent_browser_runtime_state
+test_agent_browser_wrapper_isolates_chrome_application_state
 test_common_profile_uses_enterprise_network
 test_common_profile_allows_development_endpoints
 test_agent_profiles_inherit_langfuse_cloud_endpoints
