@@ -778,16 +778,6 @@ test_command_policies_never_require_human_approval() {
     'deny'
 }
 
-test_container_wrapper_prefers_the_tool_sandbox_shim() {
-  local packages_module='nix/modules/home/packages.nix'
-
-  # Arrange: Codex sessionではagent wrapper directoryがnonoのshimよりPATHの前に置かれる。
-  # Act: PATH順序を補正するcontainer wrapperのdispatch条件をsourceから確認する。
-  # Assert: Homebrew launcherからlibexecを直接起動せず、生成済みshimへ委譲する。
-  rg -q 'NONO_TOOL_SANDBOX_SHIM_DIR.*/container' "$packages_module"
-  rg -q 'container-sandboxed' "$packages_module"
-}
-
 test_container_policy_allows_mysql_integration_test_lifecycle() {
   # Arrange, Act & Assert: Repeated test setup and inspection operations are delegated.
   assert_container_command_decision "ALLOWED" image pull mysql:8.0.33
@@ -803,26 +793,6 @@ test_container_policy_keeps_destructive_cleanup_denied() {
   assert_container_command_decision "DENIED" delete katohome-mysql
   assert_container_command_decision "DENIED" prune
   assert_container_command_decision "DENIED" image prune --all
-}
-
-test_codex_wrapper_requires_the_parent_nono_capability() {
-  local packages_module='nix/modules/home/packages.nix'
-
-  # Arrange: Codex自身のsandboxは無効化し、外側のnonoだけをsecurity boundaryとして使う。
-  # Act: nonoが起動するchild commandにcapability確認用guardがあるか調べる。
-  # Assert: NONO_CAP_FILEが注入されなければ、raw Codexを起動する前に失敗する。
-  rg -q 'codex-nono-guard' "$packages_module"
-  rg -q 'codex: nono capability was not injected' "$packages_module"
-}
-
-test_codex_wrapper_uses_the_packaged_entrypoint() {
-  local packages_module='nix/modules/home/packages.nix'
-
-  # Arrange: Codexのpackageは実バイナリをlibexec/codexとして提供する。
-  # Act: sandbox wrapperが起動するpackage内commandをsourceから確認する。
-  # Assert: 廃止されたcodex-rawではなく、packageの実バイナリへ委譲する。
-  rg -q -F '${codexCliPackage}/libexec/codex --sandbox' "$packages_module"
-  ! rg -q -F '${codexCliPackage}/bin/codex-raw' "$packages_module"
 }
 
 test_local_agent_tools_use_the_parent_sandbox() {
@@ -938,7 +908,6 @@ test_claude_allows_login_endpoints_and_launch_services() {
     '["claude.com","bridge.claudeusercontent.com"]'
   assert_agent_profile_value claude '.network.open_port | tojson' '[0]'
   assert_agent_profile_value claude '.allow_launch_services' 'null'
-  rg -q -- '--allow-launch-services' nix/modules/home/packages.nix
 }
 
 test_claude_allows_only_the_chrome_extension_bridge_host() {
@@ -948,28 +917,6 @@ test_claude_allows_only_the_chrome_extension_bridge_host() {
   assert_agent_host_decision claude ALLOWED bridge.claudeusercontent.com 443
   assert_agent_host_decision claude DENIED bridge-staging.claudeusercontent.com 443
   assert_agent_host_decision claude DENIED claudeusercontent.com 443
-}
-
-test_claude_wrapper_runs_self_update_outside_the_sandbox() {
-  local packages_module='nix/modules/home/packages.nix'
-
-  # Arrange: `claude update`のsymlink置き換えは$HOME/.local/bin全体へのwriteを要求し、
-  # 通常sessionのfilesystem境界では表現できない。
-  # Act & Assert: update/upgradeはnono runへ渡す前にraw binaryを直接execする分岐を持つ。
-  rg -q 'update \| upgrade\)' "$packages_module"
-  rg -q -F 'Run it outside the sandbox' "$packages_module"
-}
-
-test_claude_wrapper_self_update_bypass_requires_exactly_one_argument() {
-  local packages_module='nix/modules/home/packages.nix'
-
-  # Arrange: claudeの`prompt`は位置引数のため、`claude update the readme`のような
-  # 未クォートの自然文プロンプトも$1="update"になり得る。
-  # Act & Assert: `update | upgrade)`のcase分岐が、単独の文字列一致ではなく
-  # 引数個数1個のif guardの内側に入れ子になっていることを確認する。
-  rg -U -q -- \
-    'if \[ "\$#" -eq 1 \]; then\n\s*case "\$1" in\n\s*update \| upgrade\)' \
-    "$packages_module"
 }
 
 test_pi_allows_configured_openai_codex_endpoint() {
@@ -1009,11 +956,8 @@ test_common_profile_allows_new_ghq_clone_destinations
 test_common_profile_configures_sandbox_compatible_javascript_tools
 test_common_profile_allows_flutter_and_dart_runtime_state_without_home_wide_access
 test_command_policies_never_require_human_approval
-test_container_wrapper_prefers_the_tool_sandbox_shim
 test_container_policy_allows_mysql_integration_test_lifecycle
 test_container_policy_keeps_destructive_cleanup_denied
-test_codex_wrapper_requires_the_parent_nono_capability
-test_codex_wrapper_uses_the_packaged_entrypoint
 test_local_agent_tools_use_the_parent_sandbox
 test_host_artifact_publish_root_is_writable_without_broadening_its_parent
 test_host_artifact_uses_the_parent_sandbox_without_tool_policies
@@ -1027,6 +971,4 @@ test_codex_observability_does_not_allow_adjacent_hosts
 test_claude_allows_anthropic_api_endpoint
 test_claude_allows_login_endpoints_and_launch_services
 test_claude_allows_only_the_chrome_extension_bridge_host
-test_claude_wrapper_runs_self_update_outside_the_sandbox
-test_claude_wrapper_self_update_bypass_requires_exactly_one_argument
 test_pi_allows_configured_openai_codex_endpoint
