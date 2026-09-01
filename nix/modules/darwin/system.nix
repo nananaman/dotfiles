@@ -79,6 +79,9 @@
       # credsStore = osxkeychain を解決する docker-credential-osxkeychain を提供する
       "docker-credential-helper"
       "docker-buildx"
+      # colima/default.yaml の vmType: qemu が必要とする qemu-img を提供する。
+      # Homebrew の lima は qemu に依存しないため個別に入れる
+      "qemu"
     ];
 
     casks = [
