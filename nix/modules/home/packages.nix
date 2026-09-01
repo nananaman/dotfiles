@@ -7,6 +7,7 @@
 let
   python = pkgs.python313Packages;
   agent-wrapper-dir = ".local/share/nono-agent-wrappers";
+  agent-wrapper = import ./agent-wrappers.nix { inherit pkgs; };
 
   azure-ai-inference = python.buildPythonPackage rec {
     pname = "azure-ai-inference";
@@ -182,70 +183,24 @@ let
     exec "$@"
   '';
 
-  codex-sandboxed = pkgs.writeShellScriptBin "codex" ''
-    ${canonicalize-herdr-socket}
-    export CODEX_EXECUTABLE_PATH="$HOME/${agent-wrapper-dir}/codex"
-    export DISABLE_AUTOUPDATER=1
-    if [ -n "''${NONO_CAP_FILE:-}" ]; then
-      exec ${codexCliPackage}/libexec/codex --sandbox danger-full-access --ask-for-approval never "$@"
-    fi
-    HERDR_AGENT=codex exec ${nono-cli}/bin/nono run --silent \
-      --profile "$HOME/.config/nono/profiles/chouge-codex.jsonc" --allow-cwd -- \
-      ${codex-nono-guard} \
-      ${codexCliPackage}/libexec/codex --sandbox danger-full-access --ask-for-approval never "$@"
-  '';
+  codex-sandboxed = agent-wrapper.codex {
+    canonicalizeHerdrSocket = canonicalize-herdr-socket;
+    nono = "${nono-cli}/bin/nono";
+    codexGuard = "${codex-nono-guard}";
+    codex = "${codexCliPackage}/libexec/codex";
+  };
 
-  claude-sandboxed = pkgs.writeShellScriptBin "claude" ''
-    ${canonicalize-herdr-socket}
-    claude_bin="$HOME/.local/bin/claude"
-    if [ ! -x "$claude_bin" ]; then
-      echo "claude: raw executable not found: $claude_bin" >&2
-      exit 127
-    fi
-    if [ -n "''${NONO_CAP_FILE:-}" ]; then
-      exec "$claude_bin" "$@"
-    fi
-    if [ "$#" -eq 1 ]; then
-      case "$1" in
-        update | upgrade)
-          # Native self-update replaces $HOME/.local/bin/claude via a rename, which needs
-          # write access to the whole containing directory. Run it outside the sandbox
-          # rather than granting that directory-wide write to every sandboxed session.
-          # Guarded to exactly one argv so an unquoted prompt beginning with "update"
-          # (claude's positional prompt argument) cannot also take this path.
-          exec "$claude_bin" "$@"
-          ;;
-      esac
-    fi
-    HERDR_AGENT=claude exec ${nono-cli}/bin/nono run --silent \
-      --profile "$HOME/.config/nono/profiles/chouge-claude.jsonc" --allow-cwd --allow-launch-services -- \
-      "$claude_bin" --dangerously-skip-permissions "$@"
-  '';
+  claude-sandboxed = agent-wrapper.claude {
+    canonicalizeHerdrSocket = canonicalize-herdr-socket;
+    nono = "${nono-cli}/bin/nono";
+  };
 
-  pi-sandboxed = pkgs.writeShellScriptBin "pi" ''
-    ${canonicalize-herdr-socket}
-    pi_bin="$HOME/.vite-plus/bin/pi"
-    if [ ! -x "$pi_bin" ]; then
-      echo "pi: raw executable not found: $pi_bin" >&2
-      exit 127
-    fi
-    if [ -n "''${NONO_CAP_FILE:-}" ]; then
-      exec "$pi_bin" "$@"
-    fi
-    HERDR_AGENT=pi exec ${nono-cli}/bin/nono run --silent \
-      --profile "$HOME/.config/nono/profiles/chouge-pi.jsonc" --allow-cwd -- "$pi_bin" "$@"
-  '';
+  pi-sandboxed = agent-wrapper.pi {
+    canonicalizeHerdrSocket = canonicalize-herdr-socket;
+    nono = "${nono-cli}/bin/nono";
+  };
 
-  container-sandboxed = pkgs.writeShellScriptBin "container" ''
-    # Codex sessionではagent wrapper directoryがnonoのTool Sandbox shimよりPATHの前に置かれる。
-    # Homebrew launcherを直接実行するとlibexec/containerが親sandboxに拒否されるため、
-    # nonoが生成したshimへ明示的に委譲する。
-    if [ -n "''${NONO_TOOL_SANDBOX_SHIM_DIR:-}" ] &&
-      [ -x "$NONO_TOOL_SANDBOX_SHIM_DIR/container" ]; then
-      exec "$NONO_TOOL_SANDBOX_SHIM_DIR/container" "$@"
-    fi
-    exec /opt/homebrew/bin/container "$@"
-  '';
+  container-sandboxed = agent-wrapper.container { container = "/opt/homebrew/bin/container"; };
 
   host-artifact-service = pkgs.writeShellScriptBin "host-artifact-service" ''
     if [ "$#" -ne 1 ] || [ "$1" != "ensure" ]; then
