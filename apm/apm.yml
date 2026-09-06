@@ -40,3 +40,8 @@ dependencies:
     - path: ~/ghq/github.com/nananaman/skills/productivity/host-artifact
     - path: ~/ghq/github.com/nananaman/skills/productivity/improve-agent-prompt
     - path: ~/ghq/github.com/nananaman/skills/engineering/realtime-prompt-review
+    - stablyai/orca/skills/orca-cli#af82126058de7ff0864f4cfb0ed347914595de91
+    - stablyai/orca/skills/computer-use#af82126058de7ff0864f4cfb0ed347914595de91
+    - stablyai/orca/skills/orchestration#af82126058de7ff0864f4cfb0ed347914595de91
+    - stablyai/orca/skills/orca-emulator#af82126058de7ff0864f4cfb0ed347914595de91
+    - stablyai/orca/skills/orca-emulator-android#af82126058de7ff0864f4cfb0ed347914595de91

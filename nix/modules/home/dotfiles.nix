@@ -53,6 +53,9 @@ in
 
     ${lib.optionalString pkgs.stdenv.isDarwin ''
       link_force "${dotfilesDir}/aerospace/aerospace.toml" "${homeDirectory}/.aerospace.toml"
+
+      $DRY_RUN_CMD mkdir -p "${homeDirectory}/.orca"
+      link_force "${dotfilesDir}/orca/keybindings.json" "${homeDirectory}/.orca/keybindings.json"
     ''}
     link_force "${dotfilesDir}/lazygit" "${configHome}/lazygit"
     link_force "${dotfilesDir}/cspell" "${configHome}/cspell"
