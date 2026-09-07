@@ -5,7 +5,6 @@
   helpers,
   dotfilesDir,
   herdrPackage,
-  herdrAutoTitleInput,
   hunkInput,
   codexCliPackage,
   ...
@@ -27,7 +26,6 @@
         config
         dotfilesDir
         helpers
-        herdrAutoTitleInput
         hunkInput
         ;
     })
