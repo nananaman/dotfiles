@@ -4,3 +4,6 @@
 .pi/worktrees/
 
 **/.claude/settings.local.json
+
+# MCP サーバー設定。認証ヘッダなどの secret を直書きすることがあるので追跡しない
+.mcp.json

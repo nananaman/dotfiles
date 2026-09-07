@@ -28,7 +28,6 @@ dependencies:
     - path: ~/ghq/github.com/nananaman/skills/engineering/apple-container
     - path: ~/ghq/github.com/nananaman/skills/engineering/nono-sandbox-maintenance
     - path: ~/ghq/github.com/nananaman/skills/personal/chouge-git
-    - path: ~/ghq/github.com/nananaman/skills/personal/chouge-git-wt
     - path: ~/ghq/github.com/nananaman/skills/personal/chouge-changelog
     - path: ~/ghq/github.com/nananaman/skills/personal/merge-closeout
     - path: ~/ghq/github.com/nananaman/skills/meta/skill-workbench
@@ -40,3 +39,9 @@ dependencies:
     - path: ~/ghq/github.com/nananaman/skills/productivity/host-artifact
     - path: ~/ghq/github.com/nananaman/skills/productivity/improve-agent-prompt
     - path: ~/ghq/github.com/nananaman/skills/engineering/realtime-prompt-review
+    - stablyai/orca/skills/orca-cli#af82126058de7ff0864f4cfb0ed347914595de91
+    - stablyai/orca/skills/computer-use#af82126058de7ff0864f4cfb0ed347914595de91
+    - stablyai/orca/skills/orchestration#af82126058de7ff0864f4cfb0ed347914595de91
+    - stablyai/orca/skills/orca-emulator#af82126058de7ff0864f4cfb0ed347914595de91
+    - stablyai/orca/skills/orca-emulator-android#af82126058de7ff0864f4cfb0ed347914595de91
+    - humanlayer/skills/plugins/show-me/skills/show-me#3c2629142c5d437428269b1b722b08c0b87f574d

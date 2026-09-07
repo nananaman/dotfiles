@@ -175,29 +175,17 @@ let
     fi
   '';
 
-  codex-nono-guard = pkgs.writeShellScript "codex-nono-guard" ''
-    if [ -z "''${NONO_CAP_FILE:-}" ]; then
-      echo "codex: nono capability was not injected" >&2
-      exit 1
-    fi
-    exec "$@"
-  '';
-
   codex-sandboxed = agent-wrapper.codex {
     canonicalizeHerdrSocket = canonicalize-herdr-socket;
-    nono = "${nono-cli}/bin/nono";
-    codexGuard = "${codex-nono-guard}";
     codex = "${codexCliPackage}/libexec/codex";
   };
 
   claude-sandboxed = agent-wrapper.claude {
     canonicalizeHerdrSocket = canonicalize-herdr-socket;
-    nono = "${nono-cli}/bin/nono";
   };
 
   pi-sandboxed = agent-wrapper.pi {
     canonicalizeHerdrSocket = canonicalize-herdr-socket;
-    nono = "${nono-cli}/bin/nono";
   };
 
   container-sandboxed = agent-wrapper.container { container = "/opt/homebrew/bin/container"; };
@@ -407,7 +395,6 @@ in
     nono-cli
     agent-browser
     agent-wrappers
-    tirith
 
     # Cloud
     google-cloud-sdk

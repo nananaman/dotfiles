@@ -67,6 +67,7 @@
 
     taps = [
       "nikitabobko/tap"
+      "stablyai/orca"
     ];
 
     brews = [
@@ -88,6 +89,7 @@
       "1password-cli"
       "ghostty"
       "nikitabobko/tap/aerospace"
+      "stablyai/orca/orca"
     ];
   };
 }

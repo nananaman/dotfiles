@@ -9,8 +9,7 @@
 
 ## Git 作業
 
-- ファイルを変更する前に、必ず `chouge-git-wt` skill に従う。
-- commit、branch 命名、PR 運用などのその他の Git 規約は `chouge-git` skill に従う。
+- commit、branch 命名、PR 運用などの Git 規約は `chouge-git` skill に従う。
 
 ## 開発と検証
 

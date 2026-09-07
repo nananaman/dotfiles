@@ -3,34 +3,32 @@
   codex =
     {
       canonicalizeHerdrSocket,
-      nono,
-      codexGuard,
       codex,
     }:
     pkgs.writeShellScriptBin "codex" (
       builtins.replaceStrings
-        [ "@CANONICALIZE_HERDR_SOCKET@" "@NONO@" "@CODEX_GUARD@" "@CODEX@" ]
+        [ "@CANONICALIZE_HERDR_SOCKET@" "@CODEX@" ]
         [
           canonicalizeHerdrSocket
-          nono
-          codexGuard
           codex
         ]
         (builtins.readFile ./codex-wrapper.sh)
     );
 
   claude =
-    { canonicalizeHerdrSocket, nono }:
+    { canonicalizeHerdrSocket }:
     pkgs.writeShellScriptBin "claude" (
-      builtins.replaceStrings [ "@CANONICALIZE_HERDR_SOCKET@" "@NONO@" ] [ canonicalizeHerdrSocket nono ]
-        (builtins.readFile ./claude-wrapper.sh)
+      builtins.replaceStrings [ "@CANONICALIZE_HERDR_SOCKET@" ] [ canonicalizeHerdrSocket ] (
+        builtins.readFile ./claude-wrapper.sh
+      )
     );
 
   pi =
-    { canonicalizeHerdrSocket, nono }:
+    { canonicalizeHerdrSocket }:
     pkgs.writeShellScriptBin "pi" (
-      builtins.replaceStrings [ "@CANONICALIZE_HERDR_SOCKET@" "@NONO@" ] [ canonicalizeHerdrSocket nono ]
-        (builtins.readFile ./pi-wrapper.sh)
+      builtins.replaceStrings [ "@CANONICALIZE_HERDR_SOCKET@" ] [ canonicalizeHerdrSocket ] (
+        builtins.readFile ./pi-wrapper.sh
+      )
     );
 
   container =
