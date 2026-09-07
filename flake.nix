@@ -15,11 +15,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    herdr = {
-      url = "github:ogulcancelik/herdr/v0.8.2";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     hunk = {
       url = "github:modem-dev/hunk";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -35,7 +30,6 @@
       nixpkgs,
       nix-darwin,
       home-manager,
-      herdr,
       hunk,
       codex-cli-nix,
       ...
@@ -183,7 +177,6 @@
                               helpers
                               dotfilesDir
                               ;
-                            herdrPackage = herdr.packages.${pkgs.system}.default;
                             hunkInput = hunk;
                             codexCliPackage = codex-cli-nix.packages.${pkgs.system}.codex;
                           })
@@ -221,7 +214,6 @@
                         helpers
                         dotfilesDir
                         ;
-                      herdrPackage = herdr.packages.${pkgs.system}.default;
                       hunkInput = hunk;
                       codexCliPackage = codex-cli-nix.packages.${pkgs.system}.codex;
                     })

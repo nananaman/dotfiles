@@ -4,7 +4,6 @@
   lib,
   helpers,
   dotfilesDir,
-  herdrPackage,
   hunkInput,
   codexCliPackage,
   ...
@@ -14,7 +13,6 @@
     (import ./packages.nix {
       inherit
         pkgs
-        herdrPackage
         codexCliPackage
         ;
     })
@@ -37,7 +35,6 @@
         config
         dotfilesDir
         helpers
-        herdrPackage
         ;
     })
 

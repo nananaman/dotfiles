@@ -21,9 +21,5 @@ in
       source = config.lib.file.mkOutOfStoreSymlink "${piAgentDir}/pi-codex-conversion.json";
       force = true;
     };
-    ".pi/agent/extensions/herdr-agent-state.ts" = {
-      source = config.lib.file.mkOutOfStoreSymlink "${piAgentDir}/extensions/herdr-agent-state.ts";
-      force = true;
-    };
   };
 }

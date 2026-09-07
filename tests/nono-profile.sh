@@ -798,8 +798,8 @@ test_container_policy_keeps_destructive_cleanup_denied() {
 test_local_agent_tools_use_the_parent_sandbox() {
   local command
 
-  # Arrange: PiとHerdrは、既存agent sessionのfilesystem/network境界を再利用する。
-  for command in pi herdr; do
+  # Arrange: Piは、既存agent sessionのfilesystem/network境界を再利用する。
+  for command in pi; do
     # Act: source profileに個別のTool Sandbox定義があるか確認する。
     # Assert: 二重sandboxやlocal orchestrationのargv制限を避けるため、個別定義を持たない。
     assert_profile_value \

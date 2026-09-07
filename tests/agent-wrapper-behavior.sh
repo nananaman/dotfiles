@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# Arrange: 呼び出し元の端末設定を除き、wrapper 自身による環境変数の追加を検証する。
+unset HERDR_AGENT
+
 test_root="$(mktemp -d "${TMPDIR:-/tmp}/agent-wrapper-test.XXXXXX")"
 trap 'rm -rf "$test_root"' EXIT
 
@@ -47,19 +50,14 @@ build_wrappers() {
           wrapper = import (repositoryRoot + "/nix/modules/home/agent-wrappers.nix") { inherit pkgs; };
         in
         [
-          (wrapper.claude {
-            canonicalizeHerdrSocket = "";
-          })
+          (wrapper.claude {})
           (wrapper.codex {
-            canonicalizeHerdrSocket = "";
             codex = builtins.getEnv "FAKE_CODEX";
           })
           (wrapper.container {
             container = builtins.getEnv "FAKE_CONTAINER";
           })
-          (wrapper.pi {
-            canonicalizeHerdrSocket = "";
-          })
+          (wrapper.pi {})
         ]
       '
   )"
@@ -94,7 +92,7 @@ test_claude_update_uses_the_raw_executable() {
   write_call_recorder "$fake_claude" claude
 
   # Act: directory全体の置換権限が必要なself-updateを起動する。
-  env -u NONO_CAP_FILE HOME="$test_root/home" CALL_LOG="$call_log" EXPECTED_HERDR_AGENT=claude \
+  env -u NONO_CAP_FILE HOME="$test_root/home" CALL_LOG="$call_log" \
     "$rendered_claude" update
 
   # Assert: self-updateをraw executableへ委譲する。
@@ -108,7 +106,7 @@ test_claude_prompt_uses_the_raw_executable() {
   write_call_recorder "$fake_claude" claude
 
   # Act: 通常のpromptをwrapperへ渡す。
-  env -u NONO_CAP_FILE HOME="$test_root/home" CALL_LOG="$call_log" EXPECTED_HERDR_AGENT=claude \
+  env -u NONO_CAP_FILE HOME="$test_root/home" CALL_LOG="$call_log" \
     "$rendered_claude" 'review the README'
 
   # Assert: nonoやpermission迂回flagを追加せずraw executableへ委譲する。
@@ -122,7 +120,7 @@ test_claude_update_prefix_with_more_arguments_uses_the_raw_executable() {
   write_call_recorder "$fake_claude" claude
 
   # Act: updateから始まる複数引数をwrapperへ渡す。
-  env -u NONO_CAP_FILE HOME="$test_root/home" CALL_LOG="$call_log" EXPECTED_HERDR_AGENT=claude \
+  env -u NONO_CAP_FILE HOME="$test_root/home" CALL_LOG="$call_log" \
     "$rendered_claude" update README
 
   # Assert: argvを変更せずraw executableへ委譲する。
@@ -137,7 +135,7 @@ test_codex_parent_session_uses_the_raw_executable() {
   write_call_recorder "$fake_codex" codex
 
   # Act: nono capabilityが未注入の親sessionからCodexを起動する。
-  env -u NONO_CAP_FILE HOME="$test_root/home" CALL_LOG="$call_log" EXPECTED_HERDR_AGENT=codex \
+  env -u NONO_CAP_FILE HOME="$test_root/home" CALL_LOG="$call_log" \
     "$rendered_codex" exec 'argument with spaces'
 
   # Assert: nonoやsandbox迂回flagを追加せずraw executableへ委譲する。
@@ -153,7 +151,6 @@ test_codex_child_session_uses_the_raw_executable() {
 
   # Act: capabilityを注入済みとしてnested Codexを起動する。
   NONO_CAP_FILE="$test_root/cap.json" HOME="$test_root/home" CALL_LOG="$call_log" \
-    EXPECTED_HERDR_AGENT=codex \
     "$rendered_codex" resume
 
   # Assert: 注入済みのnono環境でもraw Codexへargvだけを渡す。
@@ -201,7 +198,7 @@ test_pi_parent_session_uses_the_raw_executable() {
   write_call_recorder "$fake_pi" pi
 
   # Act: nono capabilityが未注入の親sessionからPiを起動する。
-  env -u NONO_CAP_FILE HOME="$test_root/home" CALL_LOG="$call_log" EXPECTED_HERDR_AGENT=pi \
+  env -u NONO_CAP_FILE HOME="$test_root/home" CALL_LOG="$call_log" \
     "$rendered_pi" --mode plan
 
   # Assert: nonoを介さずraw Piへargvを渡す。
@@ -217,7 +214,6 @@ test_pi_child_session_uses_the_raw_executable() {
 
   # Act: capabilityを注入済みとしてnested Piを起動する。
   NONO_CAP_FILE="$test_root/cap.json" HOME="$test_root/home" CALL_LOG="$call_log" \
-    EXPECTED_HERDR_AGENT=pi \
     "$rendered_pi" resume
 
   # Assert: 二重sandboxを作らずraw Piへargvを保持して委譲する。

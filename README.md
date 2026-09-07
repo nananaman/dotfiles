@@ -51,7 +51,6 @@ nix/
 nvim/                      # Neovim configuration
 zsh/                       # Zsh configuration
 ghostty/                   # Ghostty terminal configuration
-herdr/                     # Herdr terminal multiplexer configuration
 aerospace/                 # AeroSpace window manager
 colima/                    # Colima VM config template for new profiles
 lazygit/                   # Lazygit configuration
