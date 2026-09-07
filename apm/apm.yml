@@ -45,3 +45,4 @@ dependencies:
     - stablyai/orca/skills/orchestration#af82126058de7ff0864f4cfb0ed347914595de91
     - stablyai/orca/skills/orca-emulator#af82126058de7ff0864f4cfb0ed347914595de91
     - stablyai/orca/skills/orca-emulator-android#af82126058de7ff0864f4cfb0ed347914595de91
+    - humanlayer/skills/plugins/show-me/skills/show-me#3c2629142c5d437428269b1b722b08c0b87f574d
