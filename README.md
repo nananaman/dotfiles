@@ -58,7 +58,6 @@ lazygit/                   # Lazygit configuration
 git/                       # Git config & ignore
 apm/                       # Global agent skills managed by APM
 agents/                    # Global agent instructions
-claude/                    # Claude Code settings
 codex/                     # Codex CLI instructions
 sandbox-exec/              # macOS sandbox profiles
 ```
