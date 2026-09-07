@@ -395,7 +395,6 @@ in
     nono-cli
     agent-browser
     agent-wrappers
-    tirith
 
     # Cloud
     google-cloud-sdk
