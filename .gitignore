@@ -29,3 +29,6 @@ zsh/conf.d/local.zsh
 
 # APM dependencies
 apm_modules/
+
+# Retired terminal's local session data (not configuration)
+/herdr/

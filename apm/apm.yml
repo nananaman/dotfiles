@@ -35,7 +35,6 @@ dependencies:
     - path: ~/ghq/github.com/nananaman/skills/productivity/grilling
     - path: ~/ghq/github.com/nananaman/skills/productivity/grill-me
     - path: ~/ghq/github.com/nananaman/skills/productivity/handoff
-    - path: ~/ghq/github.com/nananaman/skills/productivity/herdr
     - path: ~/ghq/github.com/nananaman/skills/productivity/host-artifact
     - path: ~/ghq/github.com/nananaman/skills/productivity/improve-agent-prompt
     - path: ~/ghq/github.com/nananaman/skills/engineering/realtime-prompt-review

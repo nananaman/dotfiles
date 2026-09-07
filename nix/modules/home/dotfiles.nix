@@ -4,7 +4,6 @@
   config,
   dotfilesDir,
   helpers,
-  herdrPackage,
   ...
 }:
 let
@@ -49,7 +48,9 @@ in
     if [ "$(readlink "${configHome}/tmux" 2>/dev/null || true)" = "${dotfilesDir}/tmux" ]; then
       $DRY_RUN_CMD rm -f "${configHome}/tmux"
     fi
-    link_force "${dotfilesDir}/herdr" "${configHome}/herdr"
+    if [ "$(readlink "${configHome}/herdr" 2>/dev/null || true)" = "${dotfilesDir}/herdr" ]; then
+      $DRY_RUN_CMD rm -f "${configHome}/herdr"
+    fi
 
     ${lib.optionalString pkgs.stdenv.isDarwin ''
       link_force "${dotfilesDir}/aerospace/aerospace.toml" "${homeDirectory}/.aerospace.toml"
@@ -149,26 +150,5 @@ in
     $DRY_RUN_CMD mkdir -p "${configHome}/git"
     link_force "${dotfilesDir}/git/ignore" "${configHome}/git/ignore"
     link_force "${dotfilesDir}/git/hooks" "${configHome}/git/hooks"
-  '';
-
-  home.activation.linkHerdrPlugins = lib.hm.dag.entryAfter [ "linkDotfiles" ] ''
-    if [ -z "''${DRY_RUN_CMD:-}" ]; then
-      plugin_path="${dotfilesDir}/herdr-plugins/hunk-review"
-      plugin_manifest="$plugin_path/herdr-plugin.toml"
-      if plugin_json="$(${herdrPackage}/bin/herdr plugin list --plugin hunk-review --json 2>/dev/null)"; then
-        registered_manifest="$(printf '%s\n' "$plugin_json" \
-          | ${pkgs.jq}/bin/jq -r '.result.plugins[]? | select(.plugin_id == "hunk-review") | .manifest_path')"
-        registered_enabled="$(printf '%s\n' "$plugin_json" \
-          | ${pkgs.jq}/bin/jq -r '.result.plugins[]? | select(.plugin_id == "hunk-review") | .enabled')"
-
-        if [ "$registered_manifest" != "$plugin_manifest" ]; then
-          if [ "$registered_enabled" = "false" ]; then
-            ${herdrPackage}/bin/herdr plugin link "$plugin_path" --disabled
-          else
-            ${herdrPackage}/bin/herdr plugin link "$plugin_path"
-          fi
-        fi
-      fi
-    fi
   '';
 }

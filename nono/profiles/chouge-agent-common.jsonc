@@ -33,7 +33,6 @@
     "(allow file-read-data (literal \"@HOME@\"))",
     // /nix/var/nix/daemon-socket/socketのsymlink解決後にあるdaemon socketだけへ接続する。
     "(allow network-outbound (path \"/private/var/run/nix-daemon.socket\"))",
-    "(allow network-outbound (path \"@HOME@/ghq/github.com/nananaman/dotfiles/herdr/herdr.sock\"))",
     // Chrome bridgeは起動ごとに生成されるnative host socketで通信する。
     "(allow network-outbound (subpath \"/private/tmp/codex-browser-use\"))",
     // terraform providerなどgo-pluginベースのツールが作るランダム名のUnix socketは、

@@ -1,6 +1,5 @@
 {
   pkgs,
-  herdrPackage,
   codexCliPackage,
   ...
 }:
@@ -165,28 +164,13 @@ let
     '';
   };
 
-  canonicalize-herdr-socket = ''
-    if [ -n "''${HERDR_SOCKET_PATH:-}" ]; then
-      herdr_socket_dir="''${HERDR_SOCKET_PATH%/*}"
-      herdr_socket_name="''${HERDR_SOCKET_PATH##*/}"
-      if canonical_herdr_socket_dir="$(cd -P -- "$herdr_socket_dir" 2>/dev/null && pwd -P)"; then
-        export HERDR_SOCKET_PATH="$canonical_herdr_socket_dir/$herdr_socket_name"
-      fi
-    fi
-  '';
-
   codex-sandboxed = agent-wrapper.codex {
-    canonicalizeHerdrSocket = canonicalize-herdr-socket;
     codex = "${codexCliPackage}/libexec/codex";
   };
 
-  claude-sandboxed = agent-wrapper.claude {
-    canonicalizeHerdrSocket = canonicalize-herdr-socket;
-  };
+  claude-sandboxed = agent-wrapper.claude { };
 
-  pi-sandboxed = agent-wrapper.pi {
-    canonicalizeHerdrSocket = canonicalize-herdr-socket;
-  };
+  pi-sandboxed = agent-wrapper.pi { };
 
   container-sandboxed = agent-wrapper.container { container = "/opt/homebrew/bin/container"; };
 
@@ -389,7 +373,6 @@ in
     secretlint
     apm-cli
     omp-cli
-    herdrPackage
     rtk
     sandbox-runtime
     nono-cli
