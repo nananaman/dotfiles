@@ -66,10 +66,6 @@
     "(allow mach-register (global-name-regex #\"^org\\.chromium\\.crashpad\\.child_port_handshake\\.\"))",
     // Chromeがbrowser processとhelper processのMach port交換に登録するPID付きserviceだけを許可する。
     "(allow mach-register (global-name-regex #\"^com\\.google\\.Chrome\\.MachPortRendezvousServer\\.[0-9]+$\"))",
-    // host-artifactは親sandboxから固定serviceとTailscale daemonだけを利用する。
-    "(allow network-outbound (remote tcp \"localhost:9417\"))",
-    "(allow mach-lookup (global-name \"io.tailscale.ipn.macsys-spks\"))",
-    "(allow mach-lookup (global-name \"io.tailscale.ipn.macsys-spki\"))",
   ],
   "groups": {
     "include": [
@@ -131,8 +127,6 @@
       "*.cloud.langfuse.com",
       // EU regionだけsubdomainが無くwildcardで拾えないため個別に許可する。
       "cloud.langfuse.com",
-      // host-artifactが検証済みTailscale Serve URLを返すために利用する。
-      "*.ts.net",
       // hatena
       "*.hatena.sh",
       // Azure CLIの認証とtoken更新、ARM control plane、Log Analytics/Application Insightsのquery data plane。
@@ -163,7 +157,6 @@
       "$HOME/.dart-tool",
       "$HOME/.dartServer",
       "$HOME/.config/flutter",
-      "$HOME/.local/share/host-artifact/public",
       "$HOME/go/pkg/mod",
       // ghq管理のrepositoryを調査、clone、修正できるようにする。
       "$HOME/ghq",
@@ -189,7 +182,6 @@
       "$HOME/.config/gh",
       "$HOME/.config/gcloud",
       "$HOME/.terraform.d",
-      "$HOME/.local/share/host-artifact/public",
       "$HOME/ghq/github.com/nananaman/dotfiles/zsh/zshrc",
     ],
     "read": [

@@ -10,7 +10,6 @@ normalize_jsonc_for_jq() {
 
 source_profile_json="$(normalize_jsonc_for_jq "$source_profile")"
 test_config_root="$(mktemp -d "${TMPDIR:-/tmp}/nono-profile-test.XXXXXX")"
-test_publish_root="$test_config_root/host-artifact/public"
 test_claude_state_root="$test_config_root/claude-state"
 test_neovim_root="$test_config_root/neovim"
 test_agent_tool_state_root="$test_config_root/agent-tool-state"
@@ -18,7 +17,6 @@ test_flutter_dart_root="$test_config_root/flutter-dart"
 profile_dir="$test_config_root/nono/profiles"
 mkdir -p \
   "$profile_dir" \
-  "$test_publish_root/example" \
   "$test_claude_state_root/locks" \
   "$test_neovim_root/config" \
   "$test_neovim_root/share" \
@@ -64,7 +62,6 @@ for copied_profile in "$profile_dir"/*.jsonc; do
   rendered_profile="$copied_profile.rendered"
   sed \
     -e "s|@HOME@|$HOME|g" \
-    -e 's|$HOME/.local/share/host-artifact/public|'"$test_publish_root"'|g' \
     -e 's|$HOME/.local/state/claude/locks|'"$test_claude_state_root/locks"'|g' \
     -e 's|$HOME/.config/nvim|'"$test_neovim_root/config"'|g' \
     -e 's|$HOME/.local/share/nvim|'"$test_neovim_root/share"'|g' \
@@ -569,12 +566,6 @@ test_common_profile_does_not_allow_adjacent_azure_storage_suffix() {
   assert_host_decision "DENIED" productionresultssa5.file.core.windows.net
 }
 
-test_common_profile_allows_tailscale_serve_origins() {
-  # Arrange & Act: Evaluate a representative MagicDNS HTTPS origin without connecting to it.
-  # Assert: Host-artifact can verify its Tailscale Serve URL through the parent sandbox.
-  assert_host_decision "ALLOWED" "machine.tailnet.ts.net"
-}
-
 test_common_profile_does_not_add_aws_control_plane_endpoints() {
   # Arrange & Act: 共通profileが宣言していないAWSのcontrol plane hostを評価する。
   # Assert: enterprise profileがLLM API向けに許可するsuffix以外へは広がっていない。
@@ -808,38 +799,6 @@ test_local_agent_tools_use_the_parent_sandbox() {
   done
 }
 
-test_host_artifact_publish_root_is_writable_without_broadening_its_parent() {
-  # Arrange: Artifacts are copied into one dedicated service-owned subtree.
-  # Act & Assert: The publish root is writable while an adjacent directory stays denied.
-  assert_path_decision \
-    "ALLOWED" \
-    "$test_publish_root/example/report.html" \
-    "readwrite"
-  assert_path_decision \
-    "DENIED" \
-    "$test_config_root/host-artifact-private/report.html" \
-    "readwrite"
-  assert_path_decision \
-    "DENIED" \
-    "$HOME/.local/share/host-artifact" \
-    "write"
-}
-
-test_host_artifact_uses_the_parent_sandbox_without_tool_policies() {
-  local command
-
-  # Arrange: Host-artifact wrappers validate their own bounded public arguments.
-  for command in host-artifact host-artifact-service host-artifact-tailscale host-artifact-workspace; do
-    # Act & Assert: None of the wrappers creates a nested Tool Sandbox boundary.
-    assert_profile_value ".command_policies.commands | has(\"$command\")" 'false'
-  done
-
-  # Act & Assert: Parent capability remains limited to the fixed service and Tailscale daemon names.
-  assert_profile_value \
-    '[.unsafe_macos_seatbelt_rules[] | select(test("host-artifact|tailscale|localhost:9417"; "i"))] | tojson' \
-    '["(allow network-outbound (remote tcp \"localhost:9417\"))","(allow mach-lookup (global-name \"io.tailscale.ipn.macsys-spks\"))","(allow mach-lookup (global-name \"io.tailscale.ipn.macsys-spki\"))"]'
-}
-
 test_bun_uses_the_outer_sandbox_with_exact_ancestor_rules() {
   # Arrange: Normalize the source profile before Home Manager substitutes the consumer home.
   # Act & Assert: Bun stays outside Tool Sandbox and receives only the proven exact ancestor grants.
@@ -945,7 +904,6 @@ test_common_profile_does_not_allow_all_github_actions_hosts
 test_common_profile_allows_github_actions_blob_log_endpoint
 test_common_profile_does_not_allow_azure_blob_apex
 test_common_profile_does_not_allow_adjacent_azure_storage_suffix
-test_common_profile_allows_tailscale_serve_origins
 test_common_profile_does_not_add_aws_control_plane_endpoints
 test_common_profile_allows_only_the_azure_cli_control_and_query_endpoints
 test_agent_profiles_inherit_azure_cli_endpoints
@@ -959,8 +917,6 @@ test_command_policies_never_require_human_approval
 test_container_policy_allows_mysql_integration_test_lifecycle
 test_container_policy_keeps_destructive_cleanup_denied
 test_local_agent_tools_use_the_parent_sandbox
-test_host_artifact_publish_root_is_writable_without_broadening_its_parent
-test_host_artifact_uses_the_parent_sandbox_without_tool_policies
 test_bun_uses_the_outer_sandbox_with_exact_ancestor_rules
 test_codex_allows_chatgpt_subscription_endpoint
 test_codex_allows_unrestricted_localhost_outbound_on_macos

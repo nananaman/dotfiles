@@ -37,14 +37,6 @@
         helpers
         ;
     })
-
-    (import ./host-artifact.nix {
-      inherit
-        pkgs
-        lib
-        config
-        ;
-    })
   ];
 
   home.stateVersion = "25.11";
