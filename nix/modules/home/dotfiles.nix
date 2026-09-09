@@ -19,11 +19,6 @@ let
       builtins.readFile ../../../nono/profiles/chouge-pi.jsonc
     )
   );
-  hostArtifactServerProfile = pkgs.writeText "host-artifact-server.jsonc" (
-    builtins.replaceStrings [ "@HOME@" ] [ homeDirectory ] (
-      builtins.readFile ../../../nono/profiles/host-artifact-server.jsonc
-    )
-  );
 in
 {
   home.activation.linkDotfiles = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
@@ -93,11 +88,16 @@ in
           ;;
       esac
     done
+    retired_profile="${configHome}/nono/profiles/host-artifact-server.jsonc"
+    case "$(readlink "$retired_profile" 2>/dev/null || true)" in
+      /nix/store/*-host-artifact-server.jsonc)
+        $DRY_RUN_CMD rm -f "$retired_profile"
+        ;;
+    esac
     link_force "${agentCommonProfile}" "${configHome}/nono/profiles/chouge-agent-common.jsonc"
     link_force "${dotfilesDir}/nono/profiles/chouge-codex.jsonc" "${configHome}/nono/profiles/chouge-codex.jsonc"
     link_force "${dotfilesDir}/nono/profiles/chouge-claude.jsonc" "${configHome}/nono/profiles/chouge-claude.jsonc"
     link_force "${agentPiProfile}" "${configHome}/nono/profiles/chouge-pi.jsonc"
-    link_force "${hostArtifactServerProfile}" "${configHome}/nono/profiles/host-artifact-server.jsonc"
     link_force "${dotfilesDir}/apm" "${homeDirectory}/.apm"
 
     ${lib.optionalString pkgs.stdenv.isLinux ''

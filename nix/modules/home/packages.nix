@@ -202,123 +202,12 @@ let
 
   container-sandboxed = agent-wrapper.container { container = "/opt/homebrew/bin/container"; };
 
-  host-artifact-service = pkgs.writeShellScriptBin "host-artifact-service" ''
-    if [ "$#" -ne 1 ] || [ "$1" != "ensure" ]; then
-      echo "usage: host-artifact-service ensure" >&2
-      exit 64
-    fi
-
-    health_url="http://127.0.0.1:9417/.well-known/host-artifact/health"
-    is_expected_health() {
-      case "$1" in
-        '{"service":"host-artifact","version":2,"status":"ok"}'|'{"service":"host-artifact","version":2,"status":"ok",'*)
-          return 0
-          ;;
-        *)
-          return 1
-          ;;
-      esac
-    }
-    health_body="$(/usr/bin/curl --fail --silent --show-error --max-time 1 "$health_url" 2>/dev/null || true)"
-    if is_expected_health "$health_body"; then
-      exit 0
-    fi
-
-    /bin/launchctl kickstart -k "gui/$UID/com.nananaman.host-artifact"
-    for _attempt in $(/usr/bin/seq 1 20); do
-      health_body="$(/usr/bin/curl --fail --silent --show-error --max-time 1 "$health_url" 2>/dev/null || true)"
-      if is_expected_health "$health_body"; then
-        exit 0
-      fi
-      /bin/sleep 0.25
-    done
-
-    echo "host-artifact-service: service did not become ready" >&2
-    exit 1
-  '';
-
-  host-artifact = pkgs.writeShellScriptBin "host-artifact" (
-    builtins.replaceStrings
-      [ "@BUN@" "@CLI@" "@HELPER_PATH@" ]
-      [
-        "${pkgs.bun}/bin/bun"
-        "$HOME/.agents/skills/host-artifact/src/cli.ts"
-        (pkgs.lib.makeBinPath [
-          host-artifact-service
-          host-artifact-tailscale
-          host-artifact-workspace
-        ])
-      ]
-      (builtins.readFile ./host-artifact.sh)
-  );
-
-  host-artifact-tailscale = pkgs.writeShellScriptBin "host-artifact-tailscale" (
-    builtins.replaceStrings
-      [ "@TAILSCALE_WRAPPER@" "@TAILSCALE_APP@" "@CURL@" "@JQ@" "@GREP@" "@TR@" ]
-      [
-        "/usr/local/bin/tailscale"
-        "/Applications/Tailscale.app/Contents/MacOS/tailscale"
-        "/usr/bin/curl"
-        "${pkgs.jq}/bin/jq"
-        "/usr/bin/grep"
-        "/usr/bin/tr"
-      ]
-      (builtins.readFile ./host-artifact-tailscale.sh)
-  );
-
-  host-artifact-workspace = pkgs.writeShellScriptBin "host-artifact-workspace" (
-    builtins.replaceStrings
-      [ "@GIT@" "@JQ@" "@SHASUM@" "@SED@" "@TR@" "@CUT@" ]
-      [ "/usr/bin/git" "${pkgs.jq}/bin/jq" "/usr/bin/shasum" "/usr/bin/sed" "/usr/bin/tr" "/usr/bin/cut" ]
-      (builtins.readFile ./host-artifact-workspace.sh)
-  );
-
-  host-artifact-server = pkgs.writeShellScriptBin "host-artifact-server" ''
-    skill_root="$HOME/.agents/skills/host-artifact"
-    host_artifact_runtime_fingerprint() {
-      {
-        ${pkgs.findutils}/bin/find "$skill_root/src" -type f -exec ${pkgs.coreutils}/bin/sha256sum {} \;
-        for runtime_file in "$skill_root/package.json" "$skill_root/bun.lock"; do
-          if [ -f "$runtime_file" ]; then
-            ${pkgs.coreutils}/bin/sha256sum "$runtime_file"
-          fi
-        done
-      } | ${pkgs.coreutils}/bin/sort | ${pkgs.coreutils}/bin/sha256sum
-    }
-    runtime_fingerprint="$(host_artifact_runtime_fingerprint)"
-    ${nono-cli}/bin/nono run --silent \
-      --profile "$HOME/.config/nono/profiles/host-artifact-server.jsonc" -- \
-      ${pkgs.bun}/bin/bun \
-      "$skill_root/src/server-main.ts" \
-      --port 9417 \
-      --publish-root "$HOME/.local/share/host-artifact/public" &
-    server_pid=$!
-
-    while /bin/kill -0 "$server_pid" 2>/dev/null; do
-      /bin/sleep 2
-      if [ "$(host_artifact_runtime_fingerprint)" != "$runtime_fingerprint" ]; then
-        /bin/kill -TERM "$server_pid"
-        wait "$server_pid" 2>/dev/null || true
-        exit 75
-      fi
-    done
-
-    wait "$server_pid"
-    server_exit=$?
-    exit "$server_exit"
-  '';
-
   agent-wrappers = pkgs.symlinkJoin {
     name = "sandboxed-agent-wrappers";
     paths = [
       codex-sandboxed
       claude-sandboxed
       pi-sandboxed
-      host-artifact
-      host-artifact-tailscale
-      host-artifact-workspace
-      host-artifact-service
-      host-artifact-server
     ]
     ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [ container-sandboxed ];
   };
