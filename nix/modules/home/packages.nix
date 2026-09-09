@@ -164,8 +164,36 @@ let
     '';
   };
 
+  # Remove this override once codex-cli-nix includes 0.154.0 or newer.
+  codex-package =
+    let
+      version = "0.154.0";
+      hashes = {
+        "codex-aarch64-apple-darwin.tar.gz" =
+          "344310a0a591c1b192e04feff304321a69907c9498baaac331ca7e16ebcef9d7";
+        "codex-code-mode-host-aarch64-apple-darwin.tar.gz" =
+          "500ee2a02ea598ae519052e7d7d8e201d1db01986f30c214ef4143645dc86fad";
+        "codex-x86_64-unknown-linux-musl.tar.gz" =
+          "d7e18b2597ae8f242f5f31ee9e90deef48dbc9edd634d9868fb6435d08c07f02";
+        "codex-code-mode-host-x86_64-unknown-linux-musl.tar.gz" =
+          "a68df7cca23c6da7cde175677df7de61c73a234add1333a1254b86d641af01f7";
+      };
+    in
+    (codexCliPackage.override {
+      fetchurl =
+        args:
+        let
+          asset = builtins.baseNameOf args.url;
+        in
+        pkgs.fetchurl {
+          url = "https://github.com/openai/codex/releases/download/rust-v${version}/${asset}";
+          sha256 = hashes.${asset};
+        };
+    }).overrideAttrs
+      { inherit version; };
+
   codex-sandboxed = agent-wrapper.codex {
-    codex = "${codexCliPackage}/libexec/codex";
+    codex = "${codex-package}/libexec/codex";
   };
 
   claude-sandboxed = agent-wrapper.claude { };
