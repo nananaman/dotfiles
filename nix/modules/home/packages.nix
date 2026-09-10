@@ -325,13 +325,13 @@ let
 
   apm-cli = python.buildPythonApplication rec {
     pname = "apm-cli";
-    version = "0.28.0";
+    version = "0.29.0";
     pyproject = true;
 
     src = python.fetchPypi {
       pname = "apm_cli";
       inherit version;
-      hash = "sha256-82JToQeMU3B82MIagQb3x/LRV5x7cYWE22G9o1P3RSE=";
+      hash = "sha256-1O8S0VNGgxMZwfQWzPq7ZKHm+JNybtnN8+FgnaeI9Y8=";
     };
 
     build-system = [ python.setuptools ];
