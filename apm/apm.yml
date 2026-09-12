@@ -8,7 +8,6 @@ dependencies:
   apm:
     - path: ~/ghq/github.com/nananaman/skills/meta/retrospective-codify
     - path: ~/ghq/github.com/nananaman/skills/engineering/create-pr
-    - path: ~/ghq/github.com/nananaman/skills/engineering/setup-engineering-flow
     - path: ~/ghq/github.com/nananaman/skills/engineering/draft-prd
     - path: ~/ghq/github.com/nananaman/skills/engineering/polish-prd
     - path: ~/ghq/github.com/nananaman/skills/engineering/draft-design-doc
@@ -20,7 +19,6 @@ dependencies:
     - path: ~/ghq/github.com/nananaman/skills/meta/update-skills
     - path: ~/ghq/github.com/nananaman/skills/engineering/review-diff-code
     - path: ~/ghq/github.com/nananaman/skills/engineering/implement
-    - path: ~/ghq/github.com/nananaman/skills/engineering/simplify-code
     - path: ~/ghq/github.com/nananaman/skills/engineering/tdd
     - path: ~/ghq/github.com/nananaman/skills/engineering/test-writing-style
     - path: ~/ghq/github.com/nananaman/skills/engineering/apple-container
