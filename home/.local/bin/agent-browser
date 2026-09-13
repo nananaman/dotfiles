@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+mise_bin=${MISE_BIN:-mise}
+installation=$("$mise_bin" --cd / --no-env --no-hooks where npm:agent-browser)
+cli=''
+for modules in "$installation/node_modules" "$installation/lib/node_modules"; do
+  if [[ -d "$modules/agent-browser/skill-data" && -f "$modules/agent-browser/bin/agent-browser.js" ]]; then
+    export AGENT_BROWSER_SKILLS_DIR="$modules/agent-browser/skill-data"
+    cli="$modules/agent-browser/bin/agent-browser.js"
+    break
+  fi
+done
+if [[ -z "$cli" ]]; then
+  echo 'agent-browser: entry point or skill-data was not found in the mise installation.' >&2
+  exit 127
+fi
+if [[ "$(uname -s)" == Darwin ]]; then
+  export CFFIXED_USER_HOME="$HOME/.local/state/nono-agent-tools/agent-browser"
+  export AGENT_BROWSER_ARGS="${AGENT_BROWSER_ARGS:+$AGENT_BROWSER_ARGS,}--no-sandbox"
+fi
+exec "$HOME/.local/bin/dotfiles-exec" node node "$cli" "$@"

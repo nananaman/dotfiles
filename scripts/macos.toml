@@ -1,0 +1,14 @@
+# Loaded only by scripts/macos.sh, never on WSL.
+[bootstrap.files."/etc/pam.d/sudo_local"]
+content = """
+# Managed by dotfiles.
+auth       optional       /opt/homebrew/opt/pam-reattach/lib/pam/pam_reattach.so
+auth       sufficient     pam_tid.so
+"""
+owner = "root"
+group = "wheel"
+mode = "0644"
+replace = true
+
+[bootstrap.user]
+login_shell = "/opt/homebrew/bin/zsh"

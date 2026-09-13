@@ -1,0 +1,4 @@
+tap "nikitabobko/tap"
+tap "stablyai/orca"
+cask "nikitabobko/tap/aerospace"
+cask "stablyai/orca/orca"

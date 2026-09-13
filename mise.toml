@@ -1,0 +1,147 @@
+# Machine setup lives here; everyday tool versions live in home/.config/mise.
+min_version = "2026.9.5"
+
+[vars]
+dotfiles_root = "{{ config_root }}"
+
+[tasks.setup]
+description = "Install tools, deploy dotfiles, and apply OS integration"
+run = 'bash scripts/bootstrap.sh "$@"'
+
+[tasks.preview]
+description = "Preview setup without applying changes"
+run = "bash scripts/bootstrap.sh --dry-run"
+
+[tasks.check]
+description = "Validate configuration, scripts, and deployment behavior"
+run = "bash scripts/check.sh"
+
+[tasks.check-sandbox]
+description = "Check nono filesystem, network, and command boundaries"
+run = "bash tests/nono-profile.sh"
+
+[tasks.update]
+description = "Update global CLI pins without applying system settings"
+run = 'mise --cd / upgrade --bump "$@"'
+
+[tasks.update-packages]
+description = "Update declared OS packages"
+run = [
+  "mise bootstrap packages upgrade",
+  "bash scripts/brew-casks.sh --upgrade",
+]
+
+[dotfiles]
+"~/.zshrc" = { source = "home/.zshrc", mode = "symlink" }
+"~/.zshenv" = { source = "home/.zshenv", mode = "symlink" }
+"~/.agents/AGENTS.md" = { source = "home/.agents/AGENTS.md", mode = "symlink" }
+"~/.claude/CLAUDE.md" = { source = "home/.agents/AGENTS.md", mode = "symlink" }
+"~/.pi/agent/AGENTS.md" = { source = "home/.agents/AGENTS.md", mode = "symlink" }
+"~/.config/codex/instructions.md" = { source = "home/.agents/AGENTS.md", mode = "symlink" }
+"~/.apm/apm.yml" = { source = "home/.apm/apm.yml", mode = "symlink" }
+"~/.apm/marketplaces.json" = { source = "home/.apm/marketplaces.json", mode = "symlink" }
+"~/.config/mise/config.toml" = { source = "home/.config/mise/config.toml", mode = "symlink" }
+"~/.config/zsh/functions" = { source = "home/.config/zsh/functions", mode = "symlink-each" }
+"~/.config/sheldon/plugins.toml" = { source = "home/.config/sheldon/plugins.toml", mode = "symlink" }
+"~/.config/nvim" = { source = "home/.config/nvim", mode = "symlink-each" }
+"~/.config/git" = { source = "home/.config/git", mode = "symlink-each" }
+"~/.config/ghostty/config" = { source = "home/.config/ghostty/config", mode = "symlink" }
+"~/.config/lazygit" = { source = "home/.config/lazygit", mode = "symlink-each" }
+"~/.config/cspell" = { source = "home/.config/cspell", mode = "symlink-each" }
+"~/.config/sql-formatter" = { source = "home/.config/sql-formatter", mode = "symlink-each" }
+"~/.config/srt" = { source = "home/.config/srt", mode = "symlink-each" }
+"~/.config/secretlint/.secretlintrc.json" = { source = "home/.config/secretlint/.secretlintrc.json", mode = "symlink" }
+"~/.config/stylua.toml" = { source = "home/.config/stylua.toml", mode = "symlink" }
+"~/.config/starship.toml" = { source = "home/.config/starship.toml", mode = "symlink" }
+"~/.config/hunk/config.toml" = { source = "home/.config/hunk/config.toml", mode = "symlink" }
+"~/.pi/agent/settings.json" = { source = "home/.pi/agent/settings.json", mode = "symlink" }
+"~/.pi/agent/pi-codex-conversion.json" = { source = "home/.pi/agent/pi-codex-conversion.json", mode = "symlink" }
+"~/.config/nono/profiles/chouge-agent-common.jsonc" = { source = "home/.config/nono/profiles/chouge-agent-common.jsonc", mode = "template" }
+"~/.config/nono/profiles/chouge-pi.jsonc" = { source = "home/.config/nono/profiles/chouge-pi.jsonc", mode = "template" }
+"~/.config/nono/profiles/chouge-codex.jsonc" = { source = "home/.config/nono/profiles/chouge-codex.jsonc", mode = "symlink" }
+"~/.config/nono/profiles/chouge-claude.jsonc" = { source = "home/.config/nono/profiles/chouge-claude.jsonc", mode = "symlink" }
+"~/.local/bin" = { source = "home/.local/bin", mode = "symlink-each", exclude = [
+  "container",
+] }
+"~/.local/bin/container" = { source = "home/.local/bin/container", mode = "symlink", variants = [
+  { os = "macos" },
+] }
+"~/.local/share/dotfiles/secretlint/package.json" = { source = "package.json", mode = "symlink" }
+"~/.local/share/dotfiles/secretlint/package-lock.json" = { source = "package-lock.json", mode = "symlink" }
+"~/.aerospace.toml" = { source = "home/.aerospace.toml", mode = "symlink", variants = [
+  { os = "macos" },
+] }
+"~/.orca/keybindings.json" = { source = "home/.orca/keybindings.json", mode = "symlink", variants = [
+  { os = "macos" },
+] }
+"~/.colima/_templates/default.yaml" = { source = "home/.colima/_templates/default.yaml", mode = "symlink", variants = [
+  { os = "macos" },
+] }
+"~/Library/Application Support/com.mitchellh.ghostty/config" = { source = "home/.config/ghostty/config", mode = "symlink", variants = [
+  { os = "macos" },
+] }
+"~/.docker/cli-plugins/docker-buildx" = { source = "/opt/homebrew/opt/docker-buildx/bin/docker-buildx", mode = "symlink", variants = [
+  { os = "macos" },
+] }
+
+[bootstrap.packages]
+"brew:git" = { os = "macos" }
+"brew:git-lfs" = { os = "macos" }
+"brew:zsh" = { os = "macos" }
+"brew:pam-reattach" = { os = "macos" }
+"brew:azure-cli" = { os = "macos" }
+"brew:colima" = { os = "macos" }
+"brew:container" = { os = "macos" }
+"brew:docker" = { os = "macos" }
+"brew:docker-compose" = { os = "macos" }
+"brew:docker-credential-helper" = { os = "macos" }
+"brew:docker-buildx" = { os = "macos" }
+"brew:qemu" = { os = "macos" }
+"brew:silicon" = "latest"
+"brew-cask:font-hackgen-nerd" = "latest"
+"brew-cask:1password-cli" = { os = "macos" }
+"brew-cask:ghostty" = { os = "macos" }
+"apt:git" = { os = "linux" }
+"apt:git-lfs" = { os = "linux" }
+"apt:zsh" = { os = "linux" }
+"apt:build-essential" = { os = "linux" }
+"apt:pkg-config" = { os = "linux" }
+"apt:libssl-dev" = { os = "linux" }
+"apt:libfontconfig1-dev" = { os = "linux" }
+"apt:libfreetype6-dev" = { os = "linux" }
+"apt:bubblewrap" = { os = "linux" }
+"apt:socat" = { os = "linux" }
+"apt:unzip" = { os = "linux" }
+"apt:curl" = { os = "linux" }
+"apt:ca-certificates" = { os = "linux" }
+
+[bootstrap.repos]
+"~/ghq/github.com/nananaman/skills" = { url = "https://github.com/nananaman/skills.git" }
+
+[bootstrap.macos.defaults."com.apple.dock"]
+autohide = true
+show-recents = false
+tilesize = 45
+orientation = "bottom"
+
+[bootstrap.macos.defaults."com.apple.finder"]
+AppleShowAllExtensions = true
+AppleShowAllFiles = true
+ShowPathbar = true
+ShowStatusBar = true
+FXEnableExtensionChangeWarning = false
+FXPreferredViewStyle = "Nlsv"
+
+[bootstrap.macos.defaults.NSGlobalDomain]
+AppleInterfaceStyle = "Dark"
+AppleShowAllExtensions = true
+KeyRepeat = 2
+InitialKeyRepeat = 25
+NSAutomaticCapitalizationEnabled = false
+NSAutomaticDashSubstitutionEnabled = false
+NSAutomaticPeriodSubstitutionEnabled = false
+NSAutomaticQuoteSubstitutionEnabled = false
+NSAutomaticSpellingCorrectionEnabled = false
+
+[bootstrap.macos.defaults."com.apple.screencapture"]
+type = "png"

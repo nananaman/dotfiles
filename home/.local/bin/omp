@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+mise_bin=${MISE_BIN:-mise}
+installation=$("$mise_bin" --cd / --no-env --no-hooks where npm:@oh-my-pi/pi-coding-agent)
+for modules in "$installation/node_modules" "$installation/lib/node_modules"; do
+  cli="$modules/@oh-my-pi/pi-coding-agent/dist/cli.js"
+  if [[ -f "$cli" ]]; then
+    exec "$HOME/.local/bin/dotfiles-exec" bun bun "$cli" "$@"
+  fi
+done
+echo 'omp: JavaScript entry point was not found in the mise installation.' >&2
+exit 127
