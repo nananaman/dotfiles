@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+if [[ -n "${NONO_TOOL_SANDBOX_SHIM_DIR:-}" && -x "$NONO_TOOL_SANDBOX_SHIM_DIR/container" ]]; then
+  exec "$NONO_TOOL_SANDBOX_SHIM_DIR/container" "$@"
+fi
+exec /opt/homebrew/bin/container "$@"

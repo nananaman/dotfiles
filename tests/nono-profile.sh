@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-source_profile="${1:-nono/profiles/chouge-agent-common.jsonc}"
+source_profile="${1:-home/.config/nono/profiles/chouge-agent-common.jsonc}"
 source_profile_dir="$(dirname "$source_profile")"
 normalize_jsonc_for_jq() {
   sed '/^[[:space:]]*[/][/]/d' "$1" | perl -0pe 's/,\s*([}\]])/$1/g'
@@ -15,9 +15,11 @@ test_claude_state_root="$test_config_root/claude-state"
 test_neovim_root="$test_config_root/neovim"
 test_agent_tool_state_root="$test_config_root/agent-tool-state"
 test_flutter_dart_root="$test_config_root/flutter-dart"
+test_browser_cache_root="$test_config_root/browser-cache"
 profile_dir="$test_config_root/nono/profiles"
 mkdir -p \
   "$profile_dir" \
+  "$test_browser_cache_root" \
   "$test_publish_root/example" \
   "$test_claude_state_root/locks" \
   "$test_neovim_root/config" \
@@ -61,14 +63,24 @@ cat >"$profile_dir/pi.jsonc" <<'EOF'
 }
 EOF
 for copied_profile in "$profile_dir"/*.jsonc; do
+  python3 - "$copied_profile" "$(command -v bun)" <<'PYTHON'
+from pathlib import Path
+import sys
+p = Path(sys.argv[1])
+p.write_text(p.read_text().replace(
+    "{{ exec(command=(mise_bin | quote) ~ ' --cd / which --tool bun bun') | trim }}", sys.argv[2]
+))
+PYTHON
   rendered_profile="$copied_profile.rendered"
   sed \
-    -e "s|@HOME@|$HOME|g" \
+    -e "s|{{ env.HOME }}|$HOME|g" \
+    -e "s|{{ vars.dotfiles_root }}|$(pwd -P)|g" \
     -e 's|$HOME/.local/share/host-artifact/public|'"$test_publish_root"'|g' \
     -e 's|$HOME/.local/state/claude/locks|'"$test_claude_state_root/locks"'|g' \
     -e 's|$HOME/.config/nvim|'"$test_neovim_root/config"'|g' \
     -e 's|$HOME/.local/share/nvim|'"$test_neovim_root/share"'|g' \
     -e 's|$HOME/.local/state/nvim|'"$test_neovim_root/state"'|g' \
+    -e 's|$HOME/.agent-browser/browsers|'"$test_browser_cache_root"'|g' \
     -e 's|$HOME/.local/state/nono-agent-tools|'"$test_agent_tool_state_root"'|g' \
     -e 's|$HOME/.dart-tool|'"$test_flutter_dart_root/dart-tool"'|g' \
     -e 's|$HOME/.dartServer|'"$test_flutter_dart_root/dart-server"'|g' \
@@ -400,7 +412,7 @@ test_common_profile_uses_a_dedicated_agent_tmpdir_for_unix_sockets() {
     'false'
   assert_profile_value \
     '[.unsafe_macos_seatbelt_rules[] | select(contains("nono-agent-tools/tmp"))] | tojson' \
-    '["(allow network-bind (subpath \"@HOME@/.local/state/nono-agent-tools/tmp\"))","(allow network-outbound (subpath \"@HOME@/.local/state/nono-agent-tools/tmp\"))"]'
+    '["(allow network-bind (subpath \"{{ env.HOME }}/.local/state/nono-agent-tools/tmp\"))","(allow network-outbound (subpath \"{{ env.HOME }}/.local/state/nono-agent-tools/tmp\"))"]'
   assert_profile_value \
     '[.unsafe_macos_seatbelt_rules[] | select(contains("(subpath \"/private/var/folders"))] | length' \
     '0'
@@ -420,7 +432,7 @@ test_common_profile_isolates_agent_browser_runtime_state() {
     'true'
   assert_profile_value \
     '[.unsafe_macos_seatbelt_rules[] | select(contains("nono-agent-tools/agent-browser/sockets"))] | tojson' \
-    '["(allow network-bind (regex \"^@HOME@/.local/state/nono-agent-tools/agent-browser/sockets/[^/]+$\"))","(allow network-outbound (regex \"^@HOME@/.local/state/nono-agent-tools/agent-browser/sockets/[^/]+$\"))"]'
+    '["(allow network-bind (regex \"^{{ env.HOME }}/.local/state/nono-agent-tools/agent-browser/sockets/[^/]+$\"))","(allow network-outbound (regex \"^{{ env.HOME }}/.local/state/nono-agent-tools/agent-browser/sockets/[^/]+$\"))"]'
   assert_profile_value \
     '[.unsafe_macos_seatbelt_rules[] | select(. == "(allow network-bind)")] | length' \
     '1'
@@ -456,24 +468,26 @@ test_common_profile_isolates_agent_browser_runtime_state() {
     '["(allow mach-register (global-name-regex #\"^org\\.chromium\\.crashpad\\.child_port_handshake\\.\"))"]'
 }
 
-test_agent_browser_wrapper_isolates_chrome_application_state() {
-  local packages_module='nix/modules/home/packages.nix'
+test_linux_browser_installation_is_read_only() {
+  # Arrange: agent-browser install stores Chrome separately from session state.
+  # Act & Assert: only the executable cache is readable; no home-wide grant is added.
+  assert_profile_array_contains '.platform_overrides.linux.filesystem.read' '$HOME/.agent-browser/browsers'
+  assert_profile_value '(.platform_overrides.linux.filesystem.allow // []) | index("$HOME/.agent-browser") == null' 'true'
+  if [[ "$OSTYPE" == linux* ]]; then
+    assert_path_decision "ALLOWED" "$test_browser_cache_root/chrome-1/chrome" "read"
+    assert_path_decision "DENIED" "$test_browser_cache_root/chrome-1/chrome" "write"
+  fi
+}
 
-  # Arrange: macOS Chrome derives Crashpad storage from the Core Foundation home.
-  # Act & Assert: Only the agent-browser wrapper redirects it into the granted agent state.
-  rg -q -F 'CFFIXED_USER_HOME="$HOME/.local/state/nono-agent-tools/agent-browser"' \
-    "$packages_module"
-  rg -q -F 'export AGENT_BROWSER_ARGS=' \
-    "$packages_module"
-  rg -q -F -- '--no-sandbox' \
-    "$packages_module"
-  ! rg -q -F -- '--disable-gpu' "$packages_module"
-  rg -q -F 'exec ${agent-browser-package}/bin/agent-browser "$@"' \
-    "$packages_module"
-  rg -q -F 'cp -R skills skill-data "$out/share/agent-browser/"' \
-    "$packages_module"
-  rg -q -F 'AGENT_BROWSER_SKILLS_DIR=${agent-browser-package}/share/agent-browser/skill-data' \
-    "$packages_module"
+test_agent_browser_wrapper_isolates_chrome_application_state() {
+  local wrapper='home/.local/bin/agent-browser'
+  # Arrange: inspect the wrapper supplying Chrome's isolated state.
+  # Act & Assert: retain the dedicated home and packaged skill data.
+  rg -q -F 'CFFIXED_USER_HOME="$HOME/.local/state/nono-agent-tools/agent-browser"' "$wrapper"
+  rg -q -F -- '--no-sandbox' "$wrapper"
+  ! rg -q -F -- '--disable-gpu' "$wrapper"
+  rg -q -F 'agent-browser/skill-data' "$wrapper"
+  rg -q -F 'dotfiles-exec" npm:agent-browser agent-browser "$@"' "$wrapper"
 }
 
 test_common_profile_uses_enterprise_network() {
@@ -645,14 +659,10 @@ test_common_profile_allows_azure_cli_state_without_broadening_credential_access(
 }
 
 test_azure_cli_installation_matches_its_sandbox_grants() {
-  # Arrange: profileはazure-cliがhostに導入済みで、grant rootが作成済みであることを前提にする。
-  # Act & Assert: grant rootの作成は、profileが解除を行うmacOSと同じ条件の内側に置く。
-  sed -n "/isDarwin ''/,/^    ''}/p" nix/modules/home/dotfiles.nix \
-    | rg -q -F '$DRY_RUN_CMD mkdir -p "${homeDirectory}/.azure"'
-
-  # Assert: onActivation.cleanupでuninstallされないよう、brewsの内側に宣言する。
-  rg -U -q -- 'brews = \[\n(\s+("[^"]+"|#.*)\n)*\s+"azure-cli"' \
-    nix/modules/darwin/system.nix
+  # Arrange: Azure CLI needs an existing grant root on macOS.
+  # Act & Assert: setup prepares it and declares the host package.
+  rg -q -F '"$HOME/.azure"' scripts/bootstrap.sh
+  rg -q -F '"brew:azure-cli" = { os = "macos" }' mise.toml
 }
 
 test_common_profile_allows_all_ghq_repositories() {
@@ -697,10 +707,8 @@ test_common_profile_configures_sandbox_compatible_javascript_tools() {
       "$agent" "DENIED" "$HOME/Library/Preferences/.wrangler/config/default.toml" "write"
   done
 
-  # Assert: Home Manager creates the grant root before nono resolves filesystem capabilities.
-  rg -q -F \
-    '$DRY_RUN_CMD mkdir -p "${homeDirectory}/.local/state/nono-agent-tools/wrangler"' \
-    nix/modules/home/dotfiles.nix
+  # Assert: setup creates the grant roots before clients run.
+  rg -q -F '{wrangler,pub-cache,agent-browser/sockets,tmp}' scripts/bootstrap.sh
 }
 
 test_common_profile_allows_flutter_and_dart_runtime_state_without_home_wide_access() {
@@ -758,13 +766,9 @@ test_common_profile_allows_flutter_and_dart_runtime_state_without_home_wide_acce
   assert_profile_value '.filesystem.allow | index("$HOME/.pub-cache/hosted/pub.dev") == null' 'true'
   assert_profile_value '.filesystem.allow_file | any(contains("/.git/FETCH_HEAD"))' 'false'
 
-  # Assert: Home Manager creates roots that nono must canonicalize before either tool can initialize them.
-  rg -q -F \
-    '$DRY_RUN_CMD mkdir -p "${homeDirectory}/.dart-tool" "${homeDirectory}/.dartServer" "${configHome}/flutter"' \
-    nix/modules/home/dotfiles.nix
-  rg -q -F \
-    '$DRY_RUN_CMD mkdir -p "${homeDirectory}/.local/state/nono-agent-tools/wrangler" "${homeDirectory}/.local/state/nono-agent-tools/pub-cache"' \
-    nix/modules/home/dotfiles.nix
+  # Assert: setup creates the narrowly scoped runtime directories.
+  rg -q -F '"$HOME/.dart-tool" "$HOME/.dartServer" "$HOME/.config/flutter"' scripts/bootstrap.sh
+  rg -q -F '{wrangler,pub-cache,agent-browser/sockets,tmp}' scripts/bootstrap.sh
 }
 
 test_command_policies_never_require_human_approval() {
@@ -848,7 +852,7 @@ test_bun_uses_the_outer_sandbox_with_exact_ancestor_rules() {
     'false'
   assert_profile_value \
     '[.unsafe_macos_seatbelt_rules[] | select(startswith("(allow file-read-"))] | tojson' \
-    '["(allow file-read-metadata (literal \"/\"))","(allow file-read-data (literal \"/Users\"))","(allow file-read-data (literal \"@HOME@\"))"]'
+    '["(allow file-read-metadata (literal \"/\"))","(allow file-read-data (literal \"/Users\"))","(allow file-read-data (literal \"{{ env.HOME }}\"))"]'
 }
 
 test_codex_allows_chatgpt_subscription_endpoint() {
@@ -934,6 +938,7 @@ test_common_profile_allows_only_the_chrome_bridge_socket_subtree
 test_common_profile_allows_only_the_nix_daemon_socket
 test_common_profile_uses_a_dedicated_agent_tmpdir_for_unix_sockets
 test_common_profile_isolates_agent_browser_runtime_state
+test_linux_browser_installation_is_read_only
 test_agent_browser_wrapper_isolates_chrome_application_state
 test_common_profile_uses_enterprise_network
 test_common_profile_allows_development_endpoints

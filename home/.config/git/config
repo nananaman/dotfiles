@@ -1,0 +1,24 @@
+[user]
+    name = chouge
+    email = 36331803+nananaman@users.noreply.github.com
+[credential]
+    helper = !gh auth git-credential
+[url "https://github.com/"]
+    insteadOf = git@github.com:
+    insteadOf = ssh://git@github.com/
+[core]
+    hooksPath = ~/.config/git/hooks
+    excludesFile = ~/.config/git/ignore
+    pager = hunk pager
+[merge]
+    conflictstyle = diff3
+[diff]
+    colorMoved = default
+[delta]
+    navigate = true
+    side-by-side = true
+[filter "lfs"]
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
+    required = true

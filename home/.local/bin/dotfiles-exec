@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $# -lt 2 ]]; then
+  echo 'usage: dotfiles-exec TOOL EXECUTABLE [ARGUMENT...]' >&2
+  exit 64
+fi
+tool=$1
+binary=$2
+shift 2
+mise_bin=${MISE_BIN:-mise}
+
+# Change only mise's lookup directory, never the application's working directory.
+raw=$("$mise_bin" --cd / --no-env --no-hooks which --tool "$tool" "$binary")
+if [[ ! -x "$raw" || "$raw" -ef "$HOME/.local/bin/$binary" ]]; then
+  printf 'dotfiles-exec: invalid raw executable for %s: %s\n' "$tool" "$raw" >&2
+  exit 127
+fi
+# Preserve project-selected runtimes for child commands. Shims supply missing tools.
+export PATH="$HOME/.local/bin:$PATH:${MISE_DATA_DIR:-$HOME/.local/share/mise}/shims"
+exec "$raw" "$@"

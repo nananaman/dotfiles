@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+export CODEX_EXECUTABLE_PATH="$HOME/.local/bin/codex"
+export DISABLE_AUTOUPDATER=1
+exec "$HOME/.local/bin/dotfiles-exec" codex codex "$@"
