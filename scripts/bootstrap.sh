@@ -32,7 +32,7 @@ if "$dry_run"; then
       "$mise_bin" --cd / bootstrap user apply --dry-run
     ;;
   esac
-  echo 'After native setup: install the locked secretlint runtime, APM skills, and OS integration.'
+  echo 'After native setup: install the locked secretlint runtime and textlint rules, APM skills, and OS integration.'
   exit 0
 fi
 
@@ -55,6 +55,7 @@ mkdir -p "$HOME/Pictures/Screenshots"
 
 npm=$("$mise_bin" --cd / which --tool node npm)
 "$npm" ci --prefix "$HOME/.local/share/dotfiles/secretlint" --ignore-scripts --no-audit --no-fund
+"$npm" ci --prefix "$HOME/.config/textlint" --ignore-scripts --no-audit --no-fund
 case "$(uname -s)" in
 Darwin) bash "$root/scripts/macos.sh" ;;
 Linux)

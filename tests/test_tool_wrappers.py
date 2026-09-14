@@ -173,6 +173,29 @@ class ToolWrapperTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(json.loads(self.log.read_text())["args"], [str(cli), "--version"])
 
+    def test_textlint_ai_uses_shared_rules_and_preserves_process_context(self):
+        # Arrange: mise 管理の CLI と共通設定を用意する。
+        cli = self.raw / "node_modules/textlint/bin/textlint.js"
+        cli.parent.mkdir(parents=True)
+        cli.write_text("// JavaScript entry\n")
+        config = self.home / ".config/textlint/.textlintrc.json"
+        config.parent.mkdir(parents=True)
+        config.write_text('{"rules": {"preset-ai-words-ja": true}}\n')
+        self.env["RAW_EXIT"] = "1"
+
+        # Act: 空白入りパスを別の project から検査する。
+        result = self.run_wrapper("textlint-ai", "docs/file with spaces.md")
+
+        # Assert: 共通設定とルールを使い、cwd・引数・検出時の終了コードを保つ。
+        self.assertEqual(result.returncode, 1, result.stderr)
+        call = json.loads(self.log.read_text())
+        self.assertEqual(call["args"], [
+            str(cli), "--config", str(config),
+            "--rules-base-directory", str(config.parent / "node_modules"),
+            "docs/file with spaces.md",
+        ])
+        self.assertEqual(call["cwd"], str(self.work))
+
     def test_container_prefers_the_injected_tool_sandbox_shim(self):
         # Arrange: an existing sandbox has already provided its safe launcher.
         shim = self.raw / "container"

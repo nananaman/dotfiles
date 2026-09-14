@@ -2,10 +2,12 @@ name: chouge-agent-context
 version: 0.1.0
 targets:
   - claude
+  - codex
   - agent-skills
 
 dependencies:
   apm:
+    - path: ~/.apm/packages/textlint-ai
     - path: ~/ghq/github.com/nananaman/skills/meta/retrospective-codify
     - path: ~/ghq/github.com/nananaman/skills/engineering/create-pr
     - path: ~/ghq/github.com/nananaman/skills/engineering/draft-prd

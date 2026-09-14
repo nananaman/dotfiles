@@ -16,10 +16,13 @@ test_neovim_root="$test_config_root/neovim"
 test_agent_tool_state_root="$test_config_root/agent-tool-state"
 test_flutter_dart_root="$test_config_root/flutter-dart"
 test_browser_cache_root="$test_config_root/browser-cache"
+# Built-in agent profiles grant writes to TMPDIR; use HOME to test read-only access.
+test_textlint_root="$(mktemp -d "$HOME/.nono-textlint-test.XXXXXX")"
 profile_dir="$test_config_root/nono/profiles"
 mkdir -p \
   "$profile_dir" \
   "$test_browser_cache_root" \
+  "$test_textlint_root/node_modules" \
   "$test_publish_root/example" \
   "$test_claude_state_root/locks" \
   "$test_neovim_root/config" \
@@ -77,6 +80,7 @@ PYTHON
     -e "s|{{ vars.dotfiles_root }}|$(pwd -P)|g" \
     -e 's|$HOME/.local/share/host-artifact/public|'"$test_publish_root"'|g' \
     -e 's|$HOME/.local/state/claude/locks|'"$test_claude_state_root/locks"'|g' \
+    -e 's|$HOME/.config/textlint|'"$test_textlint_root"'|g' \
     -e 's|$HOME/.config/nvim|'"$test_neovim_root/config"'|g' \
     -e 's|$HOME/.local/share/nvim|'"$test_neovim_root/share"'|g' \
     -e 's|$HOME/.local/state/nvim|'"$test_neovim_root/state"'|g' \
@@ -90,7 +94,7 @@ PYTHON
   mv "$rendered_profile" "$copied_profile"
 done
 ln -s "$HOME/.config/nono/packages" "$test_config_root/nono/packages"
-trap 'rm -rf "$test_config_root"' EXIT
+trap 'rm -rf "$test_config_root" "$test_textlint_root"' EXIT
 export XDG_CONFIG_HOME="$test_config_root"
 profile="$profile_dir/$(basename "$source_profile")"
 
@@ -487,7 +491,7 @@ test_agent_browser_wrapper_isolates_chrome_application_state() {
   rg -q -F -- '--no-sandbox' "$wrapper"
   ! rg -q -F -- '--disable-gpu' "$wrapper"
   rg -q -F 'agent-browser/skill-data' "$wrapper"
-  rg -q -F 'dotfiles-exec" npm:agent-browser agent-browser "$@"' "$wrapper"
+  rg -q -F 'dotfiles-exec" node node "$cli" "$@"' "$wrapper"
 }
 
 test_common_profile_uses_enterprise_network() {
@@ -927,6 +931,28 @@ test_pi_allows_configured_openai_codex_endpoint() {
   assert_agent_network_boundary pi chatgpt.com
 }
 
+test_agent_hooks_can_read_textlint_rules() {
+  local agent
+  # Arrange: ルールの依存は setup が用意した専用ディレクトリにある。
+  for agent in codex claude; do
+    # Act & Assert: 両 agent の合成済み profile で読み取りを許可する。
+    assert_agent_path_decision "$agent" ALLOWED "$test_textlint_root/.textlintrc.json" read
+    assert_agent_path_decision "$agent" ALLOWED "$test_textlint_root/node_modules/preset/index.js" read
+  done
+}
+
+test_agent_hooks_cannot_modify_textlint_rules_or_read_adjacent_configs() {
+  local agent
+  # Arrange: hook は設定と依存を読むだけで、変更する必要がない。
+  for agent in codex claude; do
+    # Act & Assert: 書き込みと隣接ディレクトリへの許可は追加しない。
+    assert_agent_path_decision "$agent" DENIED "$test_textlint_root/node_modules/preset/index.js" write
+    assert_agent_path_decision "$agent" DENIED "$test_textlint_root-private/config" read
+  done
+}
+
+test_agent_hooks_can_read_textlint_rules
+test_agent_hooks_cannot_modify_textlint_rules_or_read_adjacent_configs
 test_github_cli_uses_the_parent_sandbox
 test_ssh_private_key_remains_unreadable
 test_common_profile_includes_general_development_groups

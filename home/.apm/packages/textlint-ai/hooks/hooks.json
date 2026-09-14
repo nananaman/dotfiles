@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|apply_patch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.local/bin/dotfiles-exec\" python python3 \"${PLUGIN_ROOT}/hooks/check.py\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

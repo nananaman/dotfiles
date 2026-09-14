@@ -40,6 +40,7 @@ run = [
 "~/.config/codex/instructions.md" = { source = "home/.agents/AGENTS.md", mode = "symlink" }
 "~/.apm/apm.yml" = { source = "home/.apm/apm.yml", mode = "symlink" }
 "~/.apm/marketplaces.json" = { source = "home/.apm/marketplaces.json", mode = "symlink" }
+"~/.apm/packages/textlint-ai" = { source = "home/.apm/packages/textlint-ai", mode = "symlink" }
 "~/.config/mise/config.toml" = { source = "home/.config/mise/config.toml", mode = "symlink" }
 "~/.config/zsh/functions" = { source = "home/.config/zsh/functions", mode = "symlink-each" }
 "~/.config/sheldon/plugins.toml" = { source = "home/.config/sheldon/plugins.toml", mode = "symlink" }
@@ -51,6 +52,9 @@ run = [
 "~/.config/sql-formatter" = { source = "home/.config/sql-formatter", mode = "symlink-each" }
 "~/.config/srt" = { source = "home/.config/srt", mode = "symlink-each" }
 "~/.config/secretlint/.secretlintrc.json" = { source = "home/.config/secretlint/.secretlintrc.json", mode = "symlink" }
+"~/.config/textlint/.textlintrc.json" = { source = "home/.config/textlint/.textlintrc.json", mode = "symlink" }
+"~/.config/textlint/package.json" = { source = "home/.config/textlint/package.json", mode = "symlink" }
+"~/.config/textlint/package-lock.json" = { source = "home/.config/textlint/package-lock.json", mode = "symlink" }
 "~/.config/stylua.toml" = { source = "home/.config/stylua.toml", mode = "symlink" }
 "~/.config/starship.toml" = { source = "home/.config/starship.toml", mode = "symlink" }
 "~/.config/hunk/config.toml" = { source = "home/.config/hunk/config.toml", mode = "symlink" }

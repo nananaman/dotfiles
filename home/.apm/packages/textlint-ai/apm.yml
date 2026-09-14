@@ -1,0 +1,5 @@
+name: textlint-ai
+version: 0.1.0
+targets:
+  - claude
+  - codex
