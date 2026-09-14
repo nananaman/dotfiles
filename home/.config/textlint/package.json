@@ -1,6 +1,7 @@
 {
   "private": true,
   "dependencies": {
+    "textlint-plugin-html": "1.0.1",
     "textlint-rule-preset-ai-words-ja": "1.2.0"
   }
 }

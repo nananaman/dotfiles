@@ -1,4 +1,4 @@
-"""Return textlint findings to Claude Code and Codex after Markdown edits."""
+"""Return textlint findings to Claude Code and Codex after Markdown / HTML edits."""
 
 import json
 from pathlib import Path
@@ -25,7 +25,7 @@ def main():
     cwd = Path(event.get("cwd") or Path.cwd())
     files = list(dict.fromkeys(
         str(cwd / file) for file in edited_files(event)
-        if Path(file).suffix.lower() == ".md"
+        if Path(file).suffix.lower() in {".md", ".html", ".htm"}
     ))
     if not files:
         return 0

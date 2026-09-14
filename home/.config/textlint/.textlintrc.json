@@ -1,4 +1,9 @@
 {
+  "plugins": {
+    "html": {
+      "extensions": [".HTML", ".HTM"]
+    }
+  },
   "rules": {
     "preset-ai-words-ja": true
   }
