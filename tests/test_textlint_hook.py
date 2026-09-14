@@ -1,4 +1,4 @@
-"""APM で配布する Markdown 編集後 hook の公開契約。"""
+"""APM で配布する Markdown / HTML 編集後 hook の公開契約。"""
 
 import json
 import os
@@ -70,6 +70,29 @@ class TextlintHookTests(unittest.TestCase):
             # Assert: 一つのファイル引数として渡し、成功する。
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual((home / "args").read_text(), "/project/docs/file with spaces.md\n")
+
+    def test_html_edits_pass_filename_to_textlint(self):
+        for suffix in ["html", "htm", "HTML"]:
+            with self.subTest(suffix=suffix), tempfile.TemporaryDirectory() as directory:
+                home = Path(directory)
+                command = home / ".local/bin/textlint-ai"
+                command.parent.mkdir(parents=True)
+                command.write_text('#!/bin/sh\nprintf "%s\\n" "$@" > "$HOME/args"\n')
+                command.chmod(0o755)
+                filename = f"/project/page with spaces.{suffix}"
+                payload = {"tool_name": "apply_patch", "tool_input": {
+                    "command": f"*** Add File: {filename}"
+                }}
+
+                result = subprocess.run(
+                    [sys.executable, str(HOOK)], input=json.dumps(payload),
+                    env={**os.environ, "HOME": str(home)}, capture_output=True,
+                    text=True, timeout=60,
+                )
+
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertTrue((home / "args").exists(), "HTML 編集でも textlint を実行する")
+                self.assertEqual((home / "args").read_text(), filename + "\n")
 
     def test_codex_patch_checks_added_updated_and_moved_markdown(self):
         # Arrange: 一つの patch に追加・変更・移動・削除と対象外ファイルがある。
