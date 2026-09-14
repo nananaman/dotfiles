@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+mise_bin=${MISE_BIN:-mise}
+installation=$("$mise_bin" --cd / --no-env --no-hooks where npm:textlint)
+cli=''
+for modules in "$installation/node_modules" "$installation/lib/node_modules"; do
+  if [[ -f "$modules/textlint/bin/textlint.js" ]]; then
+    cli="$modules/textlint/bin/textlint.js"
+    break
+  fi
+done
+if [[ -z "$cli" ]]; then
+  echo 'textlint-ai: textlint entry point was not found in the mise installation.' >&2
+  exit 127
+fi
+config="$HOME/.config/textlint"
+exec "$HOME/.local/bin/dotfiles-exec" node node "$cli" \
+  --config "$config/.textlintrc.json" \
+  --rules-base-directory "$config/node_modules" "$@"

@@ -196,6 +196,8 @@
       "{{ vars.dotfiles_root }}/home/.zshrc",
       // Neovim設定本体はrepositoryへのsymlinkだが、入口もread可能にする。
       "$HOME/.config/nvim",
+      // Markdown 編集後の hook が共通設定と npm のルール依存を読む。
+      "$HOME/.config/textlint",
       // ghはgitと同じ親sandboxで認証設定を読み、host側の設定変更は許可しない。
       "$HOME/.config/gh",
       // terraformのcredentials.tfrc.json等は読み取りのみ許可し、書き込みはsandbox外で行う。
