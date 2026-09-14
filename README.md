@@ -68,32 +68,8 @@ scripts/                   # bootstrap の補助処理
 tests/                    # 配置と実行契約の検証
 ```
 
-`.agents` / `.apm` は管理対象のファイルと hook パッケージだけを配置し、取得済み skills、認証、キャッシュ、セッションを repository に取り込まない。
+`.agents` / `.apm` は個別ファイルだけを配置し、取得済み skills、認証、キャッシュ、セッションを repository に取り込まない。
 設定は原則 symlink、HOME や Bun の実体パスが必要な nono profile だけ template とする。
-
-## Coding agent の日本語チェック hook
-
-[記事で紹介されている textlint-rule-preset-ai-words-ja](https://blog.p1ass.com/posts/textlint-rule-preset-ai-words-ja/) を、Claude Code と Codex の `PostToolUse` hook で実行する。
-Claude Code の `Write` / `Edit`、Codex の `apply_patch` で編集した Markdown が対象。
-指摘は agent へ返し、文章の修正を促す。shell コマンド経由の書き込みは対象外。
-
-hook パッケージは `home/.apm/packages/textlint-ai` に置き、`home/.apm/apm.yml` から path 参照する。
-`mise run setup` が textlint 本体、lockfile に固定したルール、共通設定を配置し、最後の `apm install -g` が両 agent の hook 設定へ統合する。
-APM が生成する `~/.claude/settings.json` と `~/.codex/hooks.json` は repository で管理しない。
-Codex で初めて使う場合は、hook の内容を確認して信頼する操作が必要になる（[Codex hooks](https://developers.openai.com/codex/hooks)）。
-
-共通設定は `~/.config/textlint/.textlintrc.json`。
-除外する語は `preset-ai-words-ja.no-ai-words.allows` に追加する。
-手動で再確認する場合も、hook と同じコマンドを使える。
-
-```bash
-textlint-ai README.md
-textlint-ai "docs/**/*.md"
-```
-
-`textlint-ai` は共通設定を明示して実行し、指摘があれば終了コード 1 を返す。
-hook はその結果を終了コード 2 と stderr に変換して agent に返す。
-repository 固有のルールで実行する場合は、その project の textlint 環境を使う。
 
 ## Pre-push secretlint
 
