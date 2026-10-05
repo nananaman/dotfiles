@@ -3,10 +3,10 @@ set -euo pipefail
 [[ "$(uname -s)" == Darwin ]] || exit 0
 root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)
 mise_bin=${MISE_BIN:-mise}
-flags=()
 case "${1:-}" in
---dry-run) flags+=(--dry-run) ;;
+--dry-run) set -- --dry-run ;;
 '')
+  set --
   if [[ ! -f /opt/homebrew/opt/pam-reattach/lib/pam/pam_reattach.so ]]; then
     echo 'dotfiles: install pam-reattach before applying Touch ID settings.' >&2
     exit 1
@@ -26,7 +26,7 @@ case "${1:-}" in
 esac
 # The native file engine replaces the old Nix symlink atomically.
 MISE_GLOBAL_CONFIG_FILE="$root/scripts/macos.toml" \
-  "$mise_bin" --cd / bootstrap --only files,user "${flags[@]}"
+  "$mise_bin" --cd / bootstrap --only files,user "$@"
 
 # Raw defaults values do not expand mise templates.
 if [[ "${1:-}" == --dry-run ]]; then

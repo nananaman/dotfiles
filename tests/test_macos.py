@@ -11,6 +11,48 @@ ROOT = Path(__file__).resolve().parents[1]
 
 @unittest.skipUnless(sys.platform == "darwin", "macOS integration")
 class MacOSSetupTests(unittest.TestCase):
+    def test_apply_with_system_bash_passes_no_empty_argument(self):
+        # Arrange: PAM の読み取り先と外部コマンドを隔離し、OS は変更しない。
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            library = root / "pam_reattach.so"
+            library.touch()
+            pam = root / "pam"
+            pam.mkdir()
+            (pam / "sudo").write_text("auth include sudo_local\n")
+            script = root / "macos.sh"
+            script.write_text(
+                (ROOT / "scripts/macos.sh").read_text()
+                .replace("/opt/homebrew/opt/pam-reattach/lib/pam/pam_reattach.so", str(library))
+                .replace("/etc/pam.d", str(pam))
+            )
+            log = root / "calls"
+            for name in ("mise", "defaults", "sudo"):
+                command = root / name
+                command.write_text(
+                    '#!/bin/sh\nprintf "%s" "${0##*/}" >> "$CALL_LOG"\n'
+                    'printf " <%s>" "$@" >> "$CALL_LOG"\n'
+                    'printf "\\n" >> "$CALL_LOG"\n'
+                )
+                command.chmod(0o755)
+
+            # Act: macOS 標準 Bash 3.2 で通常の適用経路を実行する。
+            result = subprocess.run(
+                ["/bin/bash", str(script)],
+                env={**os.environ, "MISE_BIN": str(root / "mise"),
+                     "CALL_LOG": str(log), "HOME": str(root),
+                     "PATH": f"{root}:/usr/bin:/bin"},
+                capture_output=True, text=True, timeout=10,
+            )
+
+            # Assert: dry-run や空引数を付けずに適用し、保存先も設定する。
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(log.read_text().splitlines(), [
+                "mise <--cd> </> <bootstrap> <--only> <files,user>",
+                "defaults <write> <com.apple.screencapture> <location> "
+                f"<-string> <{root}/Pictures/Screenshots>",
+            ])
+
     def test_preview_does_not_invoke_sudo_or_write_pam_files(self):
         # Arrange: native commands are recorded; sudo must never be invoked.
         with tempfile.TemporaryDirectory() as directory:
