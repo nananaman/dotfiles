@@ -8,7 +8,7 @@ targets:
 dependencies:
   apm:
     - path: ~/.apm/packages/textlint-ai
-    - path: ~/ghq/github.com/nananaman/skills/meta/retrospective-codify
+    - path: ~/ghq/github.com/nananaman/skills/meta/skill-maintenance
     - path: ~/ghq/github.com/nananaman/skills/engineering/create-pr
     - path: ~/ghq/github.com/nananaman/skills/engineering/draft-prd
     - path: ~/ghq/github.com/nananaman/skills/engineering/polish-prd
@@ -27,7 +27,6 @@ dependencies:
     - path: ~/ghq/github.com/nananaman/skills/engineering/nono-sandbox-maintenance
     - path: ~/ghq/github.com/nananaman/skills/personal/chouge-git
     - path: ~/ghq/github.com/nananaman/skills/personal/chouge-changelog
-    - path: ~/ghq/github.com/nananaman/skills/personal/merge-closeout
     - path: ~/ghq/github.com/nananaman/skills/meta/skill-workbench
     - path: ~/ghq/github.com/nananaman/skills/writing/chouge-writing
     - path: ~/ghq/github.com/nananaman/skills/productivity/grilling
