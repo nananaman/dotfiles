@@ -8,29 +8,29 @@ targets:
 dependencies:
   apm:
     - path: ~/.apm/packages/textlint-ai
-    - path: ~/ghq/github.com/nananaman/skills/meta/skill-maintenance
-    - path: ~/ghq/github.com/nananaman/skills/engineering/create-pr
-    - path: ~/ghq/github.com/nananaman/skills/engineering/draft-prd
-    - path: ~/ghq/github.com/nananaman/skills/engineering/polish-prd
-    - path: ~/ghq/github.com/nananaman/skills/engineering/draft-design-doc
-    - path: ~/ghq/github.com/nananaman/skills/engineering/polish-design-doc
-    - path: ~/ghq/github.com/nananaman/skills/engineering/task-breakdown
-    - path: ~/ghq/github.com/nananaman/skills/engineering/create-plan
-    - path: ~/ghq/github.com/nananaman/skills/engineering/review-plan
-    - path: ~/ghq/github.com/nananaman/skills/meta/apm-usage
-    - path: ~/ghq/github.com/nananaman/skills/meta/update-skills
-    - path: ~/ghq/github.com/nananaman/skills/engineering/review-diff-code
-    - path: ~/ghq/github.com/nananaman/skills/engineering/implement
-    - path: ~/ghq/github.com/nananaman/skills/engineering/tdd
-    - path: ~/ghq/github.com/nananaman/skills/engineering/test-writing-style
-    - path: ~/ghq/github.com/nananaman/skills/engineering/apple-container
-    - path: ~/ghq/github.com/nananaman/skills/engineering/nono-sandbox-maintenance
-    - path: ~/ghq/github.com/nananaman/skills/personal/chouge-git
-    - path: ~/ghq/github.com/nananaman/skills/personal/chouge-changelog
-    - path: ~/ghq/github.com/nananaman/skills/meta/skill-workbench
-    - path: ~/ghq/github.com/nananaman/skills/writing/chouge-writing
-    - path: ~/ghq/github.com/nananaman/skills/productivity/grilling
-    - path: ~/ghq/github.com/nananaman/skills/productivity/handoff
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/skill-maintenance
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/create-pr
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/draft-prd
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/polish-prd
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/draft-design-doc
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/polish-design-doc
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/task-breakdown
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/create-plan
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/review-plan
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/apm-usage
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/update-skills
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/review-diff-code
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/implement
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/tdd
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/test-writing-style
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/apple-container
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/nono-sandbox-maintenance
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/chouge-git
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/chouge-changelog
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/skill-workbench
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/chouge-writing
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/grilling
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/handoff
     - stablyai/orca/skills/orca-cli#af82126058de7ff0864f4cfb0ed347914595de91
     - stablyai/orca/skills/computer-use#af82126058de7ff0864f4cfb0ed347914595de91
     - stablyai/orca/skills/orchestration#af82126058de7ff0864f4cfb0ed347914595de91
