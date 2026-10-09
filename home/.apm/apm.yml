@@ -24,6 +24,7 @@ dependencies:
     - path: ~/ghq/github.com/nananaman/skills/plugin/skills/tdd
     - path: ~/ghq/github.com/nananaman/skills/plugin/skills/test-writing-style
     - path: ~/ghq/github.com/nananaman/skills/plugin/skills/apple-container
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/excalidraw
     - path: ~/ghq/github.com/nananaman/skills/plugin/skills/nono-sandbox-maintenance
     - path: ~/ghq/github.com/nananaman/skills/plugin/skills/chouge-git
     - path: ~/ghq/github.com/nananaman/skills/plugin/skills/chouge-changelog
