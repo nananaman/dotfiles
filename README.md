@@ -48,7 +48,7 @@ mise run check
 # nono の filesystem / network / command 境界
 mise run check-sandbox
 # skill 依存の展開
-apm install -g
+mise run apm-sync
 ```
 
 CLI の更新は OS 設定の再適用を必要としない。Bun のバージョンを更新した場合は、実体パスを含む nono の pi profile を `mise bootstrap --only dotfiles` で再生成する。
@@ -80,9 +80,12 @@ repository 内に `.secretlintrc*` があればそれを使い、なければ配
 
 移行の対応表と検証範囲は [MIGRATION.md](MIGRATION.md) を参照。
 
-## Codex native plugin
+## Agent skillsとplugins
 
-pstackと本人補完pluginは [agent-plugins.toml](agent-plugins.toml) を正本に、dotfilesの明示的なplan/sync taskから管理します。
-APMは他client用の旧版24件を固定参照で維持します。Codexでは明示的なrouting taskがその24件と旧native pluginをdiscoveryから除き、pstackと補完13件を使います。
-[管理と復旧](AGENT-PLUGINS.md)を確認し、最初は対象pluginと隔離CODEX_HOMEを指定してください。
-setupはnative syncやhook trustを自動実行しません。
+pstackと本人の補完13件は [home/.apm/apm.yml](home/.apm/apm.yml) を正本にAPMで管理します。
+pstackは0.9.114のfull SHA、本人skillsはローカル正本のpath参照です。旧汎用14件は依存から除き、旧24件を別viewとして維持しません。
+`mise run apm-plan`で予定を確認し、明示依頼されたときだけ`mise run apm-sync`で全manifestを同期します。
+別登録の旧native pluginと、既存のAPM skill非表示設定は、初回切替で対象分だけ整理します。
+
+共通指示は`home/.agents/AGENTS.md`、モデル表は`home/.codex/pstack-models.md`です。
+手順・未確認事項は [AGENT-PLUGINS.md](AGENT-PLUGINS.md) を参照してください。固定pstackの隔離APM展開とSessionStartの局所比較は確認済みです。通常環境への適用・新hook信頼とモデル受入はまだ行いません。

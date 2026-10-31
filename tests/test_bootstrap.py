@@ -108,10 +108,11 @@ class DotfileDeploymentTests(unittest.TestCase):
         self.assertFalse((self.home / ".agents").is_symlink())
         self.assertFalse((self.home / ".apm").is_symlink())
         self.assertFalse((self.home / ".codex").is_symlink())
-        for target in ("AGENTS.md", "pstack-models.md"):
+        for target, source in (("AGENTS.md", "home/.agents/AGENTS.md"),
+                               ("pstack-models.md", "home/.codex/pstack-models.md")):
             codex_file = self.home / ".codex" / target
             self.assertTrue(codex_file.is_symlink())
-            self.assertEqual(codex_file.resolve(), self.repo / "home/.agents/AGENTS.md")
+            self.assertEqual(codex_file.resolve(), self.repo / source)
         self.assertEqual(skills.read_text(), "local skill\n")
         self.assertEqual(state.read_text(), '{"local": true}\n')
         self.assertEqual(codex_state.read_text(), '{"preserve": true}\n')

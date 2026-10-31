@@ -33,7 +33,7 @@ if "$dry_run"; then
     ;;
   esac
   echo 'After native setup: install the locked secretlint runtime and textlint rules, APM skills, and OS integration.'
-  echo 'Native plugins: agent-plugins-plan/sync. Codex discovery: agent-routing-plan/apply. Sync and cutover are separate explicit actions.'
+  echo 'Agent skills/plugins: apm-plan and apm-sync. New hook trust remains a separate explicit action.'
   exit 0
 fi
 
@@ -69,6 +69,6 @@ esac
 if [[ ! -d "$HOME/.config/nono/packages/nolabs-ai/pi" ]]; then
   "$mise_bin" --cd / exec -- nono pull nolabs-ai/pi
 fi
-"$mise_bin" --cd / exec -- apm install -g
-echo 'Native plugins: agent-plugins-plan/sync with an explicit CODEX_HOME and selector; agent-routing-plan/apply is the separate Codex discovery cutover.'
+"$mise_bin" --cd "$root" run apm-sync
+echo 'Agent skills/plugins are managed by apm.yml; verify deployed skills before enabling newly installed hooks.'
 echo 'Setup complete. Open a new login shell.'
