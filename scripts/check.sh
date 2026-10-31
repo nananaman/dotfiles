@@ -5,7 +5,7 @@ cd "$root"
 
 shellcheck scripts/*.sh home/.local/bin/* home/.config/git/hooks/pre-push
 shfmt -d -i 2 scripts/*.sh home/.local/bin/* home/.config/git/hooks/pre-push
-taplo format --check mise.toml scripts/*.toml home/.config/mise/config.toml \
+taplo format --check mise.toml agent-plugins.toml scripts/*.toml home/.config/mise/config.toml \
   home/.config/starship.toml home/.config/hunk/config.toml
 zsh -n home/.zshenv home/.zshrc home/.config/zsh/functions/*.zsh
 python3 - <<'PY'
@@ -21,3 +21,4 @@ for path in Path("home").rglob("*.toml"):
 print("JSON / TOML syntax: OK")
 PY
 python3 -m unittest discover -s tests -p 'test_*.py'
+python3 scripts/agent-plugins.py validate

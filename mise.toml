@@ -20,6 +20,26 @@ run = "bash scripts/check.sh"
 description = "Check nono filesystem, network, and command boundaries"
 run = "bash tests/nono-profile.sh"
 
+[tasks.agent-plugins-plan]
+description = "Preview declared native plugin changes without installing"
+run = 'python3 scripts/agent-plugins.py plan "$@"'
+
+[tasks.agent-plugins-sync]
+description = "Explicitly sync selected native plugins into a named CODEX_HOME"
+run = 'python3 scripts/agent-plugins.py sync "$@"'
+
+[tasks.agent-routing-plan]
+description = "Preview Codex-only discovery changes for the pstack cutover"
+run = 'python3 scripts/codex-routing.py plan "$@"'
+
+[tasks.agent-routing-apply]
+description = "Explicitly switch Codex discovery after both native plugins verify"
+run = 'python3 scripts/codex-routing.py apply "$@"'
+
+[tasks.agent-routing-rollback]
+description = "Restore only the discovery values saved by the routing apply"
+run = 'python3 scripts/codex-routing.py rollback "$@"'
+
 [tasks.update]
 description = "Update global CLI pins without applying system settings"
 run = 'mise --cd / upgrade --bump "$@"'
@@ -35,6 +55,8 @@ run = [
 "~/.zshrc" = { source = "home/.zshrc", mode = "symlink" }
 "~/.zshenv" = { source = "home/.zshenv", mode = "symlink" }
 "~/.agents/AGENTS.md" = { source = "home/.agents/AGENTS.md", mode = "symlink" }
+"~/.codex/AGENTS.md" = { source = "home/.agents/AGENTS.md", mode = "symlink" }
+"~/.codex/pstack-models.md" = { source = "home/.agents/AGENTS.md", mode = "symlink" }
 "~/.claude/CLAUDE.md" = { source = "home/.agents/AGENTS.md", mode = "symlink" }
 "~/.pi/agent/AGENTS.md" = { source = "home/.agents/AGENTS.md", mode = "symlink" }
 "~/.config/codex/instructions.md" = { source = "home/.agents/AGENTS.md", mode = "symlink" }

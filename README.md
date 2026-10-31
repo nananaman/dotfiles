@@ -79,3 +79,10 @@ repository 内に `.secretlintrc*` があればそれを使い、なければ配
 緊急時の bypass は `git push --no-verify`。
 
 移行の対応表と検証範囲は [MIGRATION.md](MIGRATION.md) を参照。
+
+## Codex native plugin
+
+pstackと本人補完pluginは [agent-plugins.toml](agent-plugins.toml) を正本に、dotfilesの明示的なplan/sync taskから管理します。
+APMは他client用の旧版24件を固定参照で維持します。Codexでは明示的なrouting taskがその24件と旧native pluginをdiscoveryから除き、pstackと補完13件を使います。
+[管理と復旧](AGENT-PLUGINS.md)を確認し、最初は対象pluginと隔離CODEX_HOMEを指定してください。
+setupはnative syncやhook trustを自動実行しません。

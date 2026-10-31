@@ -5,33 +5,36 @@ targets:
   - codex
   - agent-skills
 
+# Compatibility view for Claude and other shared-skill consumers.
+# Keep these owned refs fixed while Codex uses the native supplement.
+# Codex discovery is controlled separately by agent-routing-plan/apply.
 dependencies:
   apm:
     - path: ~/.apm/packages/textlint-ai
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/skill-maintenance
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/create-pr
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/draft-prd
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/polish-prd
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/draft-design-doc
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/polish-design-doc
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/task-breakdown
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/create-plan
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/review-plan
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/apm-usage
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/update-skills
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/review-diff-code
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/implement
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/tdd
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/test-writing-style
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/apple-container
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/excalidraw
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/nono-sandbox-maintenance
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/chouge-git
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/chouge-changelog
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/skill-workbench
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/chouge-writing
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/grilling
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/handoff
+    - nananaman/skills/plugin/skills/skill-maintenance#8f1e4a66cd5334a00f4e899b2ec8c200a2003f91
+    - nananaman/skills/plugin/skills/create-pr#d25aec07e3fd2695165e274330afa7d183ba3e6a
+    - nananaman/skills/plugin/skills/draft-prd#d25aec07e3fd2695165e274330afa7d183ba3e6a
+    - nananaman/skills/plugin/skills/polish-prd#d25aec07e3fd2695165e274330afa7d183ba3e6a
+    - nananaman/skills/plugin/skills/draft-design-doc#d25aec07e3fd2695165e274330afa7d183ba3e6a
+    - nananaman/skills/plugin/skills/polish-design-doc#d25aec07e3fd2695165e274330afa7d183ba3e6a
+    - nananaman/skills/plugin/skills/task-breakdown#d25aec07e3fd2695165e274330afa7d183ba3e6a
+    - nananaman/skills/plugin/skills/create-plan#d25aec07e3fd2695165e274330afa7d183ba3e6a
+    - nananaman/skills/plugin/skills/review-plan#d25aec07e3fd2695165e274330afa7d183ba3e6a
+    - nananaman/skills/plugin/skills/apm-usage#d25aec07e3fd2695165e274330afa7d183ba3e6a
+    - nananaman/skills/plugin/skills/update-skills#d25aec07e3fd2695165e274330afa7d183ba3e6a
+    - nananaman/skills/plugin/skills/review-diff-code#d25aec07e3fd2695165e274330afa7d183ba3e6a
+    - nananaman/skills/plugin/skills/implement#d25aec07e3fd2695165e274330afa7d183ba3e6a
+    - nananaman/skills/plugin/skills/tdd#d25aec07e3fd2695165e274330afa7d183ba3e6a
+    - nananaman/skills/plugin/skills/test-writing-style#d25aec07e3fd2695165e274330afa7d183ba3e6a
+    - nananaman/skills/plugin/skills/apple-container#d25aec07e3fd2695165e274330afa7d183ba3e6a
+    - nananaman/skills/plugin/skills/excalidraw#d25aec07e3fd2695165e274330afa7d183ba3e6a
+    - nananaman/skills/plugin/skills/nono-sandbox-maintenance#d25aec07e3fd2695165e274330afa7d183ba3e6a
+    - nananaman/skills/plugin/skills/chouge-git#d25aec07e3fd2695165e274330afa7d183ba3e6a
+    - nananaman/skills/plugin/skills/chouge-changelog#d25aec07e3fd2695165e274330afa7d183ba3e6a
+    - nananaman/skills/plugin/skills/skill-workbench#d25aec07e3fd2695165e274330afa7d183ba3e6a
+    - nananaman/skills/plugin/skills/chouge-writing#d25aec07e3fd2695165e274330afa7d183ba3e6a
+    - nananaman/skills/plugin/skills/grilling#d25aec07e3fd2695165e274330afa7d183ba3e6a
+    - nananaman/skills/plugin/skills/handoff#d25aec07e3fd2695165e274330afa7d183ba3e6a
     - stablyai/orca/skills/orca-cli#af82126058de7ff0864f4cfb0ed347914595de91
     - stablyai/orca/skills/computer-use#af82126058de7ff0864f4cfb0ed347914595de91
     - stablyai/orca/skills/orchestration#af82126058de7ff0864f4cfb0ed347914595de91
