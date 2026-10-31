@@ -49,4 +49,4 @@
 
 - `CHANGES.md` の変更履歴では `chouge-changelog` skillに従う。
 - テストをレビューする場合は `test-writing-style` skillに従う。
-- APMの設定や運用では `apm-usage` skillに従う。
+- APMの設定や運用では `apm-usage` skillに従う。dotfilesで管理するグローバル同期はdotfiles rootの `mise run apm-sync` を使う。

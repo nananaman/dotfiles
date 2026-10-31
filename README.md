@@ -89,3 +89,5 @@ pstackは0.9.114のfull SHA、本人skillsはローカル正本のpath参照で�
 
 共通指示は`home/.agents/AGENTS.md`、モデル表は`home/.codex/pstack-models.md`です。
 手順・未確認事項は [AGENT-PLUGINS.md](AGENT-PLUGINS.md) を参照してください。固定pstackの隔離APM展開とSessionStartの局所比較は確認済みです。通常環境への適用・新hook信頼とモデル受入はまだ行いません。
+
+環境の動作確認用の架空CLIは [tests/fixtures/agent-cli](tests/fixtures/agent-cli/README.md) に置きます。実サービスや認証情報は含めません。
