@@ -82,12 +82,24 @@ repository 内に `.secretlintrc*` があればそれを使い、なければ配
 
 ## Agent skillsとplugins
 
-pstackと本人の補完13件は [home/.apm/apm.yml](home/.apm/apm.yml) を正本にAPMで管理します。
-pstackは0.9.114のfull SHA、本人skillsはローカル正本のpath参照です。旧汎用14件は依存から除き、旧24件を別viewとして維持しません。
-`mise run apm-plan`で予定を確認し、明示依頼されたときだけ`mise run apm-sync`で全manifestを同期します。
-別登録の旧native pluginと、既存のAPM skill非表示設定は、初回切替で対象分だけ整理します。
+導入するskills・pluginsと参照先は [home/.apm/apm.yml](home/.apm/apm.yml) で管理します。
+第三者依存はfull SHA、本人skillsはローカル正本のpath参照です。
+共通指示は [home/.agents/AGENTS.md](home/.agents/AGENTS.md)、モデル表は [home/.codex/pstack-models.md](home/.codex/pstack-models.md) に置きます。
 
-共通指示は`home/.agents/AGENTS.md`、モデル表は`home/.codex/pstack-models.md`です。
-手順・未確認事項は [AGENT-PLUGINS.md](AGENT-PLUGINS.md) を参照してください。固定pstackの隔離APM展開とSessionStartの局所比較は確認済みです。通常環境への適用・新hook信頼とモデル受入はまだ行いません。
+```sh
+mise run apm-plan
+mise run apm-sync
+```
 
-環境の動作確認用の架空CLIは [tests/fixtures/agent-cli](tests/fixtures/agent-cli/README.md) に置きます。実サービスや認証情報は含めません。
+旧依存を除いたmanifest全体を同期し、削除対象の配置を確認します。手編集・所有不明のfileが残っても、無差別にdirectoryを削除しません。
+pstackの起動hookにはAPM展開後の参照補正が必要なので、直接installせずapm-syncを使います。
+pstack・APM更新時は補正の対応を確認し、失敗したまま通常sessionを開始しません。同期と、新hookの信頼・実行は別の操作です。
+
+既存環境から切り替える場合は、設定・manifest/lock・linkとユーザー変更を保存し、参照する本人正本を更新してから同期します。
+別登録のnative pluginと個別skill非表示設定はAPMが変更しないため、重複・非表示になる対象だけを整理します。
+旧skillを呼ぶ自動化の扱いも切替前に確認し、同期と一緒に無断変更しません。
+
+hookを持つ依存を外す場合は、manifestから消す前に `apm uninstall -g <依存>` でhook定義も除去します。
+復旧は保存した設定と参照先のうち変更した範囲だけを戻し、無関係な設定や自動化を巻き戻しません。
+
+環境の動作確認用の架空CLIは [tests/fixtures/agent-cli](tests/fixtures/agent-cli/README.md) に置きます。
