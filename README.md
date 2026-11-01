@@ -48,7 +48,7 @@ mise run check
 # nono の filesystem / network / command 境界
 mise run check-sandbox
 # skill 依存の展開
-apm install -g
+mise run apm-sync
 ```
 
 CLI の更新は OS 設定の再適用を必要としない。Bun のバージョンを更新した場合は、実体パスを含む nono の pi profile を `mise bootstrap --only dotfiles` で再生成する。
@@ -79,3 +79,27 @@ repository 内に `.secretlintrc*` があればそれを使い、なければ配
 緊急時の bypass は `git push --no-verify`。
 
 移行の対応表と検証範囲は [MIGRATION.md](MIGRATION.md) を参照。
+
+## Agent skillsとplugins
+
+導入するskills・pluginsと参照先は [home/.apm/apm.yml](home/.apm/apm.yml) で管理します。
+第三者依存はfull SHA、本人skillsは原則ローカル正本のpath参照です。`skill-maintenance`はfull SHAで固定し、公開済みの正本と照合します。
+共通指示は [home/.agents/AGENTS.md](home/.agents/AGENTS.md)、モデル表は [home/.codex/pstack-models.md](home/.codex/pstack-models.md) に置きます。
+
+```sh
+mise run apm-plan
+mise run apm-sync
+```
+
+旧依存を除いたmanifest全体を同期し、削除対象の配置を確認します。手編集・所有不明のfileが残っても、無差別にdirectoryを削除しません。
+pstackの起動hookにはAPM展開後の参照補正が必要なので、直接installせずapm-syncを使います。
+pstack・APM更新時は補正の対応を確認し、失敗したまま通常sessionを開始しません。同期と、新hookの信頼・実行は別の操作です。
+
+既存環境から切り替える場合は、設定・manifest/lock・linkとユーザー変更を保存し、参照する本人正本を更新してから同期します。
+別登録のnative pluginと個別skill非表示設定はAPMが変更しないため、重複・非表示になる対象だけを整理します。
+`skill-maintenance`と既存の日次保守は維持します。別登録のnative pluginを無効にする際は、callerがAPMで検出される同じskill実体を呼べるか確認し、自動化を同期と一緒に無断変更しません。
+
+hookを持つ依存を外す場合は、manifestから消す前に `apm uninstall -g <依存>` でhook定義も除去します。
+復旧は保存した設定と参照先のうち変更した範囲だけを戻し、無関係な設定や自動化を巻き戻しません。
+
+環境の動作確認用の架空CLIは [tests/fixtures/agent-cli](tests/fixtures/agent-cli/README.md) に置きます。

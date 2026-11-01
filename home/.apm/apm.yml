@@ -5,33 +5,25 @@ targets:
   - codex
   - agent-skills
 
+# APM owns pstack and the personal supplement; no legacy compatibility view.
 dependencies:
   apm:
     - path: ~/.apm/packages/textlint-ai
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/skill-maintenance
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/create-pr
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/draft-prd
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/polish-prd
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/draft-design-doc
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/polish-design-doc
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/task-breakdown
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/create-plan
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/review-plan
+    - michael-denyer/pstack-claude/plugins/pstack#5851c89613e2ddc3a6b7f4af02a42363b30ef8d3
     - path: ~/ghq/github.com/nananaman/skills/plugin/skills/apm-usage
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/update-skills
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/review-diff-code
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/implement
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/tdd
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/test-writing-style
     - path: ~/ghq/github.com/nananaman/skills/plugin/skills/apple-container
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/chouge-changelog
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/chouge-git
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/chouge-writing
     - path: ~/ghq/github.com/nananaman/skills/plugin/skills/excalidraw
     - path: ~/ghq/github.com/nananaman/skills/plugin/skills/nono-sandbox-maintenance
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/chouge-git
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/chouge-changelog
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/sakura-cloud-eventbus
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/sakura-cloud-webaccel
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/sakura-cloud-workflows
+    - nananaman/skills/plugin/skills/skill-maintenance#3e067f262e8fb97cc7333cd12ac35ff209f3643e
     - path: ~/ghq/github.com/nananaman/skills/plugin/skills/skill-workbench
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/chouge-writing
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/grilling
-    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/handoff
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/test-writing-style
+    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/update-skills
     - stablyai/orca/skills/orca-cli#af82126058de7ff0864f4cfb0ed347914595de91
     - stablyai/orca/skills/computer-use#af82126058de7ff0864f4cfb0ed347914595de91
     - stablyai/orca/skills/orchestration#af82126058de7ff0864f4cfb0ed347914595de91

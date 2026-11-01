@@ -90,13 +90,16 @@ class DotfileDeploymentTests(unittest.TestCase):
         # Arrange: these writable directories contain application-owned state.
         skills = self.home / ".agents/skills/local/SKILL.md"
         state = self.home / ".apm/config.json"
+        codex_state = self.home / ".codex/runtime-state.json"
         skills.parent.mkdir(parents=True)
         state.parent.mkdir(parents=True)
+        codex_state.parent.mkdir(parents=True)
         skills.write_text("local skill\n")
         state.write_text('{"local": true}\n')
+        codex_state.write_text('{"preserve": true}\n')
 
         # Act: deploy only the shared instructions and dependency manifest.
-        result = self.apply("~/.agents/AGENTS.md", "~/.apm/apm.yml")
+        result = self.apply("~/.agents/AGENTS.md", "~/.apm/apm.yml", "~/.codex/AGENTS.md", "~/.codex/pstack-models.md")
 
         # Assert: only the declared files are linked; runtime state stays local.
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -104,8 +107,15 @@ class DotfileDeploymentTests(unittest.TestCase):
         self.assertTrue((self.home / ".apm/apm.yml").is_symlink())
         self.assertFalse((self.home / ".agents").is_symlink())
         self.assertFalse((self.home / ".apm").is_symlink())
+        self.assertFalse((self.home / ".codex").is_symlink())
+        for target, source in (("AGENTS.md", "home/.agents/AGENTS.md"),
+                               ("pstack-models.md", "home/.codex/pstack-models.md")):
+            codex_file = self.home / ".codex" / target
+            self.assertTrue(codex_file.is_symlink())
+            self.assertEqual(codex_file.resolve(), self.repo / source)
         self.assertEqual(skills.read_text(), "local skill\n")
         self.assertEqual(state.read_text(), '{"local": true}\n')
+        self.assertEqual(codex_state.read_text(), '{"preserve": true}\n')
 
     def test_shared_commands_exclude_the_macos_container_wrapper(self):
         # Arrange: the shared command directory is used on both supported OSes.
