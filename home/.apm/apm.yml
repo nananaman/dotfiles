@@ -20,6 +20,7 @@ dependencies:
     - path: ~/ghq/github.com/nananaman/skills/plugin/skills/sakura-cloud-eventbus
     - path: ~/ghq/github.com/nananaman/skills/plugin/skills/sakura-cloud-webaccel
     - path: ~/ghq/github.com/nananaman/skills/plugin/skills/sakura-cloud-workflows
+    - nananaman/skills/plugin/skills/skill-maintenance#3e067f262e8fb97cc7333cd12ac35ff209f3643e
     - path: ~/ghq/github.com/nananaman/skills/plugin/skills/skill-workbench
     - path: ~/ghq/github.com/nananaman/skills/plugin/skills/test-writing-style
     - path: ~/ghq/github.com/nananaman/skills/plugin/skills/update-skills

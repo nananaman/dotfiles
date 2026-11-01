@@ -6,10 +6,11 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 PSTACK_REF = "michael-denyer/pstack-claude/plugins/pstack#5851c89613e2ddc3a6b7f4af02a42363b30ef8d3"
+MAINTENANCE_REF = "nananaman/skills/plugin/skills/skill-maintenance#3e067f262e8fb97cc7333cd12ac35ff209f3643e"
 SUPPLEMENT = {"apm-usage", "apple-container", "chouge-changelog", "chouge-git", "chouge-writing",
               "excalidraw", "nono-sandbox-maintenance", "sakura-cloud-eventbus", "sakura-cloud-webaccel",
               "sakura-cloud-workflows", "skill-workbench", "test-writing-style", "update-skills"}
-RETIRED_APM = {"skill-maintenance", "create-pr", "draft-prd", "polish-prd", "draft-design-doc",
+RETIRED_APM = {"create-pr", "draft-prd", "polish-prd", "draft-design-doc",
                "polish-design-doc", "task-breakdown", "create-plan", "review-plan", "review-diff-code",
                "implement", "tdd", "grilling", "handoff"}
 
@@ -21,7 +22,7 @@ class AgentDistributionContractTest(unittest.TestCase):
 
         self.assertEqual(SUPPLEMENT, local_skills)
         self.assertIn("    - " + PSTACK_REF, manifest)
-        self.assertNotIn("nananaman/skills/plugin/skills/skill-maintenance#", manifest)
+        self.assertIn("    - " + MAINTENANCE_REF, manifest)
         self.assertFalse(any("plugin/skills/" + name + "\n" in manifest for name in RETIRED_APM))
         tasks = tomllib.loads((ROOT / "mise.toml").read_text())["tasks"]
         self.assertEqual("apm install -g --dry-run", tasks["apm-plan"]["run"])
