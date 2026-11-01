@@ -92,6 +92,7 @@ mise run apm-sync
 ```
 
 旧依存を除いたmanifest全体を同期し、削除対象の配置を確認します。手編集・所有不明のfileが残っても、無差別にdirectoryを削除しません。
+pstackは依存の `targets: [codex]` でCodexだけに展開します。他の依存のtargetは維持します。Claude対応は、APMが複数manifestからCopilot用定義を選ぶ問題の解決後に確認します。
 pstackの起動hookにはAPM展開後の参照補正が必要なので、直接installせずapm-syncを使います。
 pstack・APM更新時は補正の対応を確認し、失敗したまま通常sessionを開始しません。同期と、新hookの信頼・実行は別の操作です。
 

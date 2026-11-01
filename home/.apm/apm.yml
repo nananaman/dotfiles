@@ -9,7 +9,10 @@ targets:
 dependencies:
   apm:
     - path: ~/.apm/packages/textlint-ai
-    - michael-denyer/pstack-claude/plugins/pstack#5851c89613e2ddc3a6b7f4af02a42363b30ef8d3
+    - git: michael-denyer/pstack-claude
+      path: plugins/pstack
+      ref: 5851c89613e2ddc3a6b7f4af02a42363b30ef8d3
+      targets: [codex]
     - path: ~/ghq/github.com/nananaman/skills/plugin/skills/apm-usage
     - path: ~/ghq/github.com/nananaman/skills/plugin/skills/apple-container
     - path: ~/ghq/github.com/nananaman/skills/plugin/skills/chouge-changelog

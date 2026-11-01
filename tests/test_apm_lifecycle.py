@@ -34,8 +34,9 @@ class ApmLifecycleTest(unittest.TestCase):
         (path / "SKILL.md").write_text(f"---\nname: {name}\ndescription: Inert fixture, never execute.\n---\n{body}")
         return path
 
-    def install(self, packages):
-        dependencies = "\n".join("    - path: " + str(path) for path in packages) if packages else "    []"
+    def install(self, packages, targets=None):
+        restriction = "\n      targets: [" + ", ".join(targets) + "]" if targets else ""
+        dependencies = "\n".join("    - path: " + str(path) + restriction for path in packages) if packages else "    []"
         (self.home / ".apm/apm.yml").write_text(
             "name: lifecycle-fixture\nversion: 0.1.0\ntargets: [claude, codex, agent-skills]\n"
             "dependencies:\n  apm:\n" + dependencies + "\n")
@@ -129,6 +130,30 @@ class ApmLifecycleTest(unittest.TestCase):
         hooks = json.loads((self.home / ".codex/hooks.json").read_text())
         self.assertEqual("__NO_SUCH_EXECUTABLE_HOOK__", hooks["hooks"]["SessionStart"][0]["hooks"][0]["command"])
         self.assertFalse((self.home / ".codex/plugins").exists())
+
+    def test_codex_dependency_target_excludes_competing_copilot_hooks_and_claude_outputs(self):
+        plugin = self.root / "multi-client-plugin"
+        self.skill(plugin / "skills/poteto-mode", "poteto-mode")
+        for directory in (".github/plugin", ".claude-plugin", "hooks", "agents"):
+            (plugin / directory).mkdir(parents=True, exist_ok=True)
+        (plugin / ".github/plugin/plugin.json").write_text(json.dumps({"name": "multi-client-plugin", "hooks": "hooks/copilot-hooks.json"}))
+        (plugin / ".claude-plugin/plugin.json").write_text('{"name":"multi-client-plugin"}')
+        (plugin / "agents/poteto-agent.md").write_text("---\nname: poteto-agent\ndescription: Inert fixture\n---\nNo actions.\n")
+        for filename, events in [("copilot-hooks.json", ["SessionStart", "PreToolUse"]), ("codex-hooks.json", ["SessionStart"])]:
+            command = "__CODEX_MUST_NOT_EXECUTE__" if filename.startswith("codex") else "__COPILOT_MUST_NOT_EXECUTE__"
+            (plugin / "hooks" / filename).write_text(json.dumps({"hooks": {event: [{"hooks": [{"type": "command", "command": command}]}] for event in events}}))
+
+        self.install([plugin], targets=["codex"])
+
+        hooks = json.loads((self.home / ".codex/hooks.json").read_text())["hooks"]
+        self.assertEqual({"SessionStart"}, set(hooks))
+        self.assertEqual("__CODEX_MUST_NOT_EXECUTE__", hooks["SessionStart"][0]["hooks"][0]["command"])
+        self.assertTrue((self.home / ".agents/skills/poteto-mode/SKILL.md").is_file())
+        self.assertTrue((self.home / ".codex/agents/poteto-agent.toml").is_file())
+        self.assertFalse((self.home / ".claude/apm-hooks.json").exists())
+        self.assertFalse((self.home / ".claude/agents").exists())
+        self.assertFalse((self.home / ".claude/skills").exists())
+        self.assertFalse((self.home / ".github/hooks").exists())
 
 
 if __name__ == "__main__":

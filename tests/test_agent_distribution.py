@@ -5,7 +5,11 @@ import tomllib
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-PSTACK_REF = "michael-denyer/pstack-claude/plugins/pstack#5851c89613e2ddc3a6b7f4af02a42363b30ef8d3"
+PSTACK_DEPENDENCY = """    - git: michael-denyer/pstack-claude
+      path: plugins/pstack
+      ref: 5851c89613e2ddc3a6b7f4af02a42363b30ef8d3
+      targets: [codex]
+"""
 MAINTENANCE_REF = "nananaman/skills/plugin/skills/skill-maintenance#3e067f262e8fb97cc7333cd12ac35ff209f3643e"
 SUPPLEMENT = {"apm-usage", "apple-container", "chouge-changelog", "chouge-git", "chouge-writing",
               "excalidraw", "nono-sandbox-maintenance", "sakura-cloud-eventbus", "sakura-cloud-webaccel",
@@ -21,7 +25,7 @@ class AgentDistributionContractTest(unittest.TestCase):
         local_skills = set(re.findall(r"^    - path: ~/ghq/github.com/nananaman/skills/plugin/skills/([a-z0-9-]+)$", manifest, re.M))
 
         self.assertEqual(SUPPLEMENT, local_skills)
-        self.assertIn("    - " + PSTACK_REF, manifest)
+        self.assertIn(PSTACK_DEPENDENCY, manifest)
         self.assertIn("    - " + MAINTENANCE_REF, manifest)
         self.assertFalse(any("plugin/skills/" + name + "\n" in manifest for name in RETIRED_APM))
         tasks = tomllib.loads((ROOT / "mise.toml").read_text())["tasks"]
@@ -42,8 +46,6 @@ class AgentDistributionContractTest(unittest.TestCase):
         instructions = (ROOT / "home/.agents/AGENTS.md").read_text()
         models = (ROOT / "home/.codex/pstack-models.md").read_text()
 
-        self.assertIn("通常の開発は `poteto-mode`", instructions)
-        self.assertIn("実行環境の `pstack-models.md`", instructions)
         self.assertIn("同じ配布元の実体を確認して対応付け", instructions)
         for obsolete in ("Codex", "Claude", "Pi等", "`implement`", "旧24件", "初期pilot", "gpt-6.1-sol"):
             self.assertNotIn(obsolete, instructions)

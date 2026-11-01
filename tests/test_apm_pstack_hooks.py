@@ -77,6 +77,20 @@ class PstackHookCompatibilityTest(unittest.TestCase):
             module.plan(self.home, self.package)
         self.assertEqual(before, {p: p.read_bytes() for p in self.home.rglob("*.json")})
 
+    def test_codex_only_ownership_leaves_unrelated_claude_settings_untouched(self):
+        settings = self.home / ".claude/settings.json"
+        settings.write_text(json.dumps({"hooks": {"SessionStart": [self.unrelated]}}))
+        (self.home / ".claude/apm-hooks.json").unlink()
+        (self.home / ".claude/hooks/pstack/hooks/session-start.sh").unlink()
+        before = settings.read_bytes()
+
+        changes = module.plan(self.home, self.package)
+        self.assertEqual({self.home / ".codex/hooks.json", self.home / ".codex/apm-hooks.json"}, {path for path, _ in changes})
+        self.apply()
+
+        self.assertEqual(before, settings.read_bytes())
+        self.assertEqual([], module.plan(self.home, self.package))
+
     def test_modified_command_preserves_user_changes_and_prevents_all_writes(self):
         path = self.home / ".claude/settings.json"
         data = json.loads(path.read_text())
