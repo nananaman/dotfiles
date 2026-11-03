@@ -22,8 +22,8 @@ def plan(home, package_root, source=SOURCE, claude_config_dir=None):
         if hashlib.sha256((package_root / relative).read_bytes()).hexdigest() != expected:
             raise ValueError(f"pstack source changed: {relative}; review the pinned compatibility fix")
     manifest = json.loads((package_root / ".claude-plugin/plugin.json").read_text())
-    if manifest.get("name") != "pstack" or manifest.get("version") != "0.9.114":
-        raise ValueError("expected pstack 0.9.114")
+    if manifest.get("name") != "pstack" or manifest.get("version") not in ("0.9.114", "0.9.120"):
+        raise ValueError("expected reviewed pstack 0.9.114 or 0.9.120")
     changes = []
     owned_count = 0
     for runtime, config_name in (("codex", "hooks.json"), ("claude", "settings.json")):
