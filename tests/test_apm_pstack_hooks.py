@@ -77,6 +77,32 @@ class PstackHookCompatibilityTest(unittest.TestCase):
             module.plan(self.home, self.package)
         self.assertEqual(before, {p: p.read_bytes() for p in self.home.rglob("*.json")})
 
+    def test_updated_plugin_preserves_hook_status_and_ownership(self):
+        (self.package / ".claude-plugin/plugin.json").write_text('{"name":"pstack","version":"0.9.120"}')
+        for runtime, filename in (("codex", "hooks.json"), ("claude", "settings.json")):
+            for name in (filename, "apm-hooks.json"):
+                path = self.home / ("." + runtime) / name
+                document = json.loads(path.read_text())
+                entries = document["SessionStart"] if name == "apm-hooks.json" else document["hooks"]["SessionStart"]
+                entries[1]["hooks"][0]["statusMessage"] = "Loading pstack routing"
+                path.write_text(json.dumps(document))
+
+        self.apply()
+
+        self.assertEqual([], module.plan(self.home, self.package))
+        for runtime, filename in (("codex", "hooks.json"), ("claude", "settings.json")):
+            document = json.loads((self.home / ("." + runtime) / filename).read_text())
+            self.assertEqual("Loading pstack routing", document["hooks"]["SessionStart"][1]["hooks"][0]["statusMessage"])
+
+    def test_unreviewed_version_fails_without_writing(self):
+        (self.package / ".claude-plugin/plugin.json").write_text('{"name":"pstack","version":"0.9.121"}')
+        before = {p: p.read_bytes() for p in self.home.rglob("*.json")}
+
+        with self.assertRaisesRegex(ValueError, "expected reviewed pstack"):
+            module.plan(self.home, self.package)
+
+        self.assertEqual(before, {p: p.read_bytes() for p in self.home.rglob("*.json")})
+
     def test_codex_only_ownership_leaves_unrelated_claude_settings_untouched(self):
         settings = self.home / ".claude/settings.json"
         settings.write_text(json.dumps({"hooks": {"SessionStart": [self.unrelated]}}))
