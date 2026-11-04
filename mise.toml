@@ -44,6 +44,9 @@ run = [
 ]
 
 [dotfiles]
+"~/chief-of-staff/AGENTS.md" = { source = "home/chief-of-staff/AGENTS.md", mode = "symlink" }
+"~/chief-of-staff/README.md" = { source = "home/chief-of-staff/README.md", mode = "symlink" }
+"~/chief-of-staff/mise.toml" = { source = "home/chief-of-staff/mise.toml", mode = "symlink" }
 "~/.zshrc" = { source = "home/.zshrc", mode = "symlink" }
 "~/.zshenv" = { source = "home/.zshenv", mode = "symlink" }
 "~/.agents/AGENTS.md" = { source = "home/.agents/AGENTS.md", mode = "symlink" }
