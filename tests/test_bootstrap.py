@@ -3,6 +3,7 @@
 import os
 import json
 from pathlib import Path
+import platform
 import shutil
 import subprocess
 import tempfile
@@ -74,6 +75,46 @@ class DotfileDeploymentTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertFalse(target.is_symlink())
         self.assertEqual(target.read_text(), "local configuration\n")
+
+    @unittest.skipUnless(platform.system() == "Darwin", "Herdr Desktop is macOS-only")
+    def test_herdr_settings_reapplication_preserves_local_state(self):
+        target = self.home / ".config/herdr-app/settings.json"
+        sentinels = {
+            ".config/herdr-app/layouts/.state/preserve.json": b"local layout state\n",
+            ".config/herdr-app/shared.json": b'{"local": true}\n',
+            ".local/state/herdr-core/default/preserve.json": b"local core state\n",
+            ".local/state/herdr/preserve.json": b"retired terminal state\n",
+        }
+        for name, content in sentinels.items():
+            path = self.home / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(content)
+
+        for _ in range(2):
+            result = self.apply("~/.config/herdr-app/settings.json")
+            self.assertEqual(result.returncode, 0, result.stderr)
+
+        self.assertTrue(target.is_symlink())
+        self.assertEqual(target.resolve(), self.repo / "home/.config/herdr-app/settings.json")
+        self.assertEqual(target.read_bytes(), b"{}\n")
+        self.assertTrue(target.parent.is_dir())
+        self.assertFalse(target.parent.is_symlink())
+        for name, content in sentinels.items():
+            self.assertEqual((self.home / name).read_bytes(), content)
+
+    @unittest.skipUnless(platform.system() == "Darwin", "Herdr Desktop is macOS-only")
+    def test_conflicting_herdr_settings_are_preserved(self):
+        target = self.home / ".config/herdr-app/settings.json"
+        target.parent.mkdir(parents=True)
+        original = b'{"font_size": 15}\n'
+        target.write_bytes(original)
+
+        result = self.apply("~/.config/herdr-app/settings.json")
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse(target.is_symlink())
+        self.assertEqual(target.read_bytes(), original)
+        self.assertEqual((self.repo / "home/.config/herdr-app/settings.json").read_bytes(), b"{}\n")
 
     def test_dry_run_does_not_create_the_target(self):
         # Arrange: start without a shell configuration.

@@ -23,6 +23,14 @@ macOS の Touch ID 用 PAM、WSL の Windows フォントと Terminal 設定も 
 既存の PAM / Terminal 設定には `.pre-mise` バックアップを一度だけ作る。
 `preview` は native bootstrap と CLI install の dry-run に、第三者 cask の予定一覧を加えたもの。PAM と login shell は native dry-run、スクリーンショット保存先は予定値を表示する。APM、npm ci、Windows 補助処理は実行しない。
 
+## Herdr Desktop
+
+macOS では[公式 cask](https://github.com/herdrdev/herdr-app/blob/master/README.md) の `herdr-app` を導入する。まず `hc --version` と `herdr-app --version` を確認する。cask の初回インストールには `hc` を含まないため、アプリの初期セットアップ、または内容を確認した[公式 core installer](https://releases.herdr.dev/core/install.sh) で core を導入する。操作は[公式ガイド](https://herdr.dev/guide/)を参照する。core の更新はアプリが管理する。この構成が再現するのは設定で、アプリと core のバイナリは厳密に pin しない。
+
+`~/.config/herdr-app/settings.json` だけをリンクし、隣接する状態や旧 `herdr` のデータはローカルに残す。配布初期値の `{}` は好みを指定せず、既定値はアプリに任せる。GUI の保存や zoom 操作はリンク先の Git ファイルも変更するため、Herdr を終了してから差分を確認し、共有する設定だけを残す。
+
+既存ファイルやディレクトリリンクと競合する場合は、Herdr を終了して設定とリンクをバックアップしてから配置する。初回配置に使った checkout はリンク元として保持する。main に取り込んだ後は main の checkout から `mise bootstrap dotfiles apply '~/.config/herdr-app/settings.json'` を再実行し、リンク元を切り替える。復元はリンクと保存した設定だけを戻し、`--zap` や状態ディレクトリの削除は行わない。
+
 ## Nix 管理環境からの移行
 
 ホストへの適用前に現在の Nix generation と元の checkout を保持する。Nix 自体のアンインストールはこの setup に含めない。
