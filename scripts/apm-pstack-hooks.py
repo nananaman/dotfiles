@@ -18,14 +18,18 @@ HASHES_09126 = {
     **HASHES,
     "hooks/session-start.sh": "53dd48c37c3b2aefcd1b9c1bf174ecb7b0a09637911986eb0cd57bbb4bde9532",
 }
+HASHES_09129 = {
+    **HASHES_09126,
+    "hooks/session-start.sh": "4352086cc023886e891de7dc71a2efd22fb909ce8ce86b2fbf2b980296de168f",
+}
 
 
 def plan(home, package_root, source=SOURCE, claude_config_dir=None):
     """Return only verified pstack entry replacements, without writing or executing hooks."""
     manifest = json.loads((package_root / ".claude-plugin/plugin.json").read_text())
-    if manifest.get("name") != "pstack" or manifest.get("version") not in ("0.9.114", "0.9.120", "0.9.126"):
-        raise ValueError("expected reviewed pstack 0.9.114, 0.9.120 or 0.9.126")
-    hashes = HASHES_09126 if manifest["version"] == "0.9.126" else HASHES
+    if manifest.get("name") != "pstack" or manifest.get("version") not in ("0.9.114", "0.9.120", "0.9.126", "0.9.129"):
+        raise ValueError("expected reviewed pstack 0.9.114, 0.9.120, 0.9.126 or 0.9.129")
+    hashes = {"0.9.126": HASHES_09126, "0.9.129": HASHES_09129}.get(manifest["version"], HASHES)
     for relative, expected in hashes.items():
         if hashlib.sha256((package_root / relative).read_bytes()).hexdigest() != expected:
             raise ValueError(f"pstack source changed: {relative}; review the pinned compatibility fix")
