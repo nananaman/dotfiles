@@ -13,6 +13,7 @@ from unittest.mock import Mock, patch
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "home/chief-of-staff/compact-status.py"
+CONTRACT_FIELDS = ("address", "state", "status", "turn", "exit_code", "signal", "reason", "reported")
 spec = importlib.util.spec_from_file_location("compact_status", SCRIPT)
 reader = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(reader)
@@ -53,7 +54,7 @@ class ChiefStatusTests(unittest.TestCase):
                 # Assert
                 # 必須8項目とstatus内の追加項目を正確に保ち、他の情報を表示しない。
                 self.assertEqual(run.returncode, 0, run.stderr)
-                self.assertEqual(json.loads(run.stdout), {key: self.value[key] for key in reader.FIELDS})
+                self.assertEqual(json.loads(run.stdout), {key: self.value[key] for key in CONTRACT_FIELDS})
                 self.assertEqual(run.stderr, b"")
                 self.assertNotIn(b"PRIVATE", run.stdout)
 
@@ -75,7 +76,7 @@ class ChiefStatusTests(unittest.TestCase):
     def test_invalid_json_schema_and_missing_fields_are_not_success(self):
         # Arrange
         cases = [b"", b"PRIVATE_NOT_JSON", b"\xff", b"[]", b'{"x":1,"x":2}', b'{"x":NaN}']
-        cases += [json.dumps({k: v for k, v in self.value.items() if k != key}).encode() for key in reader.FIELDS]
+        cases += [json.dumps({k: v for k, v in self.value.items() if k != key}).encode() for key in CONTRACT_FIELDS]
         cases += [json.dumps({**self.value, key: bad}).encode() for key, bad in (
             ("status", {"state": False}), ("status", "working"), ("turn", False),
             ("turn", -1), ("exit_code", False), ("reported", 0), ("signal", False),
