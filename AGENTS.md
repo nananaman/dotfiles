@@ -15,7 +15,7 @@ macOS arm64 と WSL x86_64 の dotfiles を mise で管理する repository。
 ## 検証と適用
 
 ```bash
-mise run check
+MISE_TASK_RUN_AUTO_INSTALL=false mise run check
 # nono profile の変更時
 mise run check-sandbox
 ```
