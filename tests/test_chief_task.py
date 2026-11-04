@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 
@@ -22,8 +23,10 @@ class ChiefTaskTests(unittest.TestCase):
         self.chief = self.home / "chief-of-staff"
         self.chief.mkdir(parents=True)
         shutil.copy(ROOT / "home/chief-of-staff/mise.toml", self.chief / "mise.toml")
+        shutil.copy(ROOT / "home/chief-of-staff/nono-codex.py", self.chief / "nono-codex.py")
         self.bin = self.root / "bin"
         self.bin.mkdir()
+        (self.bin / "python3").symlink_to(sys.executable)
         self.log = self.root / "calls.jsonl"
         boundary = self.bin / "boundary"
         boundary.write_text(
@@ -47,6 +50,7 @@ class ChiefTaskTests(unittest.TestCase):
             "HOME": str(self.home), "PATH": f"{self.bin}:/usr/bin:/bin",
             "MISE_CONFIG_DIR": str(self.root / "config"),
             "XDG_CONFIG_HOME": str(self.root / "config"),
+            "XDG_RUNTIME_DIR": str(self.root / "runtime"),
             "MISE_DATA_DIR": str(self.root / "data"),
             "MISE_CACHE_DIR": str(self.root / "cache"),
             "MISE_STATE_DIR": str(self.root / "state"),
@@ -69,6 +73,124 @@ class ChiefTaskTests(unittest.TestCase):
     def calls(self):
         return [json.loads(line) for line in self.log.read_text().splitlines()]
 
+    # 明示した session の state と socket だけを nono に許可する。
+    def test_explicit_session_selects_its_own_state_and_socket(self):
+        # Arrange
+        self.env["HC_SESSION"] = "chief-overnight"
+
+        # Act
+        result = self.run_mise("run", "chief", "resume", "conversation with spaces")
+
+        # Assert
+        # default や state 全体への許可に広げない。
+        self.assertEqual(result.returncode, 0, result.stderr)
+        nono, codex = self.calls()
+        state = self.home / ".local/state/herdr-core/chief-overnight"
+        self.assertEqual(nono["args"][nono["args"].index("--read") + 1], str(state))
+        self.assertEqual(nono["args"][nono["args"].index("--allow-unix-socket") + 1],
+                         str(self.root / "runtime/herdr-core/chief-overnight.sock"))
+        self.assertEqual(codex["inside_nono"], "1")
+
+    # 未設定・空値・前後空白は hc の既定値と同じ session を指す。
+    def test_empty_and_trimmed_sessions_keep_hc_defaults(self):
+        # Arrange
+        cases = [("", "default"), (" \t\r\n", "default"),
+                 (" MyTest-1._ ", "MyTest-1._")]
+        for raw, session in cases:
+            with self.subTest(raw=raw):
+                self.env["HC_SESSION"] = raw
+                self.env["XDG_STATE_HOME"] = ""
+                self.env["XDG_RUNTIME_DIR"] = ""
+
+                # Act
+                result = self.run_mise("run", "chief", "--version")
+
+                # Assert
+                # 空の XDG state でも HOME の session 配下だけを読む。
+                self.assertEqual(result.returncode, 0, result.stderr)
+                nono = self.calls()[-2]
+                self.assertEqual(nono["args"][nono["args"].index("--read") + 1],
+                                 str(self.home / ".local/state/herdr-core" / session))
+                runtime = Path(f"/run/user/{os.getuid()}")
+                socket_dir = (runtime / "herdr-core" if runtime.is_dir()
+                              else self.home / ".local/state/herdr-core" / session)
+                self.assertEqual(nono["args"][nono["args"].index("--allow-unix-socket") + 1],
+                                 str(socket_dir / f"{session}.sock"))
+
+    # path escape と未対応文字は nono や Codex を呼ぶ前に拒否する。
+    def test_invalid_session_fails_before_process_boundaries(self):
+        # Arrange
+        cases = [".", "..", "../escape", "/tmp/escape", r"a\b", "a:b",
+                 "a*b", "a?b", 'a"b', "a<b", "a>b", "a|b", "a\tb",
+                 "\x1c", "a b", "日本語", "$(touch injected)"]
+        for session in cases:
+            with self.subTest(session=session):
+                self.env["HC_SESSION"] = session
+
+                # Act
+                result = self.run_mise("run", "chief")
+
+                # Assert
+                # エラーは接続も core 起動も伴わない。
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("HC_SESSION", result.stderr)
+                self.assertFalse(self.log.exists())
+                self.assertFalse((self.chief / "injected").exists())
+
+    # XDG state/runtime と socket 上書きは hc と同じ優先順位で選ぶ。
+    def test_xdg_and_socket_overrides_grant_only_selected_paths(self):
+        # Arrange
+        self.env["HC_SESSION"] = "chief-overnight"
+        state_home = self.root / "state with spaces"
+        runtime = self.root / "runtime with spaces"
+        self.env["XDG_STATE_HOME"] = str(state_home)
+        self.env["XDG_RUNTIME_DIR"] = str(runtime)
+        config = Path(self.env["XDG_CONFIG_HOME"]) / "herdr-core/config.toml"
+        config.parent.mkdir(parents=True)
+        config_socket = str(self.root / "config.sock")
+        env_socket = str(self.root / "env.sock")
+        cases = [
+            ("", "", str(runtime / "herdr-core/chief-overnight.sock")),
+            (f'socket = "{config_socket}"', "", config_socket),
+            (f'socket = "{config_socket}"', env_socket, env_socket),
+        ]
+        for content, override, socket in cases:
+            with self.subTest(socket=socket):
+                config.write_text(content)
+                self.env["HC_SOCKET"] = override
+
+                # Act
+                result = self.run_mise("run", "chief", "--version")
+
+                # Assert
+                # core の接続先と app の既存接続先以外は追加しない。
+                self.assertEqual(result.returncode, 0, result.stderr)
+                args = self.calls()[-2]["args"]
+                self.assertEqual(args[args.index("--read") + 1],
+                                 str(state_home / "herdr-core/chief-overnight"))
+                self.assertEqual([args[i + 1] for i, arg in enumerate(args)
+                                  if arg == "--allow-unix-socket"], [
+                    socket, str(self.home / ".config/herdr-app/herdr-app.sock"),
+                ])
+
+    # 接続先を確定できない config は余分な許可を加えず停止する。
+    def test_invalid_socket_config_fails_before_nono(self):
+        # Arrange
+        config = Path(self.env["XDG_CONFIG_HOME"]) / "herdr-core/config.toml"
+        config.parent.mkdir(parents=True)
+        for content in ('socket = "', 'socket = ""', 'socket = 42'):
+            with self.subTest(content=content):
+                config.write_text(content)
+
+                # Act
+                result = self.run_mise("run", "chief")
+
+                # Assert
+                # fallback で別の接続先を起動しない。
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("socket", result.stderr)
+                self.assertFalse(self.log.exists())
+
     # 引数なしの実タスクは nono を経由して初回 prompt を渡す。
     def test_initial_launch_uses_nono_and_default_prompt(self):
         # Arrange
@@ -85,7 +207,7 @@ class ChiefTaskTests(unittest.TestCase):
         self.assertEqual(nono["args"], [
             "run", "--profile", "chouge-codex", "--workdir", str(self.chief),
             "--allow-cwd", "--read", str(self.home / ".local/state/herdr-core/default"),
-            "--allow-unix-socket", str(self.home / ".local/state/herdr-core/default/default.sock"),
+            "--allow-unix-socket", str(self.root / "runtime/herdr-core/default.sock"),
             "--allow-unix-socket", str(self.home / ".config/herdr-app/herdr-app.sock"),
             "--read-file", str(self.bin / "herdr-app"), "--", "codex",
             "--no-daemon", "--sandbox", "danger-full-access", "--ask-for-approval", "never",
@@ -137,7 +259,7 @@ class ChiefTaskTests(unittest.TestCase):
         self.assertIn("nono", result.stderr)
         self.assertFalse(self.log.exists())
 
-    # Chief 専用設定を symlink 配置し、既存の設定とローカル状態は保護する。
+    # 既存の3 symlinkだけで scriptを参照し、競合とローカル状態を保護する。
     def test_deployment_links_only_the_task_and_preserves_conflicts(self):
         # Arrange
         repository = self.root / "repository"
@@ -146,6 +268,9 @@ class ChiefTaskTests(unittest.TestCase):
         source = repository / "home/chief-of-staff/mise.toml"
         source.parent.mkdir(parents=True)
         shutil.copy(ROOT / "home/chief-of-staff/mise.toml", source)
+        for name in ("AGENTS.md", "README.md", "nono-codex.py"):
+            shutil.copy(ROOT / "home/chief-of-staff" / name, source.parent / name)
+        (self.chief / "nono-codex.py").unlink()
         target = self.chief / "mise.toml"
         local = self.chief / ".codex/local-state"
         local.parent.mkdir()
@@ -159,7 +284,8 @@ class ChiefTaskTests(unittest.TestCase):
 
                 # Act
                 result = self.run_mise(
-                    "bootstrap", "dotfiles", "apply", "~/chief-of-staff/mise.toml",
+                    "bootstrap", "dotfiles", "apply", "~/chief-of-staff/AGENTS.md",
+                    "~/chief-of-staff/README.md", "~/chief-of-staff/mise.toml",
                     cwd=repository,
                 )
 
@@ -173,6 +299,13 @@ class ChiefTaskTests(unittest.TestCase):
                     self.assertEqual(result.returncode, 0, result.stderr)
                     self.assertTrue(target.is_symlink())
                     self.assertEqual(target.resolve(), source)
+                    self.assertFalse((self.chief / "nono-codex.py").exists())
+                    launched = self.run_mise("run", "chief", "--version")
+                    self.assertEqual(launched.returncode, 0, launched.stderr)
+                    self.assertEqual(self.calls()[-1]["inside_nono"], "1")
+                    self.assertEqual(self.calls()[-1]["cwd"], str(self.chief))
+                    args = self.calls()[-1]["args"]
+                    self.assertEqual(args[args.index("-C") + 1], str(self.chief))
                 self.assertEqual(local.read_text(), "preserve local state")
 
 

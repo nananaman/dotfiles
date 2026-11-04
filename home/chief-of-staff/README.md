@@ -17,14 +17,16 @@ dotfiles の `home/chief-of-staff/AGENTS.md`、`README.md`、`mise.toml` を、�
 特に既存の `mise.toml` がある場合は上書きせず、内容を確認してから統合します。
 初回セットアップ後、取得した dotfiles のルートで Chief の3ファイルだけを配置できます。
 リンク元の checkout は配置後も保持します。
+起動用の [nono-codex.py](nono-codex.py) は `mise.toml` のリンク先と同じディレクトリから参照するため、既存の3ファイルの配置で動きます。
+Python 3.11 以降が必要です。
 
 ```sh
 mise bootstrap dotfiles apply '~/chief-of-staff/AGENTS.md' '~/chief-of-staff/README.md' '~/chief-of-staff/mise.toml'
 ```
 
-以下は既存 Herdr core の `default` セッションを使います。
+`HC_SESSION` を指定しなければ、既存 Herdr core の `default` セッションを使います。
 `hc --skill`、`herdr-app --skill`、`hc server status` で導入と接続先を確認します。
-別の `HC_SESSION` や state directory を使う場合は、実際の接続先に合わせて下記のパスを変更します。
+別の既存セッションを使う場合は、起動時に `HC_SESSION=chief-overnight mise run chief` のように指定します。
 core が存在しない、または接続できない場合に、sandbox 内から新しい core を起動して回復しようとしません。
 
 Chief と担当の両方を外側の nono で制限します。
@@ -52,7 +54,16 @@ mise run chief
 mise run chief -m gpt-6.1-sol -c 'model_reasoning_effort="high"' '依頼を整理してください。'
 ```
 
-起動引数は [mise.toml](mise.toml) で管理します。
+既定 prompt は [mise.toml](mise.toml)、nono と Codex の起動引数は [nono-codex.py](nono-codex.py) で管理します。
+
+session と接続先は [hc 0.1.17 の paths.rs](https://github.com/herdrdev/herdr-core/blob/ce87721557176f6cddaac1c7aefbf76929923263/crates/herdr-core/src/paths.rs) と [Unix の解決規則](https://github.com/herdrdev/herdr-core/blob/ce87721557176f6cddaac1c7aefbf76929923263/crates/herdr-core/src/platform/unix.rs) に合わせます。
+`HC_SESSION` の前後の ASCII 空白を除き、未設定・空値は `default` にします。
+この起動scriptでは、名前を英数字と `_ . -` に限定し、`.`、`..`、パス区切りを拒否します。
+state は `${XDG_STATE_HOME:-$HOME/.local/state}/herdr-core/<session>` です。
+socket は `HC_SOCKET`、hc config の `socket`、`$XDG_RUNTIME_DIR/herdr-core/<session>.sock` の順に選びます。
+runtime が未設定・空値なら、既存の `/run/user/<uid>/herdr-core`、次に session の state ディレクトリを使います。
+接続先を解決できない config では起動を中止します。
+script 自体は core に接続せず、起動・再起動もしません。
 
 state は読取だけ、2つの Unix socket は接続だけを許可します。
 `herdr-app` の実行ファイルはアプリの配置先への symlink であるため、その実体の読取も指定します。
@@ -82,12 +93,13 @@ mise run chief resume <会話ID>
 
 `hc run` と `hc exec` の実行主体は、親 Chief とは別の Herdr core です。
 親の nono 制限や環境変数があるだけでは、core が作るプロセスは制限されません。
-担当を起動する実 argv に nono を含めます。
+担当を起動する実 argv に `nono run` を含めます。
 目的、担当範囲、作業場所、完了条件、報告先を依頼文に入れます。
 
 Chief は依頼内容と対象リポジトリから worktree の実パスを確認して `task_dir` に代入します。
 `herdr-app ls` の結果と会話内の許可から別スペースの実 ID を選び、`worker_space` に代入します。
 合意済みの目的、担当範囲、完了条件を含む依頼文を `task_prompt` に代入してから、以下を実行します。
+`hc_state` と `hc_socket` には、使用する `HC_SESSION`、XDG 環境変数、hc config と実接続先から確認したパスを代入します。
 値を推測したり、例を実行するためだけに人間の入力を待ったりしません。
 この例は既存スペースを使い、新しいスペースを作りません。
 
@@ -96,16 +108,22 @@ Chief は依頼内容と対象リポジトリから worktree の実パスを確�
 : "${task_dir:?確認した対象 worktree の実パスを代入してください}"
 : "${worker_space:?確認した別スペースの実 ID を代入してください}"
 : "${task_prompt:?合意済みの依頼文を代入してください}"
+: "${hc_state:?確認した session の state ディレクトリを代入してください}"
+: "${hc_socket:?確認した core の Unix socket を代入してください}"
+: "${MISE_CODEX_VERSION:?確認した Codex の版を代入してください}"
 hc run --bg --cwd "$task_dir" --label "herdr.space=$worker_space" \
+  env HC_SESSION="${HC_SESSION:-default}" MISE_CODEX_VERSION="$MISE_CODEX_VERSION" \
   nono run --profile chouge-codex --workdir "$task_dir" --allow-cwd \
-  --read "$HOME/.local/state/herdr-core/default" \
-  --allow-unix-socket "$HOME/.local/state/herdr-core/default/default.sock" \
+  --read "$hc_state" --allow-unix-socket "$hc_socket" \
   --allow-unix-socket "$HOME/.config/herdr-app/herdr-app.sock" \
   --read-file "$(command -v herdr-app)" \
   -- codex --no-daemon --sandbox danger-full-access --ask-for-approval never \
   -C "$task_dir" -m gpt-6.1-sol -c 'model_reasoning_effort="high"' \
   "$task_prompt 窓口は $HC_TERMINAL_ID。完了または進められない時は hc send $HC_TERMINAL_ID で結果と根拠のパスを報告してください。追加担当は起動しないでください。"
 ```
+
+`MISE_CODEX_VERSION` を渡すだけでは、core が持つ PATH の Codex 実体は切り替わりません。
+担当の版は起動結果で確認します。この例では core の古い PATH による版の選択は解決していません。
 
 起動結果の `first_message.sent` と端末の実 ID を確認します。
 `hc get` と `hc read` で状態と内容を確かめ、`hc wait` で待ちます。
