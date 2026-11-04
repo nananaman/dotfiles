@@ -69,7 +69,11 @@ def main(args):
         return diagnostic("cannot read stdin", 74)
     except ValueError as error:
         return diagnostic(str(error), 65)
-    print(json.dumps(result, ensure_ascii=False, separators=(",", ":")))
+    try:
+        output = json.dumps(result, ensure_ascii=False, allow_nan=False, separators=(",", ":")).encode("utf-8")
+    except (ValueError, UnicodeError):
+        return diagnostic("invalid JSON output", 65)
+    sys.stdout.buffer.write(output + b"\n")
     return 0 if terminal else diagnostic("error envelope in input; hc exit code unknown", 65)
 
 

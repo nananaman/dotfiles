@@ -29,11 +29,11 @@ class ChiefStatusTests(unittest.TestCase):
             "argv": ["PRIVATE_ARGV"], "screen": "PRIVATE_SCREEN", "cwd": "PRIVATE_CWD",
         }
 
-    def run_cli(self, raw=None, args=()):
+    def run_cli(self, raw=None, args=(), env=None):
         return subprocess.run(
             [sys.executable, str(SCRIPT), *args],
             input=raw if raw is not None else json.dumps(self.value).encode(),
-            env={"PATH": "", "HC_SOCKET": "PRIVATE_SOCKET", "HC_SESSION": "unused"},
+            env={"PATH": "", "HC_SOCKET": "PRIVATE_SOCKET", "HC_SESSION": "unused", **(env or {})},
             capture_output=True, timeout=10,
         )
 
@@ -93,6 +93,77 @@ class ChiefStatusTests(unittest.TestCase):
                 self.assertEqual(run.stdout, b"")
                 self.assertIn(b"compact-status:", run.stderr)
                 self.assertNotIn(b"PRIVATE", run.stderr)
+
+    # 異常系: 指数overflowはterminal/error envelopeの深さによらず出力前に拒否する。
+    def test_overflow_numbers_fail_before_any_output(self):
+        # Arrange
+        for number in ("1e309", "-1e309"):
+            for future in (number, '{"nested":[' + number + ']}'):
+                for envelope in (False, True):
+                    with self.subTest(number=number, future=future, envelope=envelope):
+                        value = {"error": {"future": "NUMBER"}} if envelope else {
+                            **self.value, "status": {**self.value["status"], "future": "NUMBER"},
+                        }
+                        raw = json.dumps(value).replace('"NUMBER"', future).encode()
+
+                        # Act
+                        run = self.run_cli(raw)
+
+                        # Assert
+                        # filter固有の失敗で、Infinityや部分的なJSONをstdoutへ出さない。
+                        self.assertEqual(run.returncode, 65, run.stderr)
+                        self.assertEqual(run.stdout.decode("utf-8", errors="strict"), "")
+                        self.assertIn("compact-status:", run.stderr.decode("utf-8", errors="strict"))
+                        self.assertNotIn(b"Traceback", run.stderr)
+
+    # 異常系: lone surrogateは値・nested・keyともstdout encodingに依存せず出力前に拒否する。
+    def test_lone_surrogates_fail_before_any_output(self):
+        # Arrange
+        for surrogate in ("\ud800", "\udc80"):
+            for future in (surrogate, {"nested": [surrogate]}, {surrogate: "value"}):
+                for envelope in (False, True):
+                    for encoding in ("utf-8:strict", "utf-8:surrogateescape", "utf-8:surrogatepass"):
+                        with self.subTest(future=repr(future), envelope=envelope, encoding=encoding):
+                            value = {"error": {"future": future}} if envelope else {
+                                **self.value, "status": {**self.value["status"], "future": future},
+                            }
+                            raw = json.dumps(value).encode()
+
+                            # Act
+                            run = self.run_cli(raw, env={"PYTHONIOENCODING": encoding})
+
+                            # Assert
+                            # raw surrogate bytesもtracebackも出さず、filterの診断だけを返す。
+                            self.assertEqual(run.returncode, 65, run.stderr)
+                            self.assertEqual(run.stdout.decode("utf-8", errors="strict"), "")
+                            self.assertIn("compact-status:", run.stderr.decode("utf-8", errors="strict"))
+                            self.assertNotIn(b"Traceback", run.stderr)
+
+    # 正常系: 有限float・Unicode・surrogate pairと端末の観測値をそのまま保持する。
+    def test_finite_unicode_and_terminal_observations_survive_strict_output(self):
+        # Arrange
+        future = {"float": 1.25e100, "negative": -1.25e100, "zero": 0, "null": None,
+                  "false": False, "日本語": ["作業", "é", "😀"]}
+        for status_state in ("working", "blocked", "error"):
+            for exit_code, signal in ((None, None), (23, None), (None, 15)):
+                with self.subTest(status=status_state, exit_code=exit_code, signal=signal):
+                    value = {**self.value, "state": "finished" if exit_code or signal else "live",
+                             "exit_code": exit_code, "signal": signal,
+                             "status": {**self.value["status"], "state": status_state, "future": future}}
+                    raw = json.dumps(value).encode()  # emojiは正規surrogate pairとして入力する。
+
+                    # Act
+                    run = self.run_cli(raw)
+
+                    # Assert
+                    # strict UTF-8/JSONで読め、8項目とstatus全体を保持する。元hc exit/timeoutは推定しない。
+                    self.assertEqual(run.returncode, 0, run.stderr)
+                    text = run.stdout.decode("utf-8", errors="strict")
+                    self.assertEqual(json.loads(text, parse_constant=self.fail),
+                                     {key: value[key] for key in CONTRACT_FIELDS})
+                    self.assertIn("作業", text)
+                    self.assertIn("😀", text)
+                    self.assertEqual(run.stderr, b"")
 
     # 境界: 環境のsocket指定に触れず、stdinだけを使ってprocessや接続を増やさない。
     def test_cli_does_not_start_processes_or_connect_to_sockets(self):
