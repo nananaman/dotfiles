@@ -7,7 +7,7 @@ Chief は依頼を受ける窓口です。
 ## 配置と前提
 
 このガイドの起動例は macOS 用です。
-別のPCでは dotfiles を任意の場所へ取得し、最初に [dotfiles の初回セットアップ](https://github.com/nananaman/dotfiles#セットアップ) を行います。
+別のPCでは dotfiles を nono の許可範囲内（標準は `~/ghq/github.com/nananaman/dotfiles`）へ取得し、最初に [dotfiles の初回セットアップ](https://github.com/nananaman/dotfiles#セットアップ) を行います。
 Herdr の導入と core の初期設定は同じ root README の [Herdr Desktop](https://github.com/nananaman/dotfiles#herdr-desktop) に従います。
 Codex の認証はPCごとに本人が行い、認証情報や既存の会話を同期しません。
 
