@@ -11,14 +11,15 @@ Chief は依頼を受ける窓口です。
 Herdr の導入と core の初期設定は同じ root README の [Herdr Desktop](https://github.com/nananaman/dotfiles#herdr-desktop) に従います。
 Codex の認証はPCごとに本人が行い、認証情報や既存の会話を同期しません。
 
-dotfiles の `home/chief-of-staff/AGENTS.md` と `README.md` を、それぞれ `~/chief-of-staff` へ symlink で配置します。
+dotfiles の `home/chief-of-staff/AGENTS.md`、`README.md`、`mise.toml` を、それぞれ `~/chief-of-staff` へ symlink で配置します。
 ディレクトリ全体はリンクせず、ローカルの `.codex`、会話、認証情報は dotfiles に取り込みません。
 既存ファイルがある場合は、セットアップ前に内容を退避します。
-初回セットアップ後、取得した dotfiles のルートで Chief の2ファイルだけを配置できます。
+特に既存の `mise.toml` がある場合は上書きせず、内容を確認してから統合します。
+初回セットアップ後、取得した dotfiles のルートで Chief の3ファイルだけを配置できます。
 リンク元の checkout は配置後も保持します。
 
 ```sh
-mise bootstrap dotfiles apply '~/chief-of-staff/AGENTS.md' '~/chief-of-staff/README.md'
+mise bootstrap dotfiles apply '~/chief-of-staff/AGENTS.md' '~/chief-of-staff/README.md' '~/chief-of-staff/mise.toml'
 ```
 
 以下は既存 Herdr core の `default` セッションを使います。
@@ -34,20 +35,24 @@ nono 本体、既存の `chouge-codex` profile、認証済みの Codex、Herdr �
 ## Herdr から初めて起動する
 
 ユーザーが選んだ Chief 用の Herdr 端末のシェルで実行します。
-モデルと effort は現在の設定を確認してから指定します。
-以下は `gpt-6.1-sol` と `high` を使う例です。
+初回だけ、自分で配置した `mise.toml` を信頼します。
+モデルと effort は Codex の現在の設定を使います。
 
 ```sh
-nono run --profile chouge-codex \
-  --workdir "$HOME/chief-of-staff" --allow-cwd \
-  --read "$HOME/.local/state/herdr-core/default" \
-  --allow-unix-socket "$HOME/.local/state/herdr-core/default/default.sock" \
-  --allow-unix-socket "$HOME/.config/herdr-app/herdr-app.sock" \
-  --read-file "$(command -v herdr-app)" \
-  -- codex --no-daemon --sandbox danger-full-access --ask-for-approval never \
-  -C "$HOME/chief-of-staff" -m gpt-6.1-sol -c 'model_reasoning_effort="high"' \
-  'AGENTS.md と hc --skill を読み、Chief of Staff として依頼を受けてください。'
+cd ~/chief-of-staff
+mise trust mise.toml
+mise run chief
 ```
+
+引数なしでは Chief 用の初回 prompt を渡します。
+引数がある場合は既定 prompt を加えず、そのまま Codex へ渡します。
+モデルと effort を上書きする場合も通常の引数を使えます。
+
+```sh
+mise run chief -m gpt-6.1-sol -c 'model_reasoning_effort="high"' '依頼を整理してください。'
+```
+
+起動引数は [mise.toml](mise.toml) で管理します。
 
 state は読取だけ、2つの Unix socket は接続だけを許可します。
 `herdr-app` の実行ファイルはアプリの配置先への symlink であるため、その実体の読取も指定します。
@@ -58,19 +63,13 @@ state は読取だけ、2つの Unix socket は接続だけを許可します。
 
 同じ会話を二重に起動しません。
 既存 Chief の終了と再開はユーザーが行い、担当から窓口の端末や Herdr 全体を停止しません。
-Chief 用端末のシェルで以下を実行し、picker から既存の Chief の会話を選びます。
-会話 ID が分かる場合は `resume` の後に指定できます。
+Chief 用端末のシェルで、既存の Chief の会話 ID を指定します。
+ID を省略すると picker で会話を選べます。
 `--last` は担当の別会話を選ぶ可能性があるため使いません。
 
 ```sh
-nono run --profile chouge-codex \
-  --workdir "$HOME/chief-of-staff" --allow-cwd \
-  --read "$HOME/.local/state/herdr-core/default" \
-  --allow-unix-socket "$HOME/.local/state/herdr-core/default/default.sock" \
-  --allow-unix-socket "$HOME/.config/herdr-app/herdr-app.sock" \
-  --read-file "$(command -v herdr-app)" \
-  -- codex --no-daemon --sandbox danger-full-access --ask-for-approval never \
-  -C "$HOME/chief-of-staff" -m gpt-6.1-sol -c 'model_reasoning_effort="high"' resume
+cd ~/chief-of-staff
+mise run chief resume <会話ID>
 ```
 
 `~/chief-of-staff/.codex/config.toml` の `approval_policy="on-request"` と `approvals_reviewer="auto_review"` は以前の方式のローカル設定です。
