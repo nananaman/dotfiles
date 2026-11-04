@@ -78,6 +78,10 @@ nono の trace は `--log-file` で一時ファイルへ送り、起動時に `n
 `--silent` はファイル拒否の診断も消すため使いません。
 ファイル拒否は端末の `Sandbox denial`、通信拒否の理由は表示されたログで確認します。
 
+`--suppress-save-prompt "$HOME/.nix-profile"` で、既知の `.nix-profile` 拒否に対する保存提案だけを省きます。
+アクセス権と拒否診断は維持し、他のpathの保存提案は抑制しません。
+nono 0.68.0 では、対象が存在しない場合や dangling symlink でも起動できることを確認済みです。
+
 ```sh
 # nono_log に表示されたパスを代入して確認する
 rg -n 'proxy request denied' "$nono_log"
@@ -196,6 +200,7 @@ printf 'nono log: %s\n' "$nono_log" >&2
 hc run --bg --cwd "$task_dir" --label "herdr.space=$worker_space" \
   env HC_SESSION="${HC_SESSION:-default}" MISE_CODEX_VERSION="$MISE_CODEX_VERSION" \
   nono run --profile chouge-codex --log-file "$nono_log" \
+  --suppress-save-prompt "$HOME/.nix-profile" \
   --workdir "$task_dir" --allow-cwd \
   --read "$hc_state" --allow-unix-socket "$hc_socket" \
   --allow-unix-socket "$HOME/.config/herdr-app/herdr-app.sock" \

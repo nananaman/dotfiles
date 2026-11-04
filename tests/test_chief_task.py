@@ -275,6 +275,7 @@ class ChiefTaskTests(unittest.TestCase):
         log_path = nono["args"][nono["args"].index("--log-file") + 1]
         self.assertEqual(nono["args"], [
             "run", "--profile", "chouge-codex", "--log-file", log_path,
+            "--suppress-save-prompt", str(self.home / ".nix-profile"),
             "--workdir", str(self.chief),
             "--allow-cwd", "--read", str(self.home / ".local/state/herdr-core/default"),
             "--allow-unix-socket", str(self.root / "runtime/herdr-core/default.sock"),
@@ -307,6 +308,10 @@ class ChiefTaskTests(unittest.TestCase):
                 # Assert
                 # 通常の Codex 引数を shell 再評価せず転送する。
                 self.assertEqual(result.returncode, 0, result.stderr)
+                nono = self.calls()[-2]["args"]
+                self.assertEqual([nono[i + 1] for i, arg in enumerate(nono)
+                                  if arg == "--suppress-save-prompt"],
+                                 [str(self.home / ".nix-profile")])
                 codex = self.calls()[-1]
                 self.assertEqual(codex["inside_nono"], "1")
                 self.assertEqual(codex["args"], [

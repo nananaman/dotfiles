@@ -44,6 +44,7 @@ os.close(log_fd)
 print(f"nono log: {log_path}", file=sys.stderr, flush=True)
 argv = [
     "nono", "run", "--profile", "chouge-codex", "--log-file", log_path,
+    "--suppress-save-prompt", str(home / ".nix-profile"),
     "--workdir", cwd, "--allow-cwd", "--read", str(state),
     "--allow-unix-socket", socket,
     "--allow-unix-socket", str(home / ".config/herdr-app/herdr-app.sock"),
