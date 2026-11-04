@@ -70,6 +70,36 @@ runpy.run_path(sys.argv[0], run_name='__main__')
         self.assertNotIn("cause", reports[0])
         self.assertNotIn("permission", reports[0])
 
+    # 回帰: 主thread途中の空行で打ち切らず、後続の未知frameもエラーとして残す。
+    def test_blank_line_in_main_thread_keeps_later_frames_and_returns_error(self):
+        # Arrange
+        text = FIXTURE.read_text().replace(
+            "    +       9 __private_getcwd", "\n    +       9 PRIVATE_UNKNOWN",
+        )
+        with tempfile.TemporaryDirectory(prefix="chief-sample-test-") as directory:
+            sample = Path(directory) / "sample.txt"
+            sample.write_text(text)
+
+            # Act
+            run = subprocess.run(
+                [sys.executable, str(SCRIPT), str(sample)],
+                capture_output=True, text=True, timeout=10,
+            )
+
+        # Assert
+        # 部分成功にせず、未知frameをstderrと終了値に反映する。
+        report = json.loads(run.stdout)
+        self.assertEqual(run.returncode, 1, run.stdout)
+        self.assertIn("unrecognized_main_thread_frame", report["issues"])
+        self.assertIn("unrecognized_main_thread_frame", run.stderr)
+        # 空行と未知frameの後にある既知3frameも保持し、未知の実値は出さない。
+        frames = report["main_thread_frames"]
+        self.assertIn({"frame": "unknown", "count": 2}, frames)
+        self.assertEqual([frame["frame"] for frame in frames][-3:], [
+            "__getcwd", "open$NOCANCEL", "__open_nocancel",
+        ])
+        self.assertNotIn("PRIVATE", run.stdout + run.stderr)
+
     # 異常系: 欠落・重複・未知形式を成功にせず、未知frameの生文字列を漏らさない。
     def test_incomplete_or_unrecognized_reports_have_unknown_fields_and_nonzero_exit(self):
         # Arrange

@@ -58,8 +58,8 @@ def summarize(text):
     if len(graph) == 2:
         main = re.findall(
             r"^    [0-9]+ Thread_[0-9]+   DispatchQueue_[0-9]+: com\.apple\.main-thread  \(serial\)\n"
-            r"([\s\S]*?)(?=^    [0-9]+ Thread_|\Z)",
-            graph[1].split("\n\n", 1)[0], re.MULTILINE,
+            r"([\s\S]*?)(?=^    [0-9]+ Thread_|\nTotal number in stack|\nBinary Images:|\Z)",
+            graph[1], re.MULTILINE,
         )
         if len(main) == 1:
             frames = []
