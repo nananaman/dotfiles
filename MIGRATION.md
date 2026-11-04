@@ -74,7 +74,7 @@ wrapper は引数、終了コード、呼び出し元ディレクトリを保持
 - Codex / hunk / pi / OMP / agent-browser の起動と、別ディレクトリでの secretlint / preset 解決を検証。
 - Codex の配布物に code-mode-host があることを確認。code mode の対話実行と Chromium の起動は未検証。
 - CLI 一覧の macOS arm64 / Linux x64 向け backend 解決を検査。lock 非対応 backend があるため、全ツールの両 OS インストール成功を意味しない。
-- 静的検査と配置・wrapper の自動テストは `mise run check`、nono の権限境界は `mise run check-sandbox` で検査する。
+- 静的検査と配置・wrapper の自動テストは `MISE_TASK_RUN_AUTO_INSTALL=false mise run check`、nono の権限境界は `mise run check-sandbox` で検査する。
 - 個別の `upgrade --bump` が symlink を保持し、正本の pin を更新することを隔離設定で検証。
 - macOS で95ファイルの配置、CLI 6種と Neovim の起動、shell の Node/npm/uvx 選択、secretlint、nono の設定読み取りを確認。defaults は適用済み。2026-09-13 に Touch ID/PAM の設定と login shell `/opt/homebrew/bin/zsh` への切り替えを確認。
 - WSL と Windows PowerShell での実行は未検証。

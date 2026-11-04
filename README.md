@@ -52,7 +52,7 @@ mise run update codex
 # OS パッケージの更新は別操作
 mise run update-packages
 # 静的検査と隔離 HOME での配置・wrapper テスト
-mise run check
+MISE_TASK_RUN_AUTO_INSTALL=false mise run check
 # nono の filesystem / network / command 境界
 mise run check-sandbox
 # skill 依存の展開
@@ -60,7 +60,9 @@ mise run apm-sync
 ```
 
 CLI の更新は OS 設定の再適用を必要としない。Bun のバージョンを更新した場合は、実体パスを含む nono の pi profile を `mise bootstrap --only dotfiles` で再生成する。
-`check` はツールを自動インストールしない。検証用 shellcheck、shfmt、taplo、Python もグローバル設定に含む。
+`check` の実行時は `MISE_TASK_RUN_AUTO_INSTALL=false` を前置し、mise がタスク開始前に未導入ツールを自動インストールするのを防ぐ。
+`mise run check` だけでは自動インストールを抑止できない。
+検証用 shellcheck、shfmt、taplo、Python もグローバル設定に含む。
 
 ## 構成
 

@@ -1,0 +1,23 @@
+Analysis of sampling herdr-core (pid 101) every 1 millisecond
+Process:         herdr-core [101]
+Path:            /private/FIXTURE_PRIVATE/herdr-core
+Platform:        macOS
+Date/Time:       2001-02-03 04:05:06.789 +0900
+Launch Time:     2001-02-03 01:02:03.456 +0900
+Report Version:  7
+Analysis Tool:   /usr/bin/sample
+
+Call graph:
+    9 Thread_123   DispatchQueue_1: com.apple.main-thread  (serial)
+    + 9 start  (in dyld) + 6992  [0x100000001]
+    +   9 ???  (in herdr-core)  load address 0x100000000 + 0xc6c  [0x100000c6c]
+    +     9 ???  (in herdr-core)  load address 0x100000000 + 0x8fc  [0x1000008fc]
+    +       9 __private_getcwd  (in libsystem_c.dylib) + 184  [0x100000002]
+    +         9 __getcwd  (in libsystem_c.dylib) + 76  [0x100000003]
+    +           9 open$NOCANCEL  (in libsystem_kernel.dylib) + 64  [0x100000004]
+    +             9 __open_nocancel  (in libsystem_kernel.dylib) + 8  [0x100000005]
+    9 Thread_456: registry-writer
+      9 PRIVATE_OTHER_THREAD  (in private.dylib) + 8  [0x100000006]
+
+Binary Images:
+       0x100000000 -        0x100ffffff +herdr-core (0) <11111111-2222-4333-8444-555555555555> /private/FIXTURE_PRIVATE/herdr-core

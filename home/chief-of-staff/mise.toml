@@ -3,20 +3,38 @@ run_auto_install = false
 
 [tasks.chief]
 description = "Start or resume Chief of Staff inside nono"
-dir = "{{ env.HOME }}/chief-of-staff"
+dir = "{{ config_root }}"
 raw = true
+env = { CHIEF_MISE_CONFIG = "{{ config_root }}/mise.toml" }
 run = '''
 #!/usr/bin/env bash
 set -euo pipefail
 if [ "$#" -eq 0 ]; then
   set -- 'AGENTS.md と hc --skill を読み、Chief of Staff として依頼を受けてください。'
 fi
-exec nono run --profile chouge-codex \
-  --workdir "$HOME/chief-of-staff" --allow-cwd \
-  --read "$HOME/.local/state/herdr-core/default" \
-  --allow-unix-socket "$HOME/.local/state/herdr-core/default/default.sock" \
-  --allow-unix-socket "$HOME/.config/herdr-app/herdr-app.sock" \
-  --read-file "$(command -v herdr-app)" \
-  -- codex --no-daemon --sandbox danger-full-access --ask-for-approval never \
-  -C "$HOME/chief-of-staff" "$@"
+runner=$(python3 -c 'from pathlib import Path; import sys; print(Path(sys.argv[1]).resolve().with_name("nono-codex.py"))' "$CHIEF_MISE_CONFIG")
+exec python3 "$runner" "$@"
+'''
+
+[tasks.inspect-sample]
+description = "Summarize explicitly supplied macOS sample files without connecting to core"
+dir = "{{ config_root }}"
+env = { CHIEF_MISE_CONFIG = "{{ config_root }}/mise.toml" }
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+reader=$(python3 -c 'from pathlib import Path; import sys; print(Path(sys.argv[1]).resolve().with_name("inspect-sample.py"))' "$CHIEF_MISE_CONFIG")
+exec python3 "$reader" "$@"
+'''
+
+[tasks.compact-status]
+description = "Project captured hc get JSON from stdin without connecting to core"
+dir = "{{ config_root }}"
+raw = true
+env = { CHIEF_MISE_CONFIG = "{{ config_root }}/mise.toml" }
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+reader=$(python3 -c 'from pathlib import Path; import sys; print(Path(sys.argv[1]).resolve().with_name("compact-status.py"))' "$CHIEF_MISE_CONFIG")
+exec python3 "$reader" "$@"
 '''
