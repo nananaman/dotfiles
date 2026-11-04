@@ -15,3 +15,14 @@ fi
 runner=$(python3 -c 'from pathlib import Path; import sys; print(Path(sys.argv[1]).resolve().with_name("nono-codex.py"))' "$CHIEF_MISE_CONFIG")
 exec python3 "$runner" "$@"
 '''
+
+[tasks.inspect-sample]
+description = "Summarize explicitly supplied macOS sample files without connecting to core"
+dir = "{{ config_root }}"
+env = { CHIEF_MISE_CONFIG = "{{ config_root }}/mise.toml" }
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+reader=$(python3 -c 'from pathlib import Path; import sys; print(Path(sys.argv[1]).resolve().with_name("inspect-sample.py"))' "$CHIEF_MISE_CONFIG")
+exec python3 "$reader" "$@"
+'''

@@ -81,6 +81,34 @@ nono の trace は `--log-file` で一時ファイルへ送り、起動時に `n
 rg -n 'proxy request denied' "$nono_log"
 ```
 
+## 応答しない core を既存 sample で確認する
+
+対象 core が応答しない場合は、`status`、`get`、`run` などの接続を重ねず、許可済みの既存資料で確認します。
+既に取得した macOS sample がある場合は、読むことを許可された通常ファイルを明示します。
+
+```sh
+cd ~/chief-of-staff
+mise run inspect-sample /path/to/first-sample.txt /path/to/second-sample.txt
+```
+
+[inspect-sample.py](inspect-sample.py) は入力順に1行のJSONを返します。
+PID、観測時刻、launch time、herdr-core の UUID、主threadの観測frameを抽出し、連続する同じframeは件数でまとめます。
+入力path、生のsample、アドレス、他threadは出力しません。
+既存の3つの symlink から利用でき、追加配置は不要です。
+
+対応は今回確認済みの macOS `/usr/bin/sample` report version 7 の形式に限ります。
+frameは `start`、herdr-core の無名symbol、`__private_getcwd`、`__getcwd`、`open$NOCANCEL`、`__open_nocancel` を認識します。
+無名symbolは `herdr-core (unknown symbol)` と表示し、呼出元の関数は特定しません。
+未対応形式、欠落、未知frame、読取拒否は `unknown` または `issues` に残し、stderrと終了値1で示します。
+読取不能でも必須5項目を `unknown` で保持します。入力省略は終了値2です。
+
+scriptは明示したファイルだけを読み、`hc`、`ps`、`sample`、`log` を実行しません。
+defaultのpath探索、socket接続、core起動、再現実行もしません。
+同一性を比較するときはPIDだけでなくlaunch time、UUID、観測時刻を確認します。
+sampleの観測から現在の生存、根本原因、権限不足は判定しません。
+読取を拒否された場合は対象とエラーを報告し、追加権限や外側core経由の `hc exec` で迂回しません。
+既存coreの停止、再起動、設定やOS Privacyの変更は、この診断には含めません。
+
 ## 同じ会話を再開する
 
 同じ会話を二重に起動しません。

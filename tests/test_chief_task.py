@@ -300,7 +300,7 @@ class ChiefTaskTests(unittest.TestCase):
         source = repository / "home/chief-of-staff/mise.toml"
         source.parent.mkdir(parents=True)
         shutil.copy(ROOT / "home/chief-of-staff/mise.toml", source)
-        for name in ("AGENTS.md", "README.md", "nono-codex.py"):
+        for name in ("AGENTS.md", "README.md", "nono-codex.py", "inspect-sample.py"):
             shutil.copy(ROOT / "home/chief-of-staff" / name, source.parent / name)
         (self.chief / "nono-codex.py").unlink()
         target = self.chief / "mise.toml"
@@ -332,6 +332,15 @@ class ChiefTaskTests(unittest.TestCase):
                     self.assertTrue(target.is_symlink())
                     self.assertEqual(target.resolve(), source)
                     self.assertFalse((self.chief / "nono-codex.py").exists())
+                    # 既存3リンクだけで読取scriptへ到達し、nonoやCodexを呼ばない。
+                    before = self.calls() if self.log.exists() else []
+                    inspected = self.run_mise(
+                        "run", "inspect-sample", str(ROOT / "tests/fixtures/chief-sample.txt"),
+                    )
+                    self.assertEqual(inspected.returncode, 0, inspected.stderr)
+                    self.assertEqual(json.loads(inspected.stdout)["pid"], 101)
+                    self.assertEqual(self.calls() if self.log.exists() else [], before)
+                    self.assertFalse((self.chief / "inspect-sample.py").exists())
                     launched = self.run_mise("run", "chief", "--version")
                     self.assertEqual(launched.returncode, 0, launched.stderr)
                     self.assertEqual(self.calls()[-1]["inside_nono"], "1")
