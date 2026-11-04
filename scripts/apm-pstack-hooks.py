@@ -14,16 +14,21 @@ HASHES = {
     "hooks/session-start-context.md": "39dc6bebcc7b50e6add4b28d470b2faf9f34391fad1bf847039bbe76f26e84e4",
     "skills/setup-pstack/scripts/read-sheet.sh": "46d240f8f48e6bcb0d3a7d8b6c098c7bfe20f3828437b7da5e4f1ac4512357bb",
 }
+HASHES_09126 = {
+    **HASHES,
+    "hooks/session-start.sh": "53dd48c37c3b2aefcd1b9c1bf174ecb7b0a09637911986eb0cd57bbb4bde9532",
+}
 
 
 def plan(home, package_root, source=SOURCE, claude_config_dir=None):
     """Return only verified pstack entry replacements, without writing or executing hooks."""
-    for relative, expected in HASHES.items():
+    manifest = json.loads((package_root / ".claude-plugin/plugin.json").read_text())
+    if manifest.get("name") != "pstack" or manifest.get("version") not in ("0.9.114", "0.9.120", "0.9.126"):
+        raise ValueError("expected reviewed pstack 0.9.114, 0.9.120 or 0.9.126")
+    hashes = HASHES_09126 if manifest["version"] == "0.9.126" else HASHES
+    for relative, expected in hashes.items():
         if hashlib.sha256((package_root / relative).read_bytes()).hexdigest() != expected:
             raise ValueError(f"pstack source changed: {relative}; review the pinned compatibility fix")
-    manifest = json.loads((package_root / ".claude-plugin/plugin.json").read_text())
-    if manifest.get("name") != "pstack" or manifest.get("version") not in ("0.9.114", "0.9.120"):
-        raise ValueError("expected reviewed pstack 0.9.114 or 0.9.120")
     changes = []
     owned_count = 0
     for runtime, config_name in (("codex", "hooks.json"), ("claude", "settings.json")):
@@ -44,7 +49,7 @@ def plan(home, package_root, source=SOURCE, claude_config_dir=None):
             raise ValueError(f"unexpected {runtime} pstack hook shape")
         hook = entry["hooks"][0]
         exported = directory / "hooks/pstack/hooks/session-start.sh"
-        if hashlib.sha256(exported.read_bytes()).hexdigest() != HASHES["hooks/session-start.sh"]:
+        if hashlib.sha256(exported.read_bytes()).hexdigest() != hashes["hooks/session-start.sh"]:
             raise ValueError(f"modified {runtime} exported hook; preserve and inspect it")
         original = f'"{exported}" {runtime}'
         fixed = "env CLAUDE_PLUGIN_ROOT=" + shlex.quote(str(package_root)) + " " + original

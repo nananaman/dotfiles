@@ -103,6 +103,28 @@ class PstackHookCompatibilityTest(unittest.TestCase):
 
         self.assertEqual(before, {p: p.read_bytes() for p in self.home.rglob("*.json")})
 
+    def test_09126_requires_matching_source_and_exports_then_preserves_existing_configuration(self):
+        self.apply()
+        (self.package / ".claude-plugin/plugin.json").write_text('{"name":"pstack","version":"0.9.126"}')
+        updated_script = self.script + b"# reviewed update\n"
+        hashes = {relative: hashlib.sha256((self.package / relative).read_bytes()).hexdigest() for relative in module.HASHES}
+        hashes["hooks/session-start.sh"] = hashlib.sha256(updated_script).hexdigest()
+        with patch.object(module, "HASHES_09126", hashes):
+            before = {p: p.read_bytes() for p in self.home.rglob("*.json")}
+            with self.assertRaisesRegex(ValueError, "source changed"):
+                module.plan(self.home, self.package)
+            self.assertEqual(before, {p: p.read_bytes() for p in self.home.rglob("*.json")})
+
+            (self.package / "hooks/session-start.sh").write_bytes(updated_script)
+            with self.assertRaisesRegex(ValueError, "modified codex exported hook"):
+                module.plan(self.home, self.package)
+            self.assertEqual(before, {p: p.read_bytes() for p in self.home.rglob("*.json")})
+
+            for runtime in ("codex", "claude"):
+                (self.home / ("." + runtime) / "hooks/pstack/hooks/session-start.sh").write_bytes(updated_script)
+            self.assertEqual([], module.plan(self.home, self.package))
+            self.assertEqual(before, {p: p.read_bytes() for p in self.home.rglob("*.json")})
+
     def test_codex_only_ownership_leaves_unrelated_claude_settings_untouched(self):
         settings = self.home / ".claude/settings.json"
         settings.write_text(json.dumps({"hooks": {"SessionStart": [self.unrelated]}}))
