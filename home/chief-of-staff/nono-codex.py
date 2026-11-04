@@ -48,7 +48,7 @@ argv = [
     "--allow-unix-socket", socket,
     "--allow-unix-socket", str(home / ".config/herdr-app/herdr-app.sock"),
     "--read-file", app,
-    "--", "codex", "--no-daemon", "--sandbox", "danger-full-access",
+    "--", str(home / ".local/bin/codex"), "--no-daemon", "--sandbox", "danger-full-access",
     "--ask-for-approval", "never", "-C", cwd, *sys.argv[1:],
 ]
 try:

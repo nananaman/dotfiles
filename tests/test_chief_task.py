@@ -47,6 +47,9 @@ class ChiefTaskTests(unittest.TestCase):
         boundary.chmod(0o755)
         for name in ("nono", "codex", "herdr-app"):
             (self.bin / name).symlink_to(boundary)
+        self.managed_bin = self.home / ".local/bin"
+        self.managed_bin.mkdir(parents=True)
+        (self.managed_bin / "codex").symlink_to(boundary)
         self.log_directory = self.root / "logs with spaces"
         self.log_directory.mkdir()
         self.env = {
@@ -76,6 +79,41 @@ class ChiefTaskTests(unittest.TestCase):
 
     def calls(self):
         return [json.loads(line) for line in self.log.read_text().splitlines()]
+
+    # 古いPATHとglobal pinがあっても、明示版をnono内のwrapperで選ぶ。
+    def test_explicit_version_overrides_stale_path_and_global_pin(self):
+        # Arrange
+        (self.managed_bin / "codex").unlink()
+        for name in ("codex", "dotfiles-exec"):
+            shutil.copy(ROOT / "home/.local/bin" / name, self.managed_bin / name)
+        (self.bin / "codex").unlink()
+        for version in ("0.159.3", "0.166.0"):
+            executable = self.root / "data/installs/codex" / version / "bin/codex"
+            executable.parent.mkdir(parents=True)
+            executable.write_text(
+                f"#!{sys.executable}\n"
+                "import os\n"
+                "assert os.environ.get('TEST_NONO') == '1'\n"
+                f"print('codex-cli {version}')\n"
+            )
+            executable.chmod(0o755)
+            if version == "0.159.3":
+                (self.bin / "codex").symlink_to(executable)
+        (self.root / "global.toml").write_text('[tools]\ncodex = "0.159.3"\n')
+        self.env["MISE_CODEX_VERSION"] = "0.166.0"
+        self.env["MISE_BIN"] = MISE
+        self.env["MISE_TASK_RUN_AUTO_INSTALL"] = "false"
+
+        # Act
+        result = subprocess.run(
+            [sys.executable, str(self.chief / "nono-codex.py"), "--version"],
+            cwd=self.chief, env=self.env, capture_output=True, text=True, timeout=60,
+        )
+
+        # Assert
+        # PATH先頭の旧実体ではなく、指定版の結果を返す。
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout.strip(), "codex-cli 0.166.0")
 
     # nono のtraceだけを一意なprivate logへ移し、子のstderrと終了値は保持する。
     def test_private_log_paths_are_unique_and_child_errors_remain_visible(self):
@@ -241,7 +279,7 @@ class ChiefTaskTests(unittest.TestCase):
             "--allow-cwd", "--read", str(self.home / ".local/state/herdr-core/default"),
             "--allow-unix-socket", str(self.root / "runtime/herdr-core/default.sock"),
             "--allow-unix-socket", str(self.home / ".config/herdr-app/herdr-app.sock"),
-            "--read-file", str(self.bin / "herdr-app"), "--", "codex",
+            "--read-file", str(self.bin / "herdr-app"), "--", str(self.managed_bin / "codex"),
             "--no-daemon", "--sandbox", "danger-full-access", "--ask-for-approval", "never",
             "-C", str(self.chief),
             "AGENTS.md と hc --skill を読み、Chief of Staff として依頼を受けてください。",

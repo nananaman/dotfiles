@@ -33,6 +33,8 @@ Chief と担当の両方を外側の nono で制限します。
 内側の Codex は `--no-daemon --sandbox danger-full-access --ask-for-approval never` に統一し、ファイル、ネットワーク、コマンドの制限を nono が担います。
 この Codex の引数を nono なしで使わないでください。
 nono 本体、既存の `chouge-codex` profile、認証済みの Codex、Herdr が必要です。
+Codex は dotfiles の `~/.local/bin/codex` wrapper を nono 内で明示して起動します。
+wrapper が `MISE_CODEX_VERSION`（未指定ならグローバル pin）から実体を選ぶため、起動元の古い PATH にある Codex は使いません。
 
 ## Herdr から初めて起動する
 
@@ -198,13 +200,13 @@ hc run --bg --cwd "$task_dir" --label "herdr.space=$worker_space" \
   --read "$hc_state" --allow-unix-socket "$hc_socket" \
   --allow-unix-socket "$HOME/.config/herdr-app/herdr-app.sock" \
   --read-file "$(command -v herdr-app)" \
-  -- codex --no-daemon --sandbox danger-full-access --ask-for-approval never \
+  -- "$HOME/.local/bin/codex" --no-daemon --sandbox danger-full-access --ask-for-approval never \
   -C "$task_dir" -m gpt-6.1-sol -c 'model_reasoning_effort="high"' \
   "$task_prompt 窓口は $HC_TERMINAL_ID。完了または進められない時は hc send $HC_TERMINAL_ID で結果と根拠のパスを報告してください。追加担当は起動しないでください。"
 ```
 
-`MISE_CODEX_VERSION` を渡すだけでは、core が持つ PATH の Codex 実体は切り替わりません。
-担当の版は起動結果で確認します。この例では core の古い PATH による版の選択は解決していません。
+`MISE_CODEX_VERSION` は wrapper に渡し、core が持つ PATH に依存せず版を選びます。
+担当の版は起動結果で確認します。
 
 起動結果の `first_message.sent` と端末の実 ID を確認します。
 `hc get` と `hc read` で状態と内容を確かめ、`hc wait` で待ちます。
