@@ -35,6 +35,11 @@ class PstackHookCompatibilityTest(unittest.TestCase):
         manifest.write_text('{"name":"pstack","version":"0.9.114"}')
         self.addCleanup(patch.stopall)
         patch.object(module, "HASHES", hashes).start()
+        self.updated_script = self.script + b"# reviewed update\n"
+        patch.object(module, "HASHES_09126", {
+            **hashes,
+            "hooks/session-start.sh": hashlib.sha256(self.updated_script).hexdigest(),
+        }).start()
         self.unrelated = {"matcher": "startup", "hooks": [{"type": "command", "command": "unrelated-do-not-run"}]}
         for runtime, filename in (("codex", "hooks.json"), ("claude", "settings.json")):
             folder = self.home / ("." + runtime)
@@ -101,6 +106,53 @@ class PstackHookCompatibilityTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "expected reviewed pstack"):
             module.plan(self.home, self.package)
 
+        self.assertEqual(before, {p: p.read_bytes() for p in self.home.rglob("*.json")})
+
+    # 異常系: 新版のversionと旧版ソースが混在した状態では設定を変更しない。
+    def test_09126_rejects_old_source_without_writing(self):
+        # Arrange
+        (self.package / ".claude-plugin/plugin.json").write_text('{"name":"pstack","version":"0.9.126"}')
+        before = {p: p.read_bytes() for p in self.home.rglob("*.json")}
+
+        # Act
+        with self.assertRaisesRegex(ValueError, "source changed"):
+            module.plan(self.home, self.package)
+
+        # Assert
+        # 拒否時は所有記録と公開設定のどちらも書き換えない。
+        self.assertEqual(before, {p: p.read_bytes() for p in self.home.rglob("*.json")})
+
+    # 異常系: 本体だけ新版になり展開hookが旧版のままなら設定を変更しない。
+    def test_09126_rejects_old_export_without_writing(self):
+        # Arrange
+        (self.package / ".claude-plugin/plugin.json").write_text('{"name":"pstack","version":"0.9.126"}')
+        (self.package / "hooks/session-start.sh").write_bytes(self.updated_script)
+        before = {p: p.read_bytes() for p in self.home.rglob("*.json")}
+
+        # Act
+        with self.assertRaisesRegex(ValueError, "modified codex exported hook"):
+            module.plan(self.home, self.package)
+
+        # Assert
+        # 不完全な展開から既存の設定を更新しない。
+        self.assertEqual(before, {p: p.read_bytes() for p in self.home.rglob("*.json")})
+
+    # 正常系: ソースと展開hookが新版なら既存の補正済み設定をそのまま使える。
+    def test_09126_preserves_existing_corrected_configuration(self):
+        # Arrange
+        self.apply()
+        (self.package / ".claude-plugin/plugin.json").write_text('{"name":"pstack","version":"0.9.126"}')
+        (self.package / "hooks/session-start.sh").write_bytes(self.updated_script)
+        for runtime in ("codex", "claude"):
+            (self.home / ("." + runtime) / "hooks/pstack/hooks/session-start.sh").write_bytes(self.updated_script)
+        before = {p: p.read_bytes() for p in self.home.rglob("*.json")}
+
+        # Act
+        changes = module.plan(self.home, self.package)
+
+        # Assert
+        # 同じ補正を再計画しても設定や所有記録に変更が生じない。
+        self.assertEqual([], changes)
         self.assertEqual(before, {p: p.read_bytes() for p in self.home.rglob("*.json")})
 
     def test_codex_only_ownership_leaves_unrelated_claude_settings_untouched(self):
