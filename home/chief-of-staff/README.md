@@ -70,6 +70,17 @@ state は読取だけ、2つの Unix socket は接続だけを許可します。
 この許可は core や app の操作を読取専用に制限するものではありません。
 送信、担当起動、表示変更などは会話で許可された範囲に従います。
 
+nono の trace は `--log-file` で一時ファイルへ送り、起動時に `nono log: <パス>` を1行表示します。
+ファイルは一意な名前と mode 600 で作り、Git に含めません。不要になったログは削除できます。
+子コマンドの stdout・stderr・終了コードと nono の拒否診断は端末に残します。
+`--silent` はファイル拒否の診断も消すため使いません。
+ファイル拒否は端末の `Sandbox denial`、通信拒否の理由は表示されたログで確認します。
+
+```sh
+# nono_log に表示されたパスを代入して確認する
+rg -n 'proxy request denied' "$nono_log"
+```
+
 ## 同じ会話を再開する
 
 同じ会話を二重に起動しません。
@@ -111,9 +122,12 @@ Chief は依頼内容と対象リポジトリから worktree の実パスを確�
 : "${hc_state:?確認した session の state ディレクトリを代入してください}"
 : "${hc_socket:?確認した core の Unix socket を代入してください}"
 : "${MISE_CODEX_VERSION:?確認した Codex の版を代入してください}"
+nono_log=$(mktemp "${TMPDIR:-/tmp}/chief-nono.XXXXXX")
+printf 'nono log: %s\n' "$nono_log" >&2
 hc run --bg --cwd "$task_dir" --label "herdr.space=$worker_space" \
   env HC_SESSION="${HC_SESSION:-default}" MISE_CODEX_VERSION="$MISE_CODEX_VERSION" \
-  nono run --profile chouge-codex --workdir "$task_dir" --allow-cwd \
+  nono run --profile chouge-codex --log-file "$nono_log" \
+  --workdir "$task_dir" --allow-cwd \
   --read "$hc_state" --allow-unix-socket "$hc_socket" \
   --allow-unix-socket "$HOME/.config/herdr-app/herdr-app.sock" \
   --read-file "$(command -v herdr-app)" \
@@ -129,3 +143,10 @@ hc run --bg --cwd "$task_dir" --label "herdr.space=$worker_space" \
 `hc get` と `hc read` で状態と内容を確かめ、`hc wait` で待ちます。
 担当起動、ファイルのリンク、`NONO_CAP_FILE` の存在だけを制限が働いた証拠にせず、通常コマンドで許可先の書込みと範囲外の拒否を確認します。
 nono が拒否した場合は必要な対象だけを調べ、裸の Codex 起動や sandbox の全解除で代替しません。
+
+Herdr の窓が閉じていて hidden 端末の利用が許可されている場合は、`hc get`・`hc read`・`hc wait` で確認します。
+窓・スペース・フォーカスを変更しません。`hc wait` が timeout で対象が working なら、同じ画面を繰り返し read せず待ちます。
+報告、状態や差分の変化、blocked・error があるときに内容を確認します。
+
+元の checkout に未保存の差分があれば、stash や pull をせず、許可された別 worktree を使います。
+応答しない既存 core を無断で修復・停止しません。

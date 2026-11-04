@@ -41,11 +41,14 @@ class ChiefTaskTests(unittest.TestCase):
             "    command = sys.argv[sys.argv.index('--') + 1:]\n"
             "    os.environ['TEST_NONO'] = '1'\n"
             "    os.execvp(command[0], command)\n"
+            "sys.stderr.write(os.environ.get('CODEX_STDERR', ''))\n"
             "sys.exit(int(os.environ.get('CODEX_EXIT', '0')))\n"
         )
         boundary.chmod(0o755)
         for name in ("nono", "codex", "herdr-app"):
             (self.bin / name).symlink_to(boundary)
+        self.log_directory = self.root / "logs with spaces"
+        self.log_directory.mkdir()
         self.env = {
             "HOME": str(self.home), "PATH": f"{self.bin}:/usr/bin:/bin",
             "MISE_CONFIG_DIR": str(self.root / "config"),
@@ -59,6 +62,7 @@ class ChiefTaskTests(unittest.TestCase):
             "MISE_NO_AUTO_UPDATE": "1", "MISE_COLOR": "0",
             "MISE_CEILING_PATHS": str(self.root),
             "CALL_LOG": str(self.log),
+            "TMPDIR": str(self.log_directory),
         }
         (self.root / "global.toml").write_text("")
         result = self.run_mise("trust", str(self.chief / "mise.toml"))
@@ -72,6 +76,32 @@ class ChiefTaskTests(unittest.TestCase):
 
     def calls(self):
         return [json.loads(line) for line in self.log.read_text().splitlines()]
+
+    # nono のtraceだけを一意なprivate logへ移し、子のstderrと終了値は保持する。
+    def test_private_log_paths_are_unique_and_child_errors_remain_visible(self):
+        # Arrange
+        self.env["CODEX_STDERR"] = "CHILD_STDERR_SENTINEL\n"
+        self.env["CODEX_EXIT"] = "23"
+        paths = []
+        for args in ([], ["resume", "conversation with spaces"]):
+            with self.subTest(args=args):
+                # Act
+                result = self.run_mise("run", "chief", *args)
+
+                # Assert
+                # 端末にはlogの場所と子のエラーを残し、silentにはしない。
+                self.assertEqual(result.returncode, 23, result.stderr)
+                nono = self.calls()[-2]["args"]
+                self.assertIn("--log-file", nono)
+                log = Path(nono[nono.index("--log-file") + 1])
+                paths.append(log)
+                self.assertEqual(log.parent, self.log_directory)
+                self.assertTrue(log.is_file())
+                self.assertEqual(log.stat().st_mode & 0o777, 0o600)
+                self.assertEqual(result.stderr.count(f"nono log: {log}"), 1)
+                self.assertIn("CHILD_STDERR_SENTINEL\n", result.stderr)
+                self.assertNotIn("--silent", nono)
+        self.assertEqual(len(set(paths)), 2)
 
     # 明示した session の state と socket だけを nono に許可する。
     def test_explicit_session_selects_its_own_state_and_socket(self):
@@ -204,8 +234,10 @@ class ChiefTaskTests(unittest.TestCase):
         self.assertEqual(result.returncode, 17, result.stderr)
         nono, codex = self.calls()
         self.assertEqual(nono["name"], "nono")
+        log_path = nono["args"][nono["args"].index("--log-file") + 1]
         self.assertEqual(nono["args"], [
-            "run", "--profile", "chouge-codex", "--workdir", str(self.chief),
+            "run", "--profile", "chouge-codex", "--log-file", log_path,
+            "--workdir", str(self.chief),
             "--allow-cwd", "--read", str(self.home / ".local/state/herdr-core/default"),
             "--allow-unix-socket", str(self.root / "runtime/herdr-core/default.sock"),
             "--allow-unix-socket", str(self.home / ".config/herdr-app/herdr-app.sock"),

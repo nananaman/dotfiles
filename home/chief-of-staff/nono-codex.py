@@ -6,6 +6,7 @@ from pathlib import Path
 import re
 import shutil
 import sys
+import tempfile
 import tomllib
 
 
@@ -38,8 +39,11 @@ app = shutil.which("herdr-app")
 if not app:
     sys.exit("herdr-app is required")
 cwd = os.getcwd()
+log_fd, log_path = tempfile.mkstemp(prefix="chief-nono-", suffix=".log")
+os.close(log_fd)
+print(f"nono log: {log_path}", file=sys.stderr, flush=True)
 argv = [
-    "nono", "run", "--profile", "chouge-codex",
+    "nono", "run", "--profile", "chouge-codex", "--log-file", log_path,
     "--workdir", cwd, "--allow-cwd", "--read", str(state),
     "--allow-unix-socket", socket,
     "--allow-unix-socket", str(home / ".config/herdr-app/herdr-app.sock"),
