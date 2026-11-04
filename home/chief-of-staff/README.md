@@ -81,6 +81,45 @@ nono の trace は `--log-file` で一時ファイルへ送り、起動時に `n
 rg -n 'proxy request denied' "$nono_log"
 ```
 
+## 保存済みの get JSON を短く確認する
+
+既に取得した `hc get --json` のJSONを、stdinから[compact-status.py](compact-status.py)へ渡します。
+既存の3つの symlink で利用でき、追加配置は不要です。
+
+```sh
+cd ~/chief-of-staff
+mise --quiet run compact-status < /path/to/captured-get.json
+```
+
+`address`、`state`、`status` 全体、`turn`、`exit_code`、`signal`、`reason`、`reported` を1行のJSONで保持します。
+トップレベルの `argv`、`screen`、その他の項目は表示しません。
+`null`、`0`、`false` は元の値のままで、端末の完了や成功には読み替えません。
+対応する入力は hc 0.1.17 の Terminal と Status の形式です。必須8項目は欠落を補完しません。
+
+終了値0は投影の成功を表します。`blocked` や `error` のstatusもそのまま返すため、作業成功の意味ではありません。
+入力の `error` objectは内容を保持し、filterのstderrと終了値65で示します。
+空入力、不正JSON、重複キー、schema不備もstderrと終了値65で示し、生入力は出力しません。
+引数があれば終了値64、stdinの読取失敗は終了値74です。
+
+scriptはstdinの読取と投影だけを行い、taskはそのscriptを起動します。
+`hc` の実行やsocket接続は行いません。
+sessionや対象の指定、timeout、自動read、wait、retryもありません。
+stdinだけでは元のhcのstderr、CLI終了値、timeoutの有無は分かりません。取得時の記録と分けて確認します。
+filterの終了値や端末の `exit_code` から、元のhcのCLI終了値を復元しません。
+上流のget payload自体は減らず、保存済みJSONから表示する情報だけが減ります。
+bytes、lines、呼出数による表示量の比較は、実tokensの測定とは区別します。
+
+引継ぎでは元の依頼や画面を再掲せず、次の5項目を残します。
+成果根拠に短いstatusと参照先、検証の結果、未実施項目やエラーを含めます。
+
+```text
+目的: 状態表示と引継ぎの重複を減らす。
+範囲: stdinのJSON投影と既存mise task。接続は行わない。
+完了条件: 必須8項目と失敗情報を保持し、接続0で表示する。
+成果根拠: <commit>、<file:line>、<statusと検証結果・未実施項目>。
+次の一手: <担当と具体的な操作>。
+```
+
 ## 応答しない core を既存 sample で確認する
 
 対象 core が応答しない場合は、`status`、`get`、`run` などの接続を重ねず、許可済みの既存資料で確認します。

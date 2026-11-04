@@ -26,3 +26,15 @@ set -euo pipefail
 reader=$(python3 -c 'from pathlib import Path; import sys; print(Path(sys.argv[1]).resolve().with_name("inspect-sample.py"))' "$CHIEF_MISE_CONFIG")
 exec python3 "$reader" "$@"
 '''
+
+[tasks.compact-status]
+description = "Project captured hc get JSON from stdin without connecting to core"
+dir = "{{ config_root }}"
+raw = true
+env = { CHIEF_MISE_CONFIG = "{{ config_root }}/mise.toml" }
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+reader=$(python3 -c 'from pathlib import Path; import sys; print(Path(sys.argv[1]).resolve().with_name("compact-status.py"))' "$CHIEF_MISE_CONFIG")
+exec python3 "$reader" "$@"
+'''

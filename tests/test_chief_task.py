@@ -68,10 +68,10 @@ class ChiefTaskTests(unittest.TestCase):
         result = self.run_mise("trust", str(self.chief / "mise.toml"))
         self.assertEqual(result.returncode, 0, result.stderr)
 
-    def run_mise(self, *args, cwd=None):
+    def run_mise(self, *args, cwd=None, input=None):
         return subprocess.run(
             [MISE, *args], cwd=cwd or self.chief, env=self.env,
-            capture_output=True, text=True, timeout=60,
+            capture_output=True, text=True, timeout=60, input=input,
         )
 
     def calls(self):
@@ -300,7 +300,7 @@ class ChiefTaskTests(unittest.TestCase):
         source = repository / "home/chief-of-staff/mise.toml"
         source.parent.mkdir(parents=True)
         shutil.copy(ROOT / "home/chief-of-staff/mise.toml", source)
-        for name in ("AGENTS.md", "README.md", "nono-codex.py", "inspect-sample.py"):
+        for name in ("AGENTS.md", "README.md", "nono-codex.py", "inspect-sample.py", "compact-status.py"):
             shutil.copy(ROOT / "home/chief-of-staff" / name, source.parent / name)
         (self.chief / "nono-codex.py").unlink()
         target = self.chief / "mise.toml"
@@ -341,6 +341,20 @@ class ChiefTaskTests(unittest.TestCase):
                     self.assertEqual(json.loads(inspected.stdout)["pid"], 101)
                     self.assertEqual(self.calls() if self.log.exists() else [], before)
                     self.assertFalse((self.chief / "inspect-sample.py").exists())
+                    # 同じ3リンクでstdin投影へ到達し、追加コマンドを呼ばない。
+                    observed = {
+                        "address": "t7", "state": "live", "status": {"state": "blocked", "kind": "auth"},
+                        "turn": 0, "exit_code": None, "signal": None, "reason": None, "reported": False,
+                    }
+                    compacted = self.run_mise(
+                        "--quiet", "run", "compact-status",
+                        input=json.dumps({**observed, "argv": ["PRIVATE"], "screen": "PRIVATE"}),
+                    )
+                    self.assertEqual(compacted.returncode, 0, compacted.stderr)
+                    self.assertEqual(json.loads(compacted.stdout), observed)
+                    self.assertEqual(compacted.stderr, "")
+                    self.assertEqual(self.calls() if self.log.exists() else [], before)
+                    self.assertFalse((self.chief / "compact-status.py").exists())
                     launched = self.run_mise("run", "chief", "--version")
                     self.assertEqual(launched.returncode, 0, launched.stderr)
                     self.assertEqual(self.calls()[-1]["inside_nono"], "1")
