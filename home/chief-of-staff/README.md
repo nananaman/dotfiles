@@ -48,6 +48,9 @@ mise trust mise.toml
 mise run chief
 ```
 
+Chief の `mise.toml` は `[settings.task] run_auto_install = false` でタスク開始前の自動導入を無効にしているため、このディレクトリでは `MISE_TASK_RUN_AUTO_INSTALL=false` の前置は不要です。
+別 cwd の dotfiles worktree にはこの設定が引き継がれないため、`check` は dotfiles の手順どおり `MISE_TASK_RUN_AUTO_INSTALL=false` を前置します。
+
 引数なしでは Chief 用の初回 prompt を渡します。
 引数がある場合は既定 prompt を加えず、そのまま Codex へ渡します。
 モデルと effort を上書きする場合も通常の引数を使えます。

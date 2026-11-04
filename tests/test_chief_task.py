@@ -102,7 +102,6 @@ class ChiefTaskTests(unittest.TestCase):
         (self.root / "global.toml").write_text('[tools]\ncodex = "0.159.3"\n')
         self.env["MISE_CODEX_VERSION"] = "0.166.0"
         self.env["MISE_BIN"] = MISE
-        self.env["MISE_TASK_RUN_AUTO_INSTALL"] = "false"
 
         # Act
         result = subprocess.run(
