@@ -131,20 +131,29 @@ class ApmLifecycleTest(unittest.TestCase):
         self.assertEqual("__NO_SUCH_EXECUTABLE_HOOK__", hooks["hooks"]["SessionStart"][0]["hooks"][0]["command"])
         self.assertFalse((self.home / ".codex/plugins").exists())
 
-    def test_codex_dependency_target_excludes_competing_copilot_hooks_and_claude_outputs(self):
+    # 正常系: rootのAntigravity定義があってもCodex専用hookだけを選ぶ。
+    def test_codex_dependency_target_excludes_competing_hooks_and_claude_outputs(self):
+        # Arrange
         plugin = self.root / "multi-client-plugin"
         self.skill(plugin / "skills/poteto-mode", "poteto-mode")
         for directory in (".github/plugin", ".claude-plugin", "hooks", "agents"):
             (plugin / directory).mkdir(parents=True, exist_ok=True)
         (plugin / ".github/plugin/plugin.json").write_text(json.dumps({"name": "multi-client-plugin", "hooks": "hooks/copilot-hooks.json"}))
         (plugin / ".claude-plugin/plugin.json").write_text('{"name":"multi-client-plugin"}')
+        (plugin / ".antigravity-plugin").mkdir()
+        (plugin / ".antigravity-plugin/plugin.json").write_text('{"name":"multi-client-plugin","version":"1.0.0"}')
+        (plugin / "hooks.json").write_text(json.dumps({"pstack-routing": {"SessionStart": [
+            {"type": "command", "command": "__ANTIGRAVITY_MUST_NOT_EXECUTE__"}]} }))
         (plugin / "agents/poteto-agent.md").write_text("---\nname: poteto-agent\ndescription: Inert fixture\n---\nNo actions.\n")
         for filename, events in [("copilot-hooks.json", ["SessionStart", "PreToolUse"]), ("codex-hooks.json", ["SessionStart"])]:
             command = "__CODEX_MUST_NOT_EXECUTE__" if filename.startswith("codex") else "__COPILOT_MUST_NOT_EXECUTE__"
             (plugin / "hooks" / filename).write_text(json.dumps({"hooks": {event: [{"hooks": [{"type": "command", "command": command}]}] for event in events}}))
 
+        # Act
         self.install([plugin], targets=["codex"])
 
+        # Assert
+        # 他runtimeのhookやClaude出力を追加せず、既存のCodex定義を使う。
         hooks = json.loads((self.home / ".codex/hooks.json").read_text())["hooks"]
         self.assertEqual({"SessionStart"}, set(hooks))
         self.assertEqual("__CODEX_MUST_NOT_EXECUTE__", hooks["SessionStart"][0]["hooks"][0]["command"])

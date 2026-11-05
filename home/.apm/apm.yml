@@ -11,7 +11,7 @@ dependencies:
     - path: ~/.apm/packages/textlint-ai
     - git: michael-denyer/pstack-claude
       path: plugins/pstack
-      ref: 8a9d851417a4d54db24fea837424068e85348e19
+      ref: d58d761098864239f5593c9d6653d3d93f59d0a7
       targets: [codex]
     - path: ~/ghq/github.com/nananaman/skills/plugin/skills/apm-usage
     - path: ~/ghq/github.com/nananaman/skills/plugin/skills/apple-container
