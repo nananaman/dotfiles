@@ -44,9 +44,6 @@ run = [
 ]
 
 [dotfiles]
-"~/chief-of-staff/AGENTS.md" = { source = "home/chief-of-staff/AGENTS.md", mode = "symlink" }
-"~/chief-of-staff/README.md" = { source = "home/chief-of-staff/README.md", mode = "symlink" }
-"~/chief-of-staff/mise.toml" = { source = "home/chief-of-staff/mise.toml", mode = "symlink" }
 "~/.zshrc" = { source = "home/.zshrc", mode = "symlink" }
 "~/.zshenv" = { source = "home/.zshenv", mode = "symlink" }
 "~/.agents/AGENTS.md" = { source = "home/.agents/AGENTS.md", mode = "symlink" }
@@ -64,9 +61,6 @@ run = [
 "~/.config/nvim" = { source = "home/.config/nvim", mode = "symlink-each" }
 "~/.config/git" = { source = "home/.config/git", mode = "symlink-each" }
 "~/.config/ghostty/config" = { source = "home/.config/ghostty/config", mode = "symlink" }
-"~/.config/herdr-app/settings.json" = { source = "home/.config/herdr-app/settings.json", mode = "symlink", variants = [
-  { os = "macos" },
-] }
 "~/.config/lazygit" = { source = "home/.config/lazygit", mode = "symlink-each" }
 "~/.config/cspell" = { source = "home/.config/cspell", mode = "symlink-each" }
 "~/.config/sql-formatter" = { source = "home/.config/sql-formatter", mode = "symlink-each" }
@@ -125,7 +119,6 @@ run = [
 "brew-cask:font-hackgen-nerd" = "latest"
 "brew-cask:1password-cli" = { os = "macos" }
 "brew-cask:ghostty" = { os = "macos" }
-"brew-cask:herdr-app" = { os = "macos" }
 "apt:git" = { os = "linux" }
 "apt:git-lfs" = { os = "linux" }
 "apt:zsh" = { os = "linux" }
