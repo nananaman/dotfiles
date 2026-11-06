@@ -164,6 +164,41 @@ class ApmLifecycleTest(unittest.TestCase):
         self.assertFalse((self.home / ".claude/skills").exists())
         self.assertFalse((self.home / ".github/hooks").exists())
 
+    # 正常系: OMP packageやGrok専用skillが加わってもCodexの配布範囲を広げない。
+    def test_codex_target_ignores_other_clients_routing_skill_and_extension(self):
+        # Arrange
+        plugin = self.root / "multi-client-plugin"
+        self.skill(plugin / "skills/poteto-mode", "poteto-mode")
+        self.skill(plugin / "grok/skills/pstack-routing", "pstack-routing")
+        for directory in (".claude-plugin", ".codex-plugin", ".grok-plugin", "hooks", "omp"):
+            (plugin / directory).mkdir(parents=True, exist_ok=True)
+        (plugin / ".claude-plugin/plugin.json").write_text('{"name":"multi-client-plugin"}')
+        (plugin / ".codex-plugin/plugin.json").write_text(json.dumps({
+            "name": "multi-client-plugin", "skills": "./skills/", "hooks": "./hooks/codex-hooks.json"}))
+        (plugin / ".grok-plugin/plugin.json").write_text(json.dumps({
+            "name": "multi-client-plugin", "skills": ["./skills", "./grok/skills"]}))
+        (plugin / "package.json").write_text(json.dumps({
+            "name": "multi-client-plugin", "version": "1.0.0", "private": True,
+            "omp": {"extensions": ["./omp/index.mjs"]}}))
+        (plugin / "omp/index.mjs").write_text('throw new Error("OMP must not execute");\n')
+        (plugin / "hooks/codex-hooks.json").write_text(json.dumps({"hooks": {"SessionStart": [
+            {"hooks": [{"type": "command", "command": "__CODEX_MUST_NOT_EXECUTE__"}]}]}}))
+
+        # Act
+        self.install([plugin], targets=["codex"])
+
+        # Assert
+        # 共通skillとCodex hookだけを公開し、Grok routingやOMPの導入は行わない。
+        shared = self.home / ".agents/skills"
+        self.assertEqual({"poteto-mode"}, {path.name for path in shared.iterdir()})
+        self.assertTrue((shared / "poteto-mode/SKILL.md").is_file())
+        hooks = json.loads((self.home / ".codex/hooks.json").read_text())["hooks"]
+        self.assertEqual({"SessionStart"}, set(hooks))
+        self.assertEqual("__CODEX_MUST_NOT_EXECUTE__", hooks["SessionStart"][0]["hooks"][0]["command"])
+        self.assertFalse((self.home / ".omp").exists())
+        self.assertFalse((self.home / ".grok").exists())
+        self.assertFalse((self.home / ".claude/skills").exists())
+
 
 if __name__ == "__main__":
     unittest.main()
