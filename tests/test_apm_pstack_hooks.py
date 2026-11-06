@@ -45,6 +45,11 @@ class PstackHookCompatibilityTest(unittest.TestCase):
             **hashes,
             "hooks/session-start.sh": hashlib.sha256(self.latest_script).hexdigest(),
         }).start()
+        self.next_script = self.latest_script + b"# reviewed 0.9.130 update\n"
+        patch.object(module, "HASHES_09130", {
+            **hashes,
+            "hooks/session-start.sh": hashlib.sha256(self.next_script).hexdigest(),
+        }).start()
         self.unrelated = {"matcher": "startup", "hooks": [{"type": "command", "command": "unrelated-do-not-run"}]}
         for runtime, filename in (("codex", "hooks.json"), ("claude", "settings.json")):
             folder = self.home / ("." + runtime)
@@ -219,6 +224,61 @@ class PstackHookCompatibilityTest(unittest.TestCase):
         (self.package / "hooks/session-start.sh").write_bytes(self.latest_script)
         for runtime in ("codex", "claude"):
             (self.home / ("." + runtime) / "hooks/pstack/hooks/session-start.sh").write_bytes(self.latest_script)
+        before = {p: p.read_bytes() for p in self.home.rglob("*.json")}
+
+        # Act
+        changes = module.plan(self.home, self.package)
+
+        # Assert
+        # 同じ補正を再適用せず、既存のhookと所有記録を維持する。
+        self.assertEqual([], changes)
+        self.assertEqual(before, {p: p.read_bytes() for p in self.home.rglob("*.json")})
+
+    # 異常系: 新版のversionと0.9.129ソースが混在しても設定を変更しない。
+    def test_09130_rejects_09129_source_without_writing(self):
+        # Arrange
+        (self.package / ".claude-plugin/plugin.json").write_text('{"name":"pstack","version":"0.9.130"}')
+        (self.package / "hooks/session-start.sh").write_bytes(self.latest_script)
+        before = {p: p.read_bytes() for p in self.home.rglob("*.json")}
+
+        # Act
+        with self.assertRaisesRegex(ValueError, "source changed"):
+            module.plan(self.home, self.package)
+
+        # Assert
+        # 既知の旧版hashでも、新版との混在は許可しない。
+        self.assertEqual(before, {p: p.read_bytes() for p in self.home.rglob("*.json")})
+
+    # 異常系: 新版ソースに旧版の展開hookが残っていれば設定を変更しない。
+    def test_09130_rejects_09129_export_without_writing(self):
+        # Arrange
+        (self.package / ".claude-plugin/plugin.json").write_text('{"name":"pstack","version":"0.9.130"}')
+        (self.package / "hooks/session-start.sh").write_bytes(self.next_script)
+        for runtime in ("codex", "claude"):
+            (self.home / ("." + runtime) / "hooks/pstack/hooks/session-start.sh").write_bytes(self.latest_script)
+        before = {p: p.read_bytes() for p in self.home.rglob("*.json")}
+
+        # Act
+        with self.assertRaisesRegex(ValueError, "modified codex exported hook"):
+            module.plan(self.home, self.package)
+
+        # Assert
+        # 展開が不完全な状態では、設定と所有記録の両方を保つ。
+        self.assertEqual(before, {p: p.read_bytes() for p in self.home.rglob("*.json")})
+
+    # 正常系: 0.9.129から本体と展開hookが更新されても既存補正を保つ。
+    def test_09130_accepts_upgrade_from_09129_and_preserves_configuration(self):
+        # Arrange
+        manifest = self.package / ".claude-plugin/plugin.json"
+        manifest.write_text('{"name":"pstack","version":"0.9.129"}')
+        (self.package / "hooks/session-start.sh").write_bytes(self.latest_script)
+        for runtime in ("codex", "claude"):
+            (self.home / ("." + runtime) / "hooks/pstack/hooks/session-start.sh").write_bytes(self.latest_script)
+        self.apply()
+        manifest.write_text('{"name":"pstack","version":"0.9.130"}')
+        (self.package / "hooks/session-start.sh").write_bytes(self.next_script)
+        for runtime in ("codex", "claude"):
+            (self.home / ("." + runtime) / "hooks/pstack/hooks/session-start.sh").write_bytes(self.next_script)
         before = {p: p.read_bytes() for p in self.home.rglob("*.json")}
 
         # Act
