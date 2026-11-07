@@ -289,6 +289,76 @@ class PstackHookCompatibilityTest(unittest.TestCase):
         self.assertEqual([], changes)
         self.assertEqual(before, {p: p.read_bytes() for p in self.home.rglob("*.json")})
 
+    # 正常系: 0.9.132でも検証済みの0.9.130 hookを補正し、再適用は不要になる。
+    def test_09132_supplies_root_for_unchanged_reviewed_hooks(self):
+        # Arrange
+        (self.package / ".claude-plugin/plugin.json").write_text('{"name":"pstack","version":"0.9.132"}')
+        (self.package / "hooks/session-start.sh").write_bytes(self.next_script)
+        for runtime in ("codex", "claude"):
+            (self.home / ("." + runtime) / "hooks/pstack/hooks/session-start.sh").write_bytes(self.next_script)
+
+        # Act
+        self.apply()
+
+        # Assert
+        # 両runtimeの補正と所有記録が一致し、無関係なhookは保持される。
+        self.assertEqual([], module.plan(self.home, self.package))
+        for runtime, filename in (("codex", "hooks.json"), ("claude", "settings.json")):
+            document = json.loads((self.home / ("." + runtime) / filename).read_text())
+            self.assertEqual(self.unrelated, document["hooks"]["SessionStart"][0])
+            command = document["hooks"]["SessionStart"][1]["hooks"][0]["command"]
+            self.assertTrue(command.startswith("env CLAUDE_PLUGIN_ROOT="))
+
+    # 正常系: hookが変わらない0.9.130からの更新では設定を再変更しない。
+    def test_09130_to_09132_preserves_existing_corrected_configuration(self):
+        # Arrange
+        manifest = self.package / ".claude-plugin/plugin.json"
+        manifest.write_text('{"name":"pstack","version":"0.9.130"}')
+        (self.package / "hooks/session-start.sh").write_bytes(self.next_script)
+        for runtime in ("codex", "claude"):
+            (self.home / ("." + runtime) / "hooks/pstack/hooks/session-start.sh").write_bytes(self.next_script)
+        self.apply()
+        manifest.write_text('{"name":"pstack","version":"0.9.132"}')
+        before = {p: p.read_bytes() for p in self.home.rglob("*.json")}
+
+        # Act
+        changes = module.plan(self.home, self.package)
+
+        # Assert
+        # 公開設定と所有記録のバイト列を保持する。
+        self.assertEqual([], changes)
+        self.assertEqual(before, {p: p.read_bytes() for p in self.home.rglob("*.json")})
+
+    # 異常系: 0.9.132のsourceが検証済みhashと違えば全設定を保持して拒否する。
+    def test_09132_rejects_unreviewed_source_without_writing(self):
+        # Arrange
+        (self.package / ".claude-plugin/plugin.json").write_text('{"name":"pstack","version":"0.9.132"}')
+        (self.package / "hooks/session-start.sh").write_bytes(self.latest_script)
+        before = {p: p.read_bytes() for p in self.home.rglob("*.json")}
+
+        # Act
+        with self.assertRaisesRegex(ValueError, "source changed"):
+            module.plan(self.home, self.package)
+
+        # Assert
+        # 新版を許可しても旧版のsource混在を許さない。
+        self.assertEqual(before, {p: p.read_bytes() for p in self.home.rglob("*.json")})
+
+    # 異常系: 0.9.132のsourceが正しくても展開hookが異なれば設定を変更しない。
+    def test_09132_rejects_unreviewed_export_without_writing(self):
+        # Arrange
+        (self.package / ".claude-plugin/plugin.json").write_text('{"name":"pstack","version":"0.9.132"}')
+        (self.package / "hooks/session-start.sh").write_bytes(self.next_script)
+        before = {p: p.read_bytes() for p in self.home.rglob("*.json")}
+
+        # Act
+        with self.assertRaisesRegex(ValueError, "modified codex exported hook"):
+            module.plan(self.home, self.package)
+
+        # Assert
+        # 不完全な展開で公開設定と所有記録を更新しない。
+        self.assertEqual(before, {p: p.read_bytes() for p in self.home.rglob("*.json")})
+
     def test_modified_command_preserves_user_changes_and_prevents_all_writes(self):
         path = self.home / ".claude/settings.json"
         data = json.loads(path.read_text())
