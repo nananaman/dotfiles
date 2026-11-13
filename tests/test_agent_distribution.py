@@ -7,7 +7,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 PSTACK_DEPENDENCY = """    - git: michael-denyer/pstack-claude
       path: plugins/pstack
-      ref: 8074b9fda33293b51844fbfc50e615df3729350b
+      ref: f49683438054332d6c71232693bed3c9305bd4ce
       targets: [codex]
 """
 MAINTENANCE_REF = "nananaman/skills/plugin/skills/skill-maintenance#3e067f262e8fb97cc7333cd12ac35ff209f3643e"
