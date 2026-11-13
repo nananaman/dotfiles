@@ -50,6 +50,11 @@ class PstackHookCompatibilityTest(unittest.TestCase):
             **hashes,
             "hooks/session-start.sh": hashlib.sha256(self.next_script).hexdigest(),
         }).start()
+        self.new_script = self.next_script + b"# reviewed 0.9.137 update\n"
+        patch.object(module, "HASHES_09137", {
+            **hashes,
+            "hooks/session-start.sh": hashlib.sha256(self.new_script).hexdigest(),
+        }).start()
         self.unrelated = {"matcher": "startup", "hooks": [{"type": "command", "command": "unrelated-do-not-run"}]}
         for runtime, filename in (("codex", "hooks.json"), ("claude", "settings.json")):
             folder = self.home / ("." + runtime)
@@ -402,6 +407,59 @@ class PstackHookCompatibilityTest(unittest.TestCase):
     def test_09133_rejects_unreviewed_export_without_writing(self):
         (self.package / ".claude-plugin/plugin.json").write_text('{"name":"pstack","version":"0.9.133"}')
         (self.package / "hooks/session-start.sh").write_bytes(self.next_script)
+        before = {p: p.read_bytes() for p in self.home.rglob("*.json")}
+
+        with self.assertRaisesRegex(ValueError, "modified codex exported hook"):
+            module.plan(self.home, self.package)
+
+        self.assertEqual(before, {p: p.read_bytes() for p in self.home.rglob("*.json")})
+
+    def test_09137_supplies_root_for_unchanged_reviewed_hooks(self):
+        (self.package / ".claude-plugin/plugin.json").write_text('{"name":"pstack","version":"0.9.137"}')
+        (self.package / "hooks/session-start.sh").write_bytes(self.new_script)
+        for runtime in ("codex", "claude"):
+            (self.home / ("." + runtime) / "hooks/pstack/hooks/session-start.sh").write_bytes(self.new_script)
+
+        self.apply()
+
+        self.assertEqual([], module.plan(self.home, self.package))
+        for runtime, filename in (("codex", "hooks.json"), ("claude", "settings.json")):
+            document = json.loads((self.home / ("." + runtime) / filename).read_text())
+            self.assertEqual(self.unrelated, document["hooks"]["SessionStart"][0])
+            command = document["hooks"]["SessionStart"][1]["hooks"][0]["command"]
+            self.assertTrue(command.startswith("env CLAUDE_PLUGIN_ROOT="))
+
+    def test_09133_to_09137_preserves_existing_corrected_configuration(self):
+        manifest = self.package / ".claude-plugin/plugin.json"
+        manifest.write_text('{"name":"pstack","version":"0.9.133"}')
+        (self.package / "hooks/session-start.sh").write_bytes(self.next_script)
+        for runtime in ("codex", "claude"):
+            (self.home / ("." + runtime) / "hooks/pstack/hooks/session-start.sh").write_bytes(self.next_script)
+        self.apply()
+        manifest.write_text('{"name":"pstack","version":"0.9.137"}')
+        (self.package / "hooks/session-start.sh").write_bytes(self.new_script)
+        for runtime in ("codex", "claude"):
+            (self.home / ("." + runtime) / "hooks/pstack/hooks/session-start.sh").write_bytes(self.new_script)
+        before = {p: p.read_bytes() for p in self.home.rglob("*.json")}
+
+        changes = module.plan(self.home, self.package)
+
+        self.assertEqual([], changes)
+        self.assertEqual(before, {p: p.read_bytes() for p in self.home.rglob("*.json")})
+
+    def test_09137_rejects_unreviewed_source_without_writing(self):
+        (self.package / ".claude-plugin/plugin.json").write_text('{"name":"pstack","version":"0.9.137"}')
+        (self.package / "hooks/session-start.sh").write_bytes(self.latest_script)
+        before = {p: p.read_bytes() for p in self.home.rglob("*.json")}
+
+        with self.assertRaisesRegex(ValueError, "source changed"):
+            module.plan(self.home, self.package)
+
+        self.assertEqual(before, {p: p.read_bytes() for p in self.home.rglob("*.json")})
+
+    def test_09137_rejects_unreviewed_export_without_writing(self):
+        (self.package / ".claude-plugin/plugin.json").write_text('{"name":"pstack","version":"0.9.137"}')
+        (self.package / "hooks/session-start.sh").write_bytes(self.new_script)
         before = {p: p.read_bytes() for p in self.home.rglob("*.json")}
 
         with self.assertRaisesRegex(ValueError, "modified codex exported hook"):
