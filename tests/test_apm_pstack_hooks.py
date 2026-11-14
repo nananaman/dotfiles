@@ -429,6 +429,21 @@ class PstackHookCompatibilityTest(unittest.TestCase):
             command = document["hooks"]["SessionStart"][1]["hooks"][0]["command"]
             self.assertTrue(command.startswith("env CLAUDE_PLUGIN_ROOT="))
 
+    def test_09138_supplies_root_for_unchanged_reviewed_hooks(self):
+        (self.package / ".claude-plugin/plugin.json").write_text('{"name":"pstack","version":"0.9.138"}')
+        (self.package / "hooks/session-start.sh").write_bytes(self.new_script)
+        for runtime in ("codex", "claude"):
+            (self.home / ("." + runtime) / "hooks/pstack/hooks/session-start.sh").write_bytes(self.new_script)
+
+        self.apply()
+
+        self.assertEqual([], module.plan(self.home, self.package))
+        for runtime, filename in (("codex", "hooks.json"), ("claude", "settings.json")):
+            document = json.loads((self.home / ("." + runtime) / filename).read_text())
+            self.assertEqual(self.unrelated, document["hooks"]["SessionStart"][0])
+            command = document["hooks"]["SessionStart"][1]["hooks"][0]["command"]
+            self.assertTrue(command.startswith("env CLAUDE_PLUGIN_ROOT="))
+
     def test_09133_to_09137_preserves_existing_corrected_configuration(self):
         manifest = self.package / ".claude-plugin/plugin.json"
         manifest.write_text('{"name":"pstack","version":"0.9.133"}')
