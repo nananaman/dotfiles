@@ -55,6 +55,11 @@ class PstackHookCompatibilityTest(unittest.TestCase):
             **hashes,
             "hooks/session-start.sh": hashlib.sha256(self.new_script).hexdigest(),
         }).start()
+        self.current_script = self.new_script + b"# reviewed 0.9.145 update\n"
+        patch.object(module, "HASHES_09145", {
+            **hashes,
+            "hooks/session-start.sh": hashlib.sha256(self.current_script).hexdigest(),
+        }).start()
         self.unrelated = {"matcher": "startup", "hooks": [{"type": "command", "command": "unrelated-do-not-run"}]}
         for runtime, filename in (("codex", "hooks.json"), ("claude", "settings.json")):
             folder = self.home / ("." + runtime)
@@ -458,6 +463,46 @@ class PstackHookCompatibilityTest(unittest.TestCase):
             self.assertEqual(self.unrelated, document["hooks"]["SessionStart"][0])
             command = document["hooks"]["SessionStart"][1]["hooks"][0]["command"]
             self.assertTrue(command.startswith("env CLAUDE_PLUGIN_ROOT="))
+
+    def test_09145_upgrade_preserves_existing_corrected_configuration(self):
+        manifest = self.package / ".claude-plugin/plugin.json"
+        manifest.write_text('{"name":"pstack","version":"0.9.143"}')
+        (self.package / "hooks/session-start.sh").write_bytes(self.new_script)
+        for runtime in ("codex", "claude"):
+            (self.home / ("." + runtime) / "hooks/pstack/hooks/session-start.sh").write_bytes(self.new_script)
+        self.apply()
+        manifest.write_text('{"name":"pstack","version":"0.9.145"}')
+        (self.package / "hooks/session-start.sh").write_bytes(self.current_script)
+        for runtime in ("codex", "claude"):
+            (self.home / ("." + runtime) / "hooks/pstack/hooks/session-start.sh").write_bytes(self.current_script)
+        before = {p: p.read_bytes() for p in self.home.rglob("*.json")}
+
+        changes = module.plan(self.home, self.package)
+
+        self.assertEqual([], changes)
+        self.assertEqual(before, {p: p.read_bytes() for p in self.home.rglob("*.json")})
+
+    def test_09145_rejects_old_source_without_writing(self):
+        (self.package / ".claude-plugin/plugin.json").write_text('{"name":"pstack","version":"0.9.145"}')
+        (self.package / "hooks/session-start.sh").write_bytes(self.new_script)
+        before = {p: p.read_bytes() for p in self.home.rglob("*.json")}
+
+        with self.assertRaisesRegex(ValueError, "source changed"):
+            module.plan(self.home, self.package)
+
+        self.assertEqual(before, {p: p.read_bytes() for p in self.home.rglob("*.json")})
+
+    def test_09145_rejects_old_export_without_writing(self):
+        (self.package / ".claude-plugin/plugin.json").write_text('{"name":"pstack","version":"0.9.145"}')
+        (self.package / "hooks/session-start.sh").write_bytes(self.current_script)
+        for runtime in ("codex", "claude"):
+            (self.home / ("." + runtime) / "hooks/pstack/hooks/session-start.sh").write_bytes(self.new_script)
+        before = {p: p.read_bytes() for p in self.home.rglob("*.json")}
+
+        with self.assertRaisesRegex(ValueError, "modified codex exported hook"):
+            module.plan(self.home, self.package)
+
+        self.assertEqual(before, {p: p.read_bytes() for p in self.home.rglob("*.json")})
 
     def test_09133_to_09137_preserves_existing_corrected_configuration(self):
         manifest = self.package / ".claude-plugin/plugin.json"
